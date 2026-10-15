@@ -14,6 +14,8 @@ import uuid
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from .ai_fallback import AllEndpointsFailed, make_translator
+
 log = logging.getLogger("lingyi.pdf")
 
 STAGE_NAMES = {  # BabelDOC 阶段名 → 中文
@@ -41,12 +43,21 @@ class PdfRequest:
     lang_in: str = "en"
     lang_out: str = "zh"
     output: str = "dual"                # dual / alternating / mono / both
+    # 按顺序尝试的 AI 接口：[{label, base_url, api_key, model, extra_body}, ...]
+    endpoints: list = field(default_factory=list)
+    # 旧版只传一个接口（仍然兼容）
     base_url: str = ""
     api_key: str = ""
     model: str = ""
     qps: int = 1
     glossary: list = field(default_factory=list)   # [[原文, 译文], ...]
     extract_terms: bool = True
+
+    def all_endpoints(self) -> list[dict]:
+        eps = [dict(e) for e in self.endpoints if e.get("base_url") and e.get("model")]
+        if not eps and self.base_url and self.model:
+            eps = [{"label": self.model, "base_url": self.base_url, "api_key": self.api_key, "model": self.model}]
+        return eps
 
 
 @dataclass
@@ -62,6 +73,7 @@ class Job:
     finished: float | None = None
     _config: object = None
     _cancel: bool = False
+    _usage: dict = field(default_factory=dict)   # 各模型成功调用次数
 
     def public(self) -> dict:
         return {
@@ -69,6 +81,7 @@ class Job:
             "progress": round(self.progress, 1), "error": self.error,
             "outputs": self.outputs, "file": Path(self.req.path).name,
             "elapsed": round((self.finished or time.time()) - self.created, 1),
+            "models": dict(self._usage),
         }
 
 
@@ -86,7 +99,7 @@ class JobManager:
             raise FileNotFoundError(f"找不到文件：{req.path}")
         if p.suffix.lower() != ".pdf":
             raise ValueError("只支持 PDF 文件")
-        if not (req.base_url and req.model):
+        if not req.all_endpoints():
             raise ValueError("请先在灵译设置里配置 AI 翻译接口（PDF 翻译使用 AI 引擎）")
         job = Job(uuid.uuid4().hex[:12], req)
         with self._cv:
@@ -135,6 +148,8 @@ class JobManager:
 
 
 def _friendly_error(e: Exception) -> str:
+    if isinstance(e, AllEndpointsFailed):
+        return str(e)[:800]
     msg = str(e) or e.__class__.__name__
     low = msg.lower()
     if "401" in msg or "unauthorized" in low or "api key" in low:
@@ -167,7 +182,7 @@ def run_babeldoc(job: Job) -> dict:
     from babeldoc.format.pdf import high_level as hl
     from babeldoc.format.pdf.translation_config import TranslationConfig, WatermarkOutputMode
     from babeldoc.glossary import Glossary, GlossaryEntry
-    from babeldoc.translator.translator import OpenAITranslator, set_translate_rate_limiter
+    from babeldoc.translator.translator import set_translate_rate_limiter
 
     req = job.req
     job.stage = "加载版面模型（首次需下载）"
@@ -175,10 +190,8 @@ def run_babeldoc(job: Job) -> dict:
     if job._cancel:
         return {}
 
-    translator = OpenAITranslator(
-        lang_in=req.lang_in, lang_out=req.lang_out, model=req.model,
-        base_url=req.base_url.rstrip("/"), api_key=req.api_key or "none",
-    )
+    translator = make_translator(req.lang_in, req.lang_out, req.all_endpoints())
+    job._usage = translator.pool.usage
     set_translate_rate_limiter(max(1, int(req.qps)))
     glossaries = []
     entries = [GlossaryEntry(s.strip(), t.strip(), req.lang_out)

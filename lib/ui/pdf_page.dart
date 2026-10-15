@@ -123,7 +123,6 @@ class _PdfPageState extends State<PdfPage> {
     final scheme = theme.colorScheme;
     final s = Settings.instance;
     final llm = TranslateService.instance.llm;
-    final host = Uri.tryParse(s.llmBaseUrl)?.host ?? s.llmBaseUrl;
 
     final form = Card(
       child: Padding(
@@ -185,7 +184,9 @@ class _PdfPageState extends State<PdfPage> {
               const SizedBox(width: 6),
               Expanded(
                 child: Text(
-                  llm.configured ? '使用 AI 翻译：${s.llmModel} @ $host，并套用术语表' : 'PDF 翻译需要 AI 翻译接口，请先在设置中配置',
+                  llm.configured
+                      ? '使用 AI 翻译：${llm.chainLabel}（前一个限流或不可用时自动切换），并套用术语表'
+                      : 'PDF 翻译需要 AI 翻译接口，请先在设置中填写魔搭或智谱的密钥',
                   style: TextStyle(color: llm.configured ? null : scheme.error),
                 ),
               ),
@@ -288,6 +289,13 @@ class _JobCard extends StatelessWidget {
               ),
               TextButton(onPressed: onCancel, child: const Text('取消')),
             ]),
+          ],
+          if (job.models.isNotEmpty) ...[
+            const SizedBox(height: 4),
+            Text(
+              'AI 调用：${job.models.entries.map((e) => '${e.key} ${e.value} 次').join('，')}',
+              style: theme.textTheme.bodySmall?.copyWith(color: scheme.outline),
+            ),
           ],
           if (job.status == 'error') ...[
             const SizedBox(height: 6),

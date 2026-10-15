@@ -2,14 +2,15 @@
 
 对标有道的个人翻译工具：**查词 + 翻译**（同声传译在路线图中），一套 Flutter 代码同时支持 **Windows** 和 **Android**。
 
-## 功能（v0.3）
+## 功能（v0.3.1）
 
 | 功能 | Windows | Android |
 |---|---|---|
 | 离线查词（ECDICT：音标、柯林斯星级、考试标签、分词性释义、词形变化、英文释义） | ✅ | ✅ |
 | 变形自动还原（went → go，antennas → antenna） | ✅ | ✅ |
 | 输入联想、中文反查英文 | ✅ | ✅ |
-| 多引擎并排翻译：腾讯、火山、百度、DeepL、AI（任意 OpenAI 兼容接口） | ✅ | ✅ |
+| 多引擎并排翻译：火山、百度、DeepL、腾讯、AI 翻译 | ✅ | ✅ |
+| AI 多线路自动切换：魔搭 Qwen3.5-397B → Qwen3.5-27B → 智谱 GLM-4-Flash，结果下方显示实际使用的模型 | ✅ | ✅ |
 | 术语表（默认内置射频/天线术语；AI 翻译强制使用） | ✅ | ✅ |
 | AI 讲解单词 / 解析句子 | ✅ | ✅ |
 | 朗读（系统 TTS） | ✅ | ✅ |
@@ -46,7 +47,7 @@ flutter run -d windows          # 或连接手机后 flutter run
 
 - 文字识别：RapidOCR（PP-OCRv4，离线，中英文）；会把断行合并成段落，并修复英文单词间丢失的空格
 - 公式识别：RapidLaTeXOCR（离线），输出 LaTeX 和 MathML
-- PDF 翻译：BabelDOC 引擎，使用 设置 → AI 翻译 的接口和术语表。首次使用会自动下载版面分析模型和字体（约数百 MB）
+- PDF 翻译：BabelDOC 引擎，使用 设置 → AI 翻译 的线路（同样自动切换）和术语表。首次使用会自动下载版面分析模型和字体（约数百 MB）
 - 后端只监听 127.0.0.1，并校验每次启动随机生成的令牌
 
 从源码运行时（没有打包的 exe），在 设置 → 截图识别与 PDF 翻译 → 高级 中填写：
@@ -63,10 +64,14 @@ flutter run -d windows          # 或连接手机后 flutter run
 1. **翻译引擎**（设置 → 翻译引擎，至少配一个）
    - 火山翻译：每月 200 万字符免费（以控制台为准）。火山引擎控制台开通机器翻译，创建 Access Key。
    - 百度翻译：个人认证并切换到高级版后每月 100 万字符免费。
-   - AI 翻译：默认智谱 GLM-4.7-Flash（官方免费，open.bigmodel.cn 创建 API Key），支持术语表。
+   - **AI 翻译**（划词翻译、AI 讲解、PDF 翻译共用）：默认线路 魔搭 `Qwen3.5-397B-A17B` → 魔搭 `Qwen3.5-27B` → 智谱 `glm-4-flash-250414`。
+     前一个限流（429）、额度用完、超时或服务端出错时自动换下一个，出错的接口暂停使用一段时间（30 秒起，最长 10 分钟）后再回到首选。
+     线路顺序可在设置里调整，也可以加入 Qwen3.5-122B 或自定义接口。选择依据见 `tools/api_eval.py` 的实测（16 句射频句子，397B 术语命中 41/42）。
+     - 魔搭令牌：modelscope.cn 绑定阿里云账号、实名、**验证邮箱**后，在“访问令牌”页创建（`ms-` 开头）。每天约 2000 次免费调用，单模型额度动态调整。
+     - 智谱密钥：open.bigmodel.cn → API Keys。GLM-4-Flash 官方免费。
    - 腾讯云：已于 2026-10-01 停发免费额度，2027-10-01 起停止服务，仅供已有付费资源包时使用。
    - DeepL：免费版每月 50 万字符，密钥以 `:fx` 结尾。
-   - 其他 AI：DeepSeek / 通义千问 / Kimi / 本地 Ollama 一键预设，填密钥即可。
+   - 自定义 AI 接口：在 AI 线路里添加「自定义接口」，DeepSeek / 通义千问 / Kimi / 硅基流动 / 本地 Ollama 一键预设。
 2. **标准词库**（可选）：设置 → 离线词库 → 下载标准词库（默认地址已填好）。若 fork 到自己的仓库，先在 Actions 里运行一次「生成标准词库」，再把
    `https://github.com/<用户名>/<仓库>/releases/download/dict-v1/standard.db.gz`
    填到设置 → 离线词库 → 下载地址。约 135 万词，覆盖 metasurface、beamforming、downtilt 等专业词。
@@ -82,7 +87,7 @@ lib/
     user_db.dart            历史、生词本、查词次数
     settings.dart           设置（含默认术语表、热键预设）
     tts.dart                朗读
-    translate/              腾讯（TC3 签名）、DeepL、OpenAI 兼容大模型
+    translate/              火山、百度、腾讯（签名算法有单元测试）、DeepL；ai_router.dart AI 多线路自动切换
   platform/
     desktop.dart            Windows：托盘、全局热键、模拟 Ctrl+C 划词、迷你弹窗、剪贴板监听
     win_input.dart          user32 FFI（keybd_event、GetCursorPos 等）
@@ -91,7 +96,7 @@ lib/
   services/backend.dart     启动/连接本地后端，OCR 与 PDF 任务接口
   ui/                       查词翻译、截图识别、PDF 翻译、单词卡片、生词本、历史、设置
 backend/                    本地后端（Python 3.12 + FastAPI）
-  lingyi_backend/           ocr.py 文字/公式识别 · pdf_jobs.py BabelDOC 任务 · server.py 接口
+  lingyi_backend/           ocr.py 文字/公式识别 · pdf_jobs.py BabelDOC 任务 · ai_fallback.py AI 接口自动切换 · server.py 接口
   tests/  tools/            单元测试、冒烟测试、PDF 端到端测试（CI 自动运行）
   lingyi_backend.spec       PyInstaller 打包配置
 tools/build_dict.py         从 ECDICT 生成 core.db / standard.db

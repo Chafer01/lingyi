@@ -127,6 +127,13 @@ def test_pdf_validation(tmp_path):
     assert r.status_code == 400 and "AI" in r.json()["detail"]
     r = c.post("/pdf/jobs", json={"path": str(tmp_path / "none.pdf"), "base_url": "u", "model": "m"}, headers=H)
     assert r.status_code == 400
+    # 新版：多个接口按顺序切换
+    eps = [{"label": "Qwen3.5-397B（魔搭）", "base_url": "https://api-inference.modelscope.cn/v1", "api_key": "ms-x",
+            "model": "Qwen/Qwen3.5-397B-A17B", "extra_body": {"enable_thinking": False}},
+           {"label": "GLM-4-Flash（智谱）", "base_url": "https://open.bigmodel.cn/api/paas/v4", "api_key": "z",
+            "model": "glm-4-flash-250414"}]
+    r = c.post("/pdf/jobs", json={"path": _pdf(tmp_path), "endpoints": eps}, headers=H)
+    assert r.status_code == 200 and r.json()["models"] == {}
 
 
 def test_babeldoc_config_wiring(tmp_path, monkeypatch):
@@ -160,6 +167,7 @@ def test_babeldoc_config_wiring(tmp_path, monkeypatch):
     assert job.stage == "翻译段落" and job.progress == 50.0
     assert cfg.use_alternating_pages_dual and cfg.no_mono and not cfg.no_dual
     assert cfg.page_ranges
+    assert [e.model for e in cfg.translator.pool.endpoints] == ["glm"]   # 旧版单接口参数仍可用
     assert any(g.name == "灵译术语表" and len(g.entries) == 1 for g in cfg.shared_context_cross_split_part.user_glossaries) \
         if hasattr(cfg, "shared_context_cross_split_part") else True
 

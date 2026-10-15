@@ -16,9 +16,15 @@ class TranslateRequest {
 
 /// 翻译结果。
 class TranslateResult {
-  TranslateResult(this.text, {this.detected});
+  TranslateResult(this.text, {this.detected, this.via, this.skipped = const []});
   final String text;
   final String? detected;
+
+  /// 实际给出结果的模型（AI 翻译用）。
+  final String? via;
+
+  /// 自动切换前失败的接口及原因。
+  final List<String> skipped;
 }
 
 /// 引擎调用失败时抛出，message 直接展示给用户。

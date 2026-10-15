@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../util/text_utils.dart';
+import 'translate/ai_router.dart';
+
 /// 默认术语表：射频/天线领域常用词，可在设置里自行修改。
 const defaultGlossary = '''# 每行一条：英文 = 中文。翻译时会提示术语，大模型引擎会强制使用。
 radiation pattern = 方向图
@@ -23,6 +26,13 @@ metasurface = 超表面
 beamforming = 波束赋形
 sidelobe = 旁瓣
 grating lobe = 栅瓣
+radome = 天线罩
+null filling = 零点填充
+beam squint = 波束偏斜
+parasitic element = 寄生单元
+mutual coupling = 互耦
+upper sidelobe suppression = 上旁瓣抑制
+adjacent-cell interference = 邻区干扰
 ''';
 
 /// 引擎显示顺序。
@@ -107,6 +117,48 @@ class Settings extends ChangeNotifier {
 
   Future<void> load() async {
     _p = await SharedPreferences.getInstance();
+    await _migrateAi();
+    await _migrateGlossary();
+  }
+
+  /// 已经改过术语表的用户：把新版默认术语里缺少的条目补到末尾（只补一次）。
+  Future<void> _migrateGlossary() async {
+    if (_p.getBool('glossaryV2') ?? false) return;
+    final saved = _p.getString('glossary');
+    if (saved != null) {
+      final have = parseGlossary(saved).keys.map((k) => k.toLowerCase()).toSet();
+      final add = defaultGlossary
+          .split('\n')
+          .where((l) => l.contains('=') && !l.trimLeft().startsWith('#'))
+          .where((l) => !have.contains(l.split('=').first.trim().toLowerCase()))
+          .toList();
+      if (add.isNotEmpty) {
+        await _p.setString('glossary', '${saved.trimRight()}\n${add.join('\n')}\n');
+      }
+    }
+    await _p.setBool('glossaryV2', true);
+  }
+
+  /// v0.3.1 之前只有一个“大模型接口”。把原来填的智谱/魔搭密钥迁移到新的分平台密钥，
+  /// 其他接口（DeepSeek、Ollama 等）保留为“自定义接口”并接在默认线路后面。
+  Future<void> _migrateAi() async {
+    if (_p.getBool('aiMigrated') ?? false) return;
+    final base = _p.getString('llmBaseUrl');
+    final key = _p.getString('llmKey') ?? '';
+    if (key.isNotEmpty && (base == null || base.contains('bigmodel.cn'))) {
+      if (zhipuKey.isEmpty) await _p.setString('zhipuKey', key);
+      await _p.remove('llmBaseUrl');
+      await _p.remove('llmKey');
+      await _p.remove('llmModel');
+    } else if (key.isNotEmpty && base != null && base.contains('modelscope.cn')) {
+      if (modelscopeKey.isEmpty) await _p.setString('modelscopeKey', key);
+      await _p.remove('llmBaseUrl');
+      await _p.remove('llmKey');
+      await _p.remove('llmModel');
+    } else if (base != null && base.isNotEmpty && !base.contains('bigmodel.cn')) {
+      await _p.setStringList('aiChain', [...defaultAiChain, 'custom']);
+    }
+    await _p.setBool('aiMigrated', true);
   }
 
   String _s(String k, [String d = '']) => _p.getString(k) ?? d;
@@ -142,12 +194,27 @@ class Settings extends ChangeNotifier {
   String get deeplKey => _s('deeplKey');
   set deeplKey(String v) => _set('deeplKey', v.trim());
 
-  // ---- 大模型（OpenAI 兼容接口：DeepSeek、通义千问、Kimi、Ollama 等）----
-  String get llmBaseUrl => _s('llmBaseUrl', 'https://open.bigmodel.cn/api/paas/v4');
+  // ---- AI 翻译（OpenAI 兼容接口，按线路顺序自动切换）----
+  /// 魔搭 ModelScope 访问令牌（ms- 开头）。
+  String get modelscopeKey => _s('modelscopeKey');
+  set modelscopeKey(String v) => _set('modelscopeKey', v.trim());
+
+  /// 智谱开放平台 API Key。
+  String get zhipuKey => _s('zhipuKey');
+  set zhipuKey(String v) => _set('zhipuKey', v.trim());
+
+  /// 启用的 AI 线路 id，按尝试顺序。见 [aiRoutes]。
+  List<String> get aiChain => (_p.getStringList('aiChain') ?? defaultAiChain)
+      .where((id) => aiRouteById(id) != null)
+      .toList();
+  set aiChain(List<String> v) => _set('aiChain', v);
+
+  // 自定义接口（DeepSeek、通义千问、Kimi、Ollama 等）
+  String get llmBaseUrl => _s('llmBaseUrl');
   set llmBaseUrl(String v) => _set('llmBaseUrl', v.trim());
   String get llmKey => _s('llmKey');
   set llmKey(String v) => _set('llmKey', v.trim());
-  String get llmModel => _s('llmModel', 'glm-4.7-flash');
+  String get llmModel => _s('llmModel');
   set llmModel(String v) => _set('llmModel', v.trim());
 
   /// 启用的翻译引擎 id，按显示顺序。

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../services/backend.dart';
 import '../services/dict_service.dart';
 import '../services/settings.dart';
+import '../services/translate/ai_router.dart';
 import '../services/translate/engine.dart';
 import '../services/translate/translate_service.dart';
 import 'widgets.dart';
@@ -54,12 +55,14 @@ class SettingsPage extends StatelessWidget {
             const Divider(height: 1),
             _EngineTile(
               engine: tr.llm,
-              help: '任何 OpenAI 兼容接口均可，用于技术翻译（强制使用术语表）和 AI 讲解。推荐智谱 GLM-4.7-Flash：官方免费，在 open.bigmodel.cn 注册后创建 API Key 即可；免费版只允许 1 个并发。',
+              help: '按下面的线路顺序尝试：前一个限流、额度用完、超时或出错时自动换下一个，结果下方会显示实际使用的模型。'
+                  '划词翻译、AI 讲解和 PDF 翻译都使用这条线路。\n'
+                  '魔搭：modelscope.cn 绑定阿里云账号、完成实名并验证邮箱后，在“访问令牌”页创建（ms- 开头），每天约 2000 次免费调用。\n'
+                  '智谱：open.bigmodel.cn 注册后在“API Keys”页创建，GLM-4-Flash 官方免费。',
               fields: [
-                const _LlmPresets(),
-                _Field(label: '接口地址', value: s.llmBaseUrl, onChanged: (v) => s.llmBaseUrl = v),
-                _Field(label: 'API 密钥', value: s.llmKey, obscure: true, onChanged: (v) => s.llmKey = v),
-                _Field(label: '模型', value: s.llmModel, onChanged: (v) => s.llmModel = v),
+                _Field(label: '魔搭 ModelScope 访问令牌', value: s.modelscopeKey, obscure: true, onChanged: (v) => s.modelscopeKey = v),
+                _Field(label: '智谱 API Key', value: s.zhipuKey, obscure: true, onChanged: (v) => s.zhipuKey = v),
+                const _AiChainEditor(),
               ],
             ),
             const Divider(height: 1),
@@ -121,7 +124,7 @@ class SettingsPage extends StatelessWidget {
           ]),
           const SizedBox(height: 8),
           Center(
-            child: Text('灵译 0.3.0 · 词库数据来自 ECDICT',
+            child: Text('灵译 0.3.1 · 词库数据来自 ECDICT',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Theme.of(context).colorScheme.outline)),
           ),
         ],
@@ -253,7 +256,8 @@ class _EngineTile extends StatelessWidget {
               toast(context, '正在测试 ${engine.name}…');
               try {
                 final r = await engine.translate(TranslateRequest('The antenna gain is 18 dBi.'));
-                if (context.mounted) toast(context, '${engine.name} 正常：${r.text}');
+                final via = r.via == null ? '' : '（${r.via}${r.skipped.isEmpty ? '' : '，已自动切换'}）';
+                if (context.mounted) toast(context, '${engine.name} 正常$via：${r.text}');
               } catch (e) {
                 if (context.mounted) toast(context, '$e');
               }
@@ -269,10 +273,10 @@ class _LlmPresets extends StatelessWidget {
   const _LlmPresets();
 
   static const presets = [
-    ('智谱 GLM-4.7-Flash（免费）', 'https://open.bigmodel.cn/api/paas/v4', 'glm-4.7-flash'),
     ('DeepSeek', 'https://api.deepseek.com/v1', 'deepseek-chat'),
     ('通义千问', 'https://dashscope.aliyuncs.com/compatible-mode/v1', 'qwen-plus'),
     ('Kimi', 'https://api.moonshot.cn/v1', 'kimi-latest'),
+    ('硅基流动', 'https://api.siliconflow.cn/v1', 'Qwen/Qwen3-8B'),
     ('Ollama 本地', 'http://localhost:11434/v1', 'qwen3:8b'),
   ];
 
@@ -292,6 +296,115 @@ class _LlmPresets extends StatelessWidget {
           ),
       ]),
     );
+  }
+}
+
+/// AI 线路：启用哪些模型、按什么顺序尝试。
+class _AiChainEditor extends StatelessWidget {
+  const _AiChainEditor();
+
+  @override
+  Widget build(BuildContext context) {
+    final s = Settings.instance;
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final chain = s.aiChain;
+    final ready = {for (final e in TranslateService.instance.llm.endpoints) e.id: e};
+    final others = aiRoutes.where((r) => !chain.contains(r.id)).toList();
+
+    String? missing(AiRoute r) {
+      if (ready.containsKey(r.id)) return null;
+      return switch (r.provider) {
+        'modelscope' => '未填魔搭令牌，跳过',
+        'zhipu' => '未填智谱密钥，跳过',
+        _ => '未填写接口，跳过',
+      };
+    }
+
+    void move(int i, int d) {
+      final l = List<String>.from(chain);
+      final t = l[i];
+      l[i] = l[i + d];
+      l[i + d] = t;
+      s.aiChain = l;
+    }
+
+    Future<void> test(AiEndpoint ep) async {
+      toast(context, '正在测试 ${ep.label}…');
+      try {
+        final r = await AiRouter().chat([ep], '把用户的文本翻译成简体中文，只输出译文。', 'The radome causes beam squint.');
+        if (context.mounted) toast(context, '${ep.label} 正常：${r.text}');
+      } catch (e) {
+        if (context.mounted) toast(context, '$e');
+      }
+    }
+
+    return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+      const SizedBox(height: 10),
+      Text('线路（从上到下依次尝试）', style: theme.textTheme.labelLarge),
+      const SizedBox(height: 4),
+      for (var i = 0; i < chain.length; i++)
+        Builder(builder: (context) {
+          final r = aiRouteById(chain[i])!;
+          final miss = missing(r);
+          final ep = ready[r.id];
+          return ListTile(
+            dense: true,
+            contentPadding: EdgeInsets.zero,
+            leading: CircleAvatar(
+              radius: 12,
+              backgroundColor: miss == null ? scheme.primaryContainer : scheme.surfaceContainerHighest,
+              child: Text('${i + 1}', style: theme.textTheme.labelSmall),
+            ),
+            title: Text(r.id == 'custom' && s.llmModel.isNotEmpty ? '自定义：${s.llmModel}' : r.label),
+            subtitle: Text(miss ?? r.note,
+                style: TextStyle(color: miss == null ? scheme.outline : scheme.error)),
+            trailing: Row(mainAxisSize: MainAxisSize.min, children: [
+              if (ep != null)
+                IconButton(
+                    tooltip: '测试', icon: const Icon(Icons.play_arrow_rounded, size: 18), onPressed: () => test(ep)),
+              IconButton(
+                tooltip: '上移',
+                icon: const Icon(Icons.arrow_upward, size: 18),
+                onPressed: i == 0 ? null : () => move(i, -1),
+              ),
+              IconButton(
+                tooltip: '下移',
+                icon: const Icon(Icons.arrow_downward, size: 18),
+                onPressed: i == chain.length - 1 ? null : () => move(i, 1),
+              ),
+              IconButton(
+                tooltip: '移除',
+                icon: const Icon(Icons.close, size: 18),
+                onPressed: chain.length <= 1 ? null : () => s.aiChain = (List<String>.from(chain)..removeAt(i)),
+              ),
+            ]),
+          );
+        }),
+      if (others.isNotEmpty)
+        Wrap(spacing: 8, runSpacing: 6, crossAxisAlignment: WrapCrossAlignment.center, children: [
+          Text('添加：', style: theme.textTheme.bodySmall),
+          for (final r in others)
+            ActionChip(
+              avatar: const Icon(Icons.add, size: 16),
+              label: Text(r.label),
+              onPressed: () => s.aiChain = [...chain, r.id],
+            ),
+          TextButton(
+            onPressed: () => s.aiChain = List<String>.from(defaultAiChain),
+            child: const Text('恢复默认'),
+          ),
+        ]),
+      if (chain.contains('custom')) ...[
+        const SizedBox(height: 12),
+        Text('自定义接口（任何 OpenAI 兼容接口）', style: theme.textTheme.labelLarge),
+        const SizedBox(height: 6),
+        const _LlmPresets(),
+        _Field(label: '接口地址', value: s.llmBaseUrl, onChanged: (v) => s.llmBaseUrl = v),
+        _Field(label: 'API 密钥', value: s.llmKey, obscure: true, onChanged: (v) => s.llmKey = v),
+        _Field(label: '模型', value: s.llmModel, onChanged: (v) => s.llmModel = v),
+      ],
+    ]);
   }
 }
 

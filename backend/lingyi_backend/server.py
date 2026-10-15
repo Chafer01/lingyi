@@ -34,6 +34,7 @@ class PdfBody(BaseModel):
     lang_in: str = "en"
     lang_out: str = "zh"
     output: str = "dual"
+    endpoints: list[dict] = []
     base_url: str = ""
     api_key: str = ""
     model: str = ""

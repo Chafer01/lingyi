@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import '../platform/app_state.dart';
 import '../services/dict_service.dart';
 import '../services/settings.dart';
+import '../services/translate/ai_router.dart';
 import '../services/translate/engine.dart';
 import '../services/translate/translate_service.dart';
 import '../services/tts.dart';
@@ -382,12 +383,14 @@ class _EngineCard extends StatelessWidget {
             final msg = err is TranslateException ? err.message : '网络错误：$err';
             return Text(msg, style: theme.textTheme.bodyMedium?.copyWith(color: scheme.error));
           }
-          final text = snap.data!.text;
+          final r = snap.data!;
+          final text = r.text;
           final toEnglish = detectLang(source) == Lang.zh;
           return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             SelectableText(text, style: theme.textTheme.bodyLarge?.copyWith(height: 1.55)),
             const SizedBox(height: 4),
-            Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+            Row(children: [
+              Expanded(child: r.via == null ? const SizedBox() : ViaLabel(r.via!, skipped: r.skipped)),
               IconButton(
                 tooltip: '朗读',
                 iconSize: 18,
@@ -442,7 +445,7 @@ class _AiExplainCard extends StatelessWidget {
           label: Text(isWord ? 'AI 讲解这个词' : 'AI 解析这句话'),
           onPressed: llm.configured
               ? c.requestAiExplain
-              : () => toast(context, '请先在设置中配置大模型接口'),
+              : () => toast(context, llm.setupHint),
         ),
       );
     }
@@ -456,7 +459,7 @@ class _AiExplainCard extends StatelessWidget {
             Text('AI 讲解', style: theme.textTheme.titleSmall?.copyWith(color: theme.colorScheme.primary)),
           ]),
           const SizedBox(height: 10),
-          FutureBuilder<String>(
+          FutureBuilder<AiReply>(
             future: c.aiExplain,
             builder: (context, snap) {
               if (snap.connectionState != ConnectionState.done) {
@@ -468,11 +471,42 @@ class _AiExplainCard extends StatelessWidget {
               if (snap.hasError) {
                 return Text('${snap.error}', style: TextStyle(color: theme.colorScheme.error));
               }
-              return MiniMarkdown(snap.data ?? '');
+              final r = snap.data!;
+              return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                MiniMarkdown(r.text),
+                const SizedBox(height: 6),
+                ViaLabel(r.endpoint.label, skipped: r.skipped),
+              ]);
             },
           ),
         ]),
       ),
     );
+  }
+}
+
+/// 显示实际使用的 AI 模型；发生自动切换时，悬停可查看前面接口失败的原因。
+class ViaLabel extends StatelessWidget {
+  const ViaLabel(this.via, {super.key, this.skipped = const []});
+  final String via;
+  final List<String> skipped;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final color = skipped.isEmpty ? theme.colorScheme.outline : theme.colorScheme.tertiary;
+    final label = Row(mainAxisSize: MainAxisSize.min, children: [
+      Icon(skipped.isEmpty ? Icons.smart_toy_outlined : Icons.alt_route, size: 14, color: color),
+      const SizedBox(width: 4),
+      Flexible(
+        child: Text(
+          skipped.isEmpty ? via : '$via（已自动切换）',
+          overflow: TextOverflow.ellipsis,
+          style: theme.textTheme.bodySmall?.copyWith(color: color),
+        ),
+      ),
+    ]);
+    if (skipped.isEmpty) return label;
+    return Tooltip(message: skipped.join('\n'), child: label);
   }
 }

@@ -8,6 +8,7 @@ import 'package:http/http.dart' as http;
 
 import '../util/text_utils.dart';
 import 'settings.dart';
+import 'translate/translate_service.dart';
 
 /// 后端调用失败时抛出，message 直接展示给用户。
 class BackendException implements Exception {
@@ -45,7 +46,10 @@ class PdfJob {
         error = j['error'] as String? ?? '',
         file = j['file'] as String? ?? '',
         elapsed = (j['elapsed'] as num?)?.toDouble() ?? 0,
-        outputs = Map<String, String>.from((j['outputs'] as Map?) ?? const {});
+        outputs = Map<String, String>.from((j['outputs'] as Map?) ?? const {}),
+        models = {
+          for (final e in ((j['models'] as Map?) ?? const {}).entries) '${e.key}': (e.value as num).toInt(),
+        };
 
   final String id;
   final String status; // queued / running / done / error / cancelled
@@ -55,6 +59,9 @@ class PdfJob {
   final String file;
   final double elapsed;
   final Map<String, String> outputs;
+
+  /// 各 AI 模型实际成功调用的次数（发生自动切换时可以看出用了哪些）。
+  final Map<String, int> models;
 
   bool get finished => status == 'done' || status == 'error' || status == 'cancelled';
 }
@@ -238,7 +245,7 @@ class Backend {
   Future<OcrResult> ocrClipboard({String mode = 'text'}) async =>
       OcrResult(Map<String, dynamic>.from(await _post('/ocr/clipboard', {'mode': mode}) as Map));
 
-  /// 提交 PDF 翻译。使用设置中的 AI 接口和术语表。
+  /// 提交 PDF 翻译。使用设置中的 AI 线路和术语表。
   Future<PdfJob> pdfSubmit({
     required String path,
     String? outDir,
@@ -255,9 +262,8 @@ class Backend {
       'lang_in': toEnglish ? 'zh' : 'en',
       'lang_out': toEnglish ? 'en' : 'zh',
       'output': output,
-      'base_url': s.llmBaseUrl,
-      'api_key': s.llmKey,
-      'model': s.llmModel,
+      // 按顺序尝试，限流/额度用完/超时时自动切换到下一个
+      'endpoints': [for (final e in TranslateService.instance.llm.endpoints) e.toJson()],
       'qps': s.pdfQps,
       // 术语表是“英文 = 中文”，译成英文时反过来用。
       'glossary': toEnglish ? glossary.map((e) => [e[1], e[0]]).toList() : glossary,

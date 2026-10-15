@@ -24,9 +24,19 @@ TOKEN = "e2e"
 class FakeOpenAI(BaseHTTPRequestHandler):
     """最小的 OpenAI 兼容 /chat/completions：把原文前面加上“译：”返回。"""
     calls = 0
+    busy = 0
 
     def do_POST(self):  # noqa: N802
         body = json.loads(self.rfile.read(int(self.headers.get("Content-Length", 0))) or b"{}")
+        if body.get("model") == "busy":     # 模拟首选模型限流，验证自动切换
+            FakeOpenAI.busy += 1
+            data = b'{"error":{"message":"Request limit exceeded"}}'
+            self.send_response(429)
+            self.send_header("Content-Type", "application/json")
+            self.send_header("Content-Length", str(len(data)))
+            self.end_headers()
+            self.wfile.write(data)
+            return
         FakeOpenAI.calls += 1
         user = next((m["content"] for m in reversed(body.get("messages", [])) if m.get("role") == "user"), "")
         if isinstance(user, list):
@@ -112,7 +122,10 @@ def main():
                          text=True, encoding="utf-8", errors="replace")
     try:
         port = wait_port(p, started)
-        job = call(port, "/pdf/jobs", {"path": str(pdf), "base_url": fake_url, "api_key": "x", "model": "fake",
+        endpoints = [{"label": "限流模型", "base_url": fake_url, "api_key": "x", "model": "busy",
+                      "extra_body": {"enable_thinking": False}},
+                     {"label": "备用模型", "base_url": fake_url, "api_key": "x", "model": "fake"}]
+        job = call(port, "/pdf/jobs", {"path": str(pdf), "endpoints": endpoints,
                                        "output": "both", "extract_terms": False,
                                        "glossary": [["phase shifter", "移相器"]]})
         last = ""
@@ -128,10 +141,11 @@ def main():
             time.sleep(2)
         assert s["status"] == "done", s
         outs = s["outputs"]
-        print("输出：", outs, "AI 调用次数：", FakeOpenAI.calls)
+        print("输出：", outs, "AI 调用次数：", FakeOpenAI.calls, "限流次数：", FakeOpenAI.busy, "模型：", s.get("models"))
         assert outs.get("dual") and Path(outs["dual"]).stat().st_size > 1000
         assert outs.get("mono") and Path(outs["mono"]).stat().st_size > 1000
         assert FakeOpenAI.calls > 0
+        assert FakeOpenAI.busy >= 1 and s["models"].get("备用模型", 0) > 0, s
         print("PDF 端到端测试通过")
     finally:
         p.stdin.close()

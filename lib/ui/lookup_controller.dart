@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../platform/app_state.dart';
 import '../services/dict_service.dart';
+import '../services/translate/ai_router.dart';
 import '../services/translate/translate_service.dart';
 import '../services/user_db.dart';
 import '../util/text_utils.dart';
@@ -44,7 +45,7 @@ class LookupController extends ChangeNotifier {
   Map<String, String> glossary = const {};
 
   /// “AI 讲解”的结果；null 表示尚未请求。
-  Future<String>? aiExplain;
+  Future<AiReply>? aiExplain;
 
   int _handledSerial = 0;
   int _runId = 0;
