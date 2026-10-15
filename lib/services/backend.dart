@@ -207,7 +207,7 @@ class Backend {
     await ensureStarted();
     try {
       final r = await http.post(_uri(path), headers: _headers, body: utf8.encode(jsonEncode(body))).timeout(timeout);
-      return _decode(r);
+      return await _decode(r);
     } on SocketException catch (e) {
       throw BackendException('无法连接后端：${e.message}');
     } on TimeoutException {
@@ -218,7 +218,7 @@ class Backend {
   Future<dynamic> _get(String path) async {
     await ensureStarted();
     try {
-      return _decode(await http.get(_uri(path), headers: _headers).timeout(const Duration(seconds: 20)));
+      return await _decode(await http.get(_uri(path), headers: _headers).timeout(const Duration(seconds: 20)));
     } on SocketException catch (e) {
       throw BackendException('无法连接后端：${e.message}');
     }

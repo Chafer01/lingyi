@@ -112,17 +112,34 @@ jobs:
       - name: 编译后端
         shell: bash
         working-directory: backend
+        env:
+          PYTHONIOENCODING: utf-8
+          PYTHONUTF8: '1'
         run: |
-          set -e
-          pip install -r requirements.txt pyinstaller pytest httpx
+          # 每一步失败时把输出末尾写进注解，便于通过 API 查看
+          step() {
+            name="$1"; shift
+            "$@" > step.txt 2>&1
+            code=$?
+            cat step.txt
+            if [ $code -ne 0 ]; then
+              msg=$(tail -40 step.txt | sed 's/%/%25/g' | awk '{printf "%s%%0A", $0}')
+              echo "::error title=后端：$name::$msg"
+              exit $code
+            fi
+          }
+          step "安装依赖" pip install -r requirements.txt pyinstaller pytest httpx
           # 预先下载公式识别模型，打进安装包，用户首次使用无需联网
-          python -c "from rapid_latex_ocr import LatexOCR; LatexOCR()"
-          python -m pytest tests -q
-          pyinstaller lingyi_backend.spec --noconfirm --log-level WARN
-          python tools/smoke_test.py dist/lingyi_backend/lingyi_backend.exe
+          step "下载公式模型" python -c "from rapid_latex_ocr import LatexOCR; LatexOCR()"
+          step "单元测试" python -m pytest tests -q
+          step "PyInstaller 打包" pyinstaller lingyi_backend.spec --noconfirm --log-level WARN
+          step "冒烟测试" python tools/smoke_test.py dist/lingyi_backend/lingyi_backend.exe
       - name: PDF 端到端测试（假 AI 接口）
         shell: bash
         working-directory: backend
+        env:
+          PYTHONIOENCODING: utf-8
+          PYTHONUTF8: '1'
         run: |
           set +e
           python tools/pdf_e2e.py dist/lingyi_backend/lingyi_backend.exe > e2e.txt 2>&1
