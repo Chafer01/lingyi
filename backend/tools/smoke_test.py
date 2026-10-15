@@ -61,11 +61,18 @@ def call(port, path, body=None, timeout=300):
 def dump_logs():
     import os
     d = Path(os.environ.get("LOCALAPPDATA") or Path.home() / ".cache") / "lingyi"
-    for name in ("backend.log", "backend.out.log"):
-        f = d / name
-        if f.exists():
-            print(f"----- {name}（末尾）-----")
-            print(f.read_text(encoding="utf-8", errors="replace")[-4000:])
+    f = d / "backend.log"
+    if f.exists():
+        print("----- backend.log（末尾）-----")
+        print(f.read_text(encoding="utf-8", errors="replace")[-1500:])
+    f = d / "backend.out.log"
+    if f.exists():
+        # faulthandler 的线程转储：每个线程只保留最内层的几帧，便于看出卡在哪里
+        print("----- 线程调用栈（每个线程最内层 6 帧）-----")
+        for block in f.read_text(encoding="utf-8", errors="replace").split("\n\n")[-12:]:
+            lines = [l for l in block.splitlines() if l.strip()]
+            if lines:
+                print("\n".join(lines[:7]))
 
 
 def main():

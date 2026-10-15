@@ -93,6 +93,11 @@ def main(argv=None):
         pass
     _redirect_output()
     logging.getLogger("lingyi").info("listening on %s:%s", args.host, port)
+    # 就绪行已发出，此时到达的请求在监听队列中等待；先在主线程导入重型模块，再开始处理请求。
+    from .server import preload
+    errs = preload()
+    if errs:
+        logging.getLogger("lingyi").error("preload errors: %s", errs)
     server.run(sockets=[sock])
 
 

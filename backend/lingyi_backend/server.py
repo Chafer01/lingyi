@@ -42,6 +42,31 @@ class PdfBody(BaseModel):
     extract_terms: bool = True
 
 
+# 各功能实际用到的模块。启动时在主线程预先导入（见 __main__.preload），健康检查再确认一遍。
+FEATURE_MODULES = {
+    "ocr": ("rapidocr_onnxruntime",),
+    "formula": ("rapid_latex_ocr", "latex2mathml.converter"),
+    "pdf": ("babeldoc.format.pdf.high_level", "babeldoc.format.pdf.translation_config",
+            "babeldoc.translator.translator", "babeldoc.docvision.doclayout", "babeldoc.glossary"),
+}
+
+
+def preload() -> dict:
+    """在主线程导入所有重型模块。
+
+    Windows 打包程序里，在工作线程中首次导入 scipy 等带原生 DLL 的库可能卡死，
+    因此必须在启动时、事件循环开始前由主线程完成导入。返回 {功能: 错误信息}。
+    """
+    errors = {}
+    for name, mods in FEATURE_MODULES.items():
+        try:
+            for mod in mods:
+                _timed_import(mod)
+        except Exception as e:  # noqa: BLE001
+            errors[name] = f"{e.__class__.__name__}: {e}"
+    return errors
+
+
 def _timed_import(mod: str):
     """导入模块并记录耗时；超过 60 秒把所有线程的调用栈写进日志，便于排查卡死。"""
     import faulthandler
@@ -107,15 +132,8 @@ def create_app(token: str, jobs: JobManager | None = None) -> FastAPI:
     @app.get("/health", dependencies=[Depends(auth)])
     def health():
         feats = {}
-        checks = {
-            "ocr": ("rapidocr_onnxruntime",),
-            "formula": ("rapid_latex_ocr", "latex2mathml.converter"),
-            # 导入 PDF 流程实际用到的模块，打包遗漏依赖时这里就能发现
-            "pdf": ("babeldoc.format.pdf.high_level", "babeldoc.format.pdf.translation_config",
-                    "babeldoc.translator.translator", "babeldoc.docvision.doclayout", "babeldoc.glossary"),
-        }
         errors = {}
-        for name, mods in checks.items():
+        for name, mods in FEATURE_MODULES.items():
             try:
                 for mod in mods:
                     _timed_import(mod)
