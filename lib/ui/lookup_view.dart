@@ -365,7 +365,7 @@ class _EngineCard extends StatelessWidget {
           child: Text(job.engine.setupHint,
               style: theme.textTheme.bodyMedium?.copyWith(color: scheme.outline)),
         ),
-        TextButton(onPressed: () => AppState.instance.tab.value = 3, child: const Text('去设置')),
+        TextButton(onPressed: () => AppState.instance.page.value = AppPage.settings, child: const Text('去设置')),
       ]);
     } else {
       body = FutureBuilder<TranslateResult>(

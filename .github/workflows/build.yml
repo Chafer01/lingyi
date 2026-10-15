@@ -103,6 +103,39 @@ jobs:
             echo "::error title=flutter build windows::$msg"
           fi
           exit $code
+      # ---- 本地后端（截图 OCR / 公式识别 / PDF 翻译）----
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: backend/requirements.txt
+      - name: 编译后端
+        shell: bash
+        working-directory: backend
+        run: |
+          set -e
+          pip install -r requirements.txt pyinstaller pytest httpx
+          # 预先下载公式识别模型，打进安装包，用户首次使用无需联网
+          python -c "from rapid_latex_ocr import LatexOCR; LatexOCR()"
+          python -m pytest tests -q
+          pyinstaller lingyi_backend.spec --noconfirm --log-level WARN
+          python tools/smoke_test.py dist/lingyi_backend/lingyi_backend.exe
+      - name: PDF 端到端测试（假 AI 接口）
+        shell: bash
+        working-directory: backend
+        run: |
+          set +e
+          python tools/pdf_e2e.py dist/lingyi_backend/lingyi_backend.exe > e2e.txt 2>&1
+          code=$?
+          cat e2e.txt
+          if [ $code -ne 0 ]; then
+            msg=$(tail -30 e2e.txt | sed 's/%/%25/g' | awk '{printf "%s%%0A", $0}')
+            echo "::warning title=PDF 端到端测试未通过::$msg"
+          fi
+          exit 0
+      - name: 放入安装目录
+        shell: pwsh
+        run: Copy-Item -Recurse backend\dist\lingyi_backend build\windows\x64\runner\Release\backend
       - name: 打包
         shell: pwsh
         run: Compress-Archive -Path build\windows\x64\runner\Release\* -DestinationPath lingyi-windows.zip
@@ -133,7 +166,7 @@ jobs:
           target_commitish: ${{ github.sha }}
           overwrite_files: true
           body: |
-            - **Windows**：下载 `lingyi-windows.zip`，解压后运行 `lingyi.exe`
+            - **Windows**：下载 `lingyi-windows.zip`，解压后运行 `lingyi.exe`（内含截图识别 / PDF 翻译后端，解压后约 700 MB）
             - **安卓**：下载 `lingyi-android.apk` 安装（需允许安装未知来源应用）
           files: |
             lingyi-android.apk

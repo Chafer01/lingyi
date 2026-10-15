@@ -90,6 +90,14 @@ const hotkeyPresets = <HotkeyPreset>[
   HotkeyPreset('Alt + Q', false, true, false, 'Q'),
 ];
 
+/// 截图识别热键。最后一项表示不注册。
+const ocrHotkeyPresets = <HotkeyPreset>[
+  HotkeyPreset('Alt + S', false, true, false, 'S'),
+  HotkeyPreset('Ctrl + Alt + S', true, true, false, 'S'),
+  HotkeyPreset('Alt + W', false, true, false, 'W'),
+  HotkeyPreset('关闭', false, false, false, ''),
+];
+
 /// 应用设置，基于 SharedPreferences 持久化。
 class Settings extends ChangeNotifier {
   Settings._();
@@ -198,6 +206,30 @@ class Settings extends ChangeNotifier {
 
   bool get closeToTray => _p.getBool('closeToTray') ?? true;
   set closeToTray(bool v) => _set('closeToTray', v);
+
+  // ---- 截图识别与 PDF 翻译（Windows，本地 Python 后端）----
+  int get ocrHotkeyIndex => (_p.getInt('ocrHotkeyIndex') ?? 0).clamp(0, ocrHotkeyPresets.length - 1);
+  set ocrHotkeyIndex(int v) => _set('ocrHotkeyIndex', v);
+  HotkeyPreset get ocrHotkey => ocrHotkeyPresets[ocrHotkeyIndex];
+
+  /// 后端启动命令。留空时使用随包附带的 backend\lingyi_backend.exe；
+  /// 从源码运行时可填 `python -m lingyi_backend`，并把工作目录设为仓库的 backend 文件夹。
+  String get backendCmd => _s('backendCmd');
+  set backendCmd(String v) => _set('backendCmd', v);
+  String get backendDir => _s('backendDir');
+  set backendDir(String v) => _set('backendDir', v);
+
+  /// PDF 翻译：每秒请求数（免费大模型一般只允许 1 个并发）。
+  int get pdfQps => (_p.getInt('pdfQps') ?? 1).clamp(1, 32);
+  set pdfQps(int v) => _set('pdfQps', v);
+
+  /// PDF 输出：dual 左右对照 / alternating 原文译文交替页 / mono 仅译文 / both 双语 + 仅译文。
+  String get pdfOutput => _s('pdfOutput', 'dual');
+  set pdfOutput(String v) => _set('pdfOutput', v);
+
+  /// 翻译前先让 AI 自动提取全文术语，保证前后译法一致（会多消耗一些额度）。
+  bool get pdfExtractTerms => _p.getBool('pdfExtractTerms') ?? true;
+  set pdfExtractTerms(bool v) => _set('pdfExtractTerms', v);
 
   // ---- 外观 ----
   ThemeMode get themeMode => ThemeMode.values[(_p.getInt('themeMode') ?? 0).clamp(0, 2)];

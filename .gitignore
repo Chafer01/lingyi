@@ -36,3 +36,10 @@ build/
 # 词库构建产物
 *.db
 !assets/dict/*.gz
+
+# 后端
+backend/build/
+backend/dist/
+backend/**/__pycache__/
+backend/.pytest_cache/
+backend/e2e.txt

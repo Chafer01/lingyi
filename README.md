@@ -2,7 +2,7 @@
 
 对标有道的个人翻译工具：**查词 + 翻译**（同声传译在路线图中），一套 Flutter 代码同时支持 **Windows** 和 **Android**。
 
-## 功能（v0.2）
+## 功能（v0.3）
 
 | 功能 | Windows | Android |
 |---|---|---|
@@ -18,6 +18,9 @@
 | 全局热键划词：选中文字按 `Alt + D`，鼠标旁弹出翻译 | ✅ | — |
 | 复制即翻译（可选）、托盘常驻 | ✅ | — |
 | 在任意 App 选中文字 → 菜单「灵译查词」 | — | ✅ |
+| **截图翻译**：`Alt + S` 框选屏幕，离线识别文字后在鼠标旁弹出翻译 | ✅ | — |
+| **截图识别**：文字 / 公式两种模式；公式输出 LaTeX，可复制为 Word 公式（MathML） | ✅ | — |
+| **PDF 翻译**：保留原排版、公式和图表，输出左右对照 / 交替页 / 仅译文 PDF，套用术语表 | ✅ | — |
 | 分享文字到灵译 | — | ✅ |
 
 ## 下载与编译
@@ -36,6 +39,24 @@ flutter run -d windows          # 或连接手机后 flutter run
 ```
 
 仓库里只保存定制过的平台文件（安卓清单、MainActivity、图标），其余由 `flutter create` 生成，已存在的文件不会被覆盖。
+
+## 截图识别与 PDF 翻译（v0.3，Windows）
+
+这两项由随包附带的本地后端 `backend\lingyi_backend.exe` 完成，灵译在需要时自动启动它，退出时一并关闭：
+
+- 文字识别：RapidOCR（PP-OCRv4，离线，中英文）；会把断行合并成段落，并修复英文单词间丢失的空格
+- 公式识别：RapidLaTeXOCR（离线），输出 LaTeX 和 MathML
+- PDF 翻译：BabelDOC 引擎，使用 设置 → AI 翻译 的接口和术语表。首次使用会自动下载版面分析模型和字体（约数百 MB）
+- 后端只监听 127.0.0.1，并校验每次启动随机生成的令牌
+
+从源码运行时（没有打包的 exe），在 设置 → 截图识别与 PDF 翻译 → 高级 中填写：
+
+```
+启动命令：python -m lingyi_backend
+工作目录：<仓库>\backend      （先执行 pip install -r requirements.txt，需 Python 3.12）
+```
+
+后端单独测试：`cd backend && python -m pytest tests -q && python tools/smoke_test.py`
 
 ## 首次配置
 
@@ -66,15 +87,21 @@ lib/
     desktop.dart            Windows：托盘、全局热键、模拟 Ctrl+C 划词、迷你弹窗、剪贴板监听
     win_input.dart          user32 FFI（keybd_event、GetCursorPos 等）
     android_intent.dart     安卓：PROCESS_TEXT / SEND
-  ui/                       查词翻译、单词卡片、生词本、历史、设置
+    screen_capture.dart     调用系统截图（ms-screenclip），等待截图进入剪贴板
+  services/backend.dart     启动/连接本地后端，OCR 与 PDF 任务接口
+  ui/                       查词翻译、截图识别、PDF 翻译、单词卡片、生词本、历史、设置
+backend/                    本地后端（Python 3.12 + FastAPI）
+  lingyi_backend/           ocr.py 文字/公式识别 · pdf_jobs.py BabelDOC 任务 · server.py 接口
+  tests/  tools/            单元测试、冒烟测试、PDF 端到端测试（CI 自动运行）
+  lingyi_backend.spec       PyInstaller 打包配置
 tools/build_dict.py         从 ECDICT 生成 core.db / standard.db
 ```
 
 ## 路线图
 
-- **v0.2.x**：划词改用 UI Automation 读取选区（不经过剪贴板）、截图 OCR 翻译、PDF/Word 文档翻译、悬浮球（安卓）
-- **v0.3**：同声传译——系统音频/麦克风 → sherpa-onnx 流式识别 + SenseVoice 整句定稿 → 翻译 → 双语字幕条
-- **v0.4**：MDX 词典挂载、生词本复习
+- **v0.3.x**：划词改用 UI Automation 读取选区（不经过剪贴板）、Word 文档翻译、悬浮球（安卓）
+- **v0.4**：同声传译——系统音频/麦克风 → sherpa-onnx 流式识别 + SenseVoice 整句定稿 → 翻译 → 双语字幕条
+- **v0.5**：MDX 词典挂载、生词本复习
 
 ## 数据来源
 

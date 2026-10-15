@@ -7,9 +7,11 @@ import 'package:hotkey_manager/hotkey_manager.dart';
 import 'package:tray_manager/tray_manager.dart';
 import 'package:window_manager/window_manager.dart';
 
+import '../services/backend.dart';
 import '../services/settings.dart';
 import '../util/text_utils.dart';
 import 'app_state.dart';
+import 'screen_capture.dart';
 import 'win_input.dart';
 
 /// Windows 桌面集成：托盘、全局热键、自动划词（小图标/直接弹出）、迷你弹窗、剪贴板监听、关闭到托盘。
@@ -59,18 +61,24 @@ class Desktop with WindowListener, TrayListener {
 
     await hotKeyManager.unregisterAll();
     await _applyHotkey();
+    await _applyOcrHotkey();
     _applyClipboardWatch();
     _applyAutoSelect();
     _settings.addListener(_onSettingsChanged);
   }
 
   int _lastHotkey = -1;
+  int _lastOcrHotkey = -1;
   bool _lastClipWatch = false;
   bool _lastAutoSelect = false;
 
   void _onSettingsChanged() {
     if (_settings.hotkeyIndex != _lastHotkey) {
       _applyHotkey();
+      _updateTrayMenu();
+    }
+    if (_settings.ocrHotkeyIndex != _lastOcrHotkey) {
+      _applyOcrHotkey();
       _updateTrayMenu();
     }
     if (_settings.clipboardWatch != _lastClipWatch) _applyClipboardWatch();
@@ -158,7 +166,76 @@ class Desktop with WindowListener, TrayListener {
         'Q': PhysicalKeyboardKey.keyQ,
         'X': PhysicalKeyboardKey.keyX,
         'T': PhysicalKeyboardKey.keyT,
+        'S': PhysicalKeyboardKey.keyS,
+        'W': PhysicalKeyboardKey.keyW,
       }[letter];
+
+  // ---- 截图识别热键 ----
+
+  HotKey? _ocrHotKey;
+
+  Future<void> _applyOcrHotkey() async {
+    _lastOcrHotkey = _settings.ocrHotkeyIndex;
+    if (_ocrHotKey != null) {
+      await hotKeyManager.unregister(_ocrHotKey!);
+      _ocrHotKey = null;
+    }
+    final p = _settings.ocrHotkey;
+    final key = _letterKey(p.key);
+    if (key == null) return; // “关闭”
+    final hk = HotKey(
+      key: key,
+      modifiers: [
+        if (p.ctrl) HotKeyModifier.control,
+        if (p.alt) HotKeyModifier.alt,
+        if (p.shift) HotKeyModifier.shift,
+      ],
+      scope: HotKeyScope.system,
+    );
+    try {
+      await hotKeyManager.register(hk, keyDownHandler: (_) => snipTranslate());
+      _ocrHotKey = hk;
+    } catch (_) {}
+  }
+
+  bool _snipping = false;
+
+  /// 截图翻译：调出系统截图 → 后端识别文字 → 在鼠标旁的迷你窗口里翻译。
+  /// 识别失败时打开主窗口的“识别”页显示原因。
+  Future<void> snipTranslate() async {
+    if (_snipping) {
+      // 上一次截图还在等待（可能被 Esc 取消了）：重新打开截图界面，由上一次调用接收结果。
+      await ScreenCapture.snip();
+      return;
+    }
+    _snipping = true;
+    try {
+      // 提前启动后端，和用户框选并行。
+      final warmup = Backend.instance.ensureStarted().catchError((Object _) {});
+      if (!await ScreenCapture.snip()) return;
+      await warmup;
+      try {
+        final r = await Backend.instance.ocrClipboard();
+        _state.ocrIncoming.value = OcrIncoming(result: r);
+        if (r.text.trim().isEmpty) {
+          _state.ocrIncoming.value = OcrIncoming(error: '没有识别到文字');
+          await _showPage(AppPage.ocr);
+          return;
+        }
+        await showMini(r.text.trim());
+      } catch (e) {
+        _state.ocrIncoming.value = OcrIncoming(error: '$e');
+        await _showPage(AppPage.ocr);
+      }
+    } finally {
+      _snipping = false;
+    }
+  }
+
+  Future<void> _showPage(AppPage page) async {
+    await showMain();
+    _state.page.value = page;
+  }
 
   Future<void> _onHotkey() async {
     final fg = WinInput.foreground();
@@ -406,6 +483,7 @@ class Desktop with WindowListener, TrayListener {
   }
 
   Future<void> quit() async {
+    await Backend.instance.stop();
     _clipTimer?.cancel();
     _mouseTimer?.cancel();
     _iconTimer?.cancel();
@@ -442,6 +520,10 @@ class Desktop with WindowListener, TrayListener {
     await trayManager.setContextMenu(Menu(items: [
       MenuItem(key: 'show', label: '打开灵译'),
       MenuItem(key: 'lookup', label: '划词翻译（${_settings.hotkey.label}）'),
+      MenuItem(
+        key: 'snip',
+        label: _settings.ocrHotkey.key.isEmpty ? '截图翻译' : '截图翻译（${_settings.ocrHotkey.label}）',
+      ),
       MenuItem.checkbox(key: 'auto', label: '选中文字自动翻译', checked: _settings.autoSelect),
       MenuItem.separator(),
       MenuItem(key: 'exit', label: '退出'),
@@ -461,6 +543,8 @@ class Desktop with WindowListener, TrayListener {
         showMain();
       case 'lookup':
         showMini('');
+      case 'snip':
+        snipTranslate();
       case 'auto':
         _settings.autoSelect = !_settings.autoSelect;
       case 'exit':

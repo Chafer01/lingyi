@@ -1,5 +1,7 @@
 import 'package:flutter/foundation.dart';
 
+import '../services/backend.dart';
+
 /// 外部传入的查询（全局热键划词、自动划词、剪贴板、安卓“选中文字 → 灵译”、分享）。
 class IncomingQuery {
   IncomingQuery(this.text, this.serial);
@@ -8,6 +10,16 @@ class IncomingQuery {
   /// 递增序号，保证同样的文字再次传入时也会触发刷新。
   final int serial;
 }
+
+/// 截图热键等外部触发的识别结果（或错误），由“识别”页显示。
+class OcrIncoming {
+  OcrIncoming({this.result, this.error});
+  final OcrResult? result;
+  final String? error;
+}
+
+/// 主窗口的页面。
+enum AppPage { lookup, ocr, pdf, wordbook, history, settings }
 
 /// Windows 窗口的三种形态。安卓上始终是 [main]。
 enum WinView {
@@ -36,11 +48,14 @@ class AppState {
   /// 迷你窗口是否钉住（失去焦点时不自动隐藏）。
   final ValueNotifier<bool> pinned = ValueNotifier(false);
 
+  /// 最近一次外部触发的截图识别。
+  final ValueNotifier<OcrIncoming?> ocrIncoming = ValueNotifier(null);
+
   /// 主窗口当前页。
-  final ValueNotifier<int> tab = ValueNotifier(0);
+  final ValueNotifier<AppPage> page = ValueNotifier(AppPage.lookup);
 
   void push(String text) {
-    tab.value = 0;
+    page.value = AppPage.lookup;
     incoming.value = IncomingQuery(text, ++_serial);
   }
 }

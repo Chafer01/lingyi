@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 
+import '../services/backend.dart';
 import '../services/dict_service.dart';
 import '../services/settings.dart';
 import '../services/translate/engine.dart';
@@ -102,6 +103,7 @@ class SettingsPage extends StatelessWidget {
                 onChanged: (v) => s.closeToTray = v,
               ),
             ]),
+          if (Platform.isWindows) const _BackendSection(),
           _Section(title: '外观', children: [
             ListTile(
               title: const Text('主题'),
@@ -119,7 +121,7 @@ class SettingsPage extends StatelessWidget {
           ]),
           const SizedBox(height: 8),
           Center(
-            child: Text('灵译 0.2.1 · 词库数据来自 ECDICT',
+            child: Text('灵译 0.3.0 · 词库数据来自 ECDICT',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Theme.of(context).colorScheme.outline)),
           ),
         ],
@@ -600,6 +602,89 @@ class _AutoSelectSectionState extends State<_AutoSelectSection> {
             ]),
           ),
         ],
+      ],
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+
+/// 截图识别与 PDF 翻译：热键与本地后端。
+class _BackendSection extends StatelessWidget {
+  const _BackendSection();
+
+  @override
+  Widget build(BuildContext context) {
+    final s = Settings.instance;
+    final b = Backend.instance;
+    final theme = Theme.of(context);
+    return _Section(
+      title: '截图识别与 PDF 翻译',
+      subtitle: '由本地后端完成，离线识别文字和公式',
+      children: [
+        ListTile(
+          title: const Text('截图翻译热键'),
+          subtitle: const Text('框选屏幕区域，识别文字后在鼠标旁弹出翻译'),
+          trailing: DropdownButton<int>(
+            value: s.ocrHotkeyIndex,
+            underline: const SizedBox(),
+            items: [
+              for (var i = 0; i < ocrHotkeyPresets.length; i++)
+                DropdownMenuItem(value: i, child: Text(ocrHotkeyPresets[i].label)),
+            ],
+            onChanged: (v) => s.ocrHotkeyIndex = v ?? 0,
+          ),
+        ),
+        ValueListenableBuilder<String>(
+          valueListenable: b.status,
+          builder: (context, st, _) => ListTile(
+            title: const Text('后端状态'),
+            subtitle: Text(st),
+            trailing: Wrap(spacing: 8, children: [
+              OutlinedButton(
+                onPressed: () async {
+                  try {
+                    final h = await b.health();
+                    final f = Map<String, dynamic>.from(h['features'] as Map);
+                    String mark(String k) => f[k] == true ? '✓' : '✗';
+                    if (context.mounted) {
+                      toast(context, '后端 ${h['version']}：文字识别 ${mark('ocr')}  公式 ${mark('formula')}  PDF ${mark('pdf')}');
+                    }
+                  } catch (e) {
+                    if (context.mounted) toast(context, '$e');
+                  }
+                },
+                child: const Text('检测'),
+              ),
+              OutlinedButton(
+                onPressed: () async {
+                  try {
+                    await b.restart();
+                  } catch (e) {
+                    if (context.mounted) toast(context, '$e');
+                  }
+                },
+                child: const Text('重启'),
+              ),
+            ]),
+          ),
+        ),
+        ExpansionTile(
+          shape: const Border(),
+          title: const Text('高级：后端启动命令'),
+          childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+          expandedCrossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              '留空时使用安装包自带的 backend\\lingyi_backend.exe。从源码运行时可填：python -m lingyi_backend，'
+              '工作目录填仓库里的 backend 文件夹（需先 pip install -r requirements.txt）。修改后点“重启”生效。',
+              style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.outline),
+            ),
+            const SizedBox(height: 8),
+            _Field(label: '启动命令', value: s.backendCmd, onChanged: (v) => s.backendCmd = v),
+            _Field(label: '工作目录', value: s.backendDir, onChanged: (v) => s.backendDir = v),
+          ],
+        ),
       ],
     );
   }

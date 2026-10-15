@@ -6,9 +6,12 @@ import 'package:window_manager/window_manager.dart';
 
 import '../platform/app_state.dart';
 import '../platform/desktop.dart';
+import '../services/backend.dart';
 import 'app.dart';
 import 'history_page.dart';
 import 'lookup_view.dart';
+import 'ocr_page.dart';
+import 'pdf_page.dart';
 import 'settings_page.dart';
 import 'wordbook_page.dart';
 
@@ -16,25 +19,45 @@ import 'wordbook_page.dart';
 class Shell extends StatelessWidget {
   const Shell({super.key});
 
-  static const _destinations = [
-    (Icons.translate_outlined, Icons.translate, '查词翻译'),
-    (Icons.star_outline, Icons.star, '生词本'),
-    (Icons.history_outlined, Icons.history, '历史'),
-    (Icons.settings_outlined, Icons.settings, '设置'),
+  static const _all = [
+    (AppPage.lookup, Icons.translate_outlined, Icons.translate, '查词翻译'),
+    (AppPage.ocr, Icons.document_scanner_outlined, Icons.document_scanner, '截图识别'),
+    (AppPage.pdf, Icons.picture_as_pdf_outlined, Icons.picture_as_pdf, 'PDF 翻译'),
+    (AppPage.wordbook, Icons.star_outline, Icons.star, '生词本'),
+    (AppPage.history, Icons.history_outlined, Icons.history, '历史'),
+    (AppPage.settings, Icons.settings_outlined, Icons.settings, '设置'),
   ];
+
+  /// 截图识别和 PDF 翻译依赖本地后端，只在 Windows 上提供。
+  static List<(AppPage, IconData, IconData, String)> get _destinations => [
+        for (final d in _all)
+          if (Backend.supported || (d.$1 != AppPage.ocr && d.$1 != AppPage.pdf)) d,
+      ];
+
+  static Widget _pageFor(AppPage p) => switch (p) {
+        AppPage.lookup => const LookupView(),
+        AppPage.ocr => const OcrPage(),
+        AppPage.pdf => const PdfPage(),
+        AppPage.wordbook => const WordbookPage(),
+        AppPage.history => const HistoryPage(),
+        AppPage.settings => const SettingsPage(),
+      };
 
   @override
   Widget build(BuildContext context) {
     final state = AppState.instance;
+    final dests = _destinations;
+    final pages = [for (final d in dests) _pageFor(d.$1)];
     return ValueListenableBuilder<WinView>(
       valueListenable: state.view,
       builder: (context, view, _) {
         if (view == WinView.icon) return const _SelectionIcon();
         if (view == WinView.mini) return const _MiniShell();
-        return ValueListenableBuilder<int>(
-          valueListenable: state.tab,
-          builder: (context, tab, _) {
-            final pages = const [LookupView(), WordbookPage(), HistoryPage(), SettingsPage()];
+        return ValueListenableBuilder<AppPage>(
+          valueListenable: state.page,
+          builder: (context, page, _) {
+            final tab = dests.indexWhere((d) => d.$1 == page).clamp(0, dests.length - 1);
+            void select(int i) => state.page.value = dests[i].$1;
             final body = IndexedStack(index: tab, children: pages);
             final wide = MediaQuery.sizeOf(context).width >= 720;
             if (wide) {
@@ -42,7 +65,7 @@ class Shell extends StatelessWidget {
                 body: Row(children: [
                   NavigationRail(
                     selectedIndex: tab,
-                    onDestinationSelected: (i) => state.tab.value = i,
+                    onDestinationSelected: select,
                     labelType: NavigationRailLabelType.all,
                     leading: Padding(
                       padding: const EdgeInsets.only(top: 8, bottom: 16),
@@ -52,8 +75,8 @@ class Shell extends StatelessWidget {
                       ),
                     ),
                     destinations: [
-                      for (final d in _destinations)
-                        NavigationRailDestination(icon: Icon(d.$1), selectedIcon: Icon(d.$2), label: Text(d.$3)),
+                      for (final d in dests)
+                        NavigationRailDestination(icon: Icon(d.$2), selectedIcon: Icon(d.$3), label: Text(d.$4)),
                     ],
                   ),
                   const VerticalDivider(width: 1),
@@ -65,11 +88,11 @@ class Shell extends StatelessWidget {
               body: SafeArea(bottom: false, child: body),
               bottomNavigationBar: NavigationBar(
                 selectedIndex: tab,
-                onDestinationSelected: (i) => state.tab.value = i,
+                onDestinationSelected: select,
                 height: 64,
                 destinations: [
-                  for (final d in _destinations)
-                    NavigationDestination(icon: Icon(d.$1), selectedIcon: Icon(d.$2), label: d.$3),
+                  for (final d in dests)
+                    NavigationDestination(icon: Icon(d.$2), selectedIcon: Icon(d.$3), label: d.$4),
                 ],
               ),
             );
