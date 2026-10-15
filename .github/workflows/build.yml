@@ -134,7 +134,7 @@ jobs:
           step "安装依赖" pip install -r requirements.txt pyinstaller pytest httpx
           step "安装依赖（不带依赖）" pip install --no-deps -r requirements-nodeps.txt
           # 预先下载公式识别模型，打进安装包，用户首次使用无需联网
-          step "下载公式模型" python -c "from rapid_latex_ocr import LatexOCR; LatexOCR()"
+          step "下载公式模型" python -c "from lingyi_backend import ocr; ocr._formula()"
           step "单元测试" python -m pytest tests -q
           step "PyInstaller 打包" pyinstaller lingyi_backend.spec --noconfirm --log-level WARN
           step "冒烟测试" python tools/smoke_test.py dist/lingyi_backend/lingyi_backend.exe
