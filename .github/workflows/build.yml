@@ -26,8 +26,27 @@ jobs:
           cache: true
       - run: flutter --version
       - run: flutter pub get
-      - run: flutter analyze --no-fatal-infos --no-fatal-warnings
-      - run: flutter test
+      - name: 静态分析
+        run: |
+          set +e
+          flutter analyze --no-fatal-infos --no-fatal-warnings > analyze.txt 2>&1
+          code=$?
+          cat analyze.txt
+          # 把问题写进注解，便于通过 API 查看
+          msg=$(grep -E '^ *(info|warning|error) ' analyze.txt | head -80 | sed 's/%/%25/g' | awk '{printf "%s%%0A", $0}')
+          if [ -n "$msg" ]; then echo "::warning title=flutter analyze::$msg"; fi
+          exit $code
+      - name: 单元测试
+        run: |
+          set +e
+          flutter test > test.txt 2>&1
+          code=$?
+          cat test.txt
+          if [ $code -ne 0 ]; then
+            msg=$(tail -60 test.txt | sed 's/%/%25/g' | awk '{printf "%s%%0A", $0}')
+            echo "::error title=flutter test::$msg"
+          fi
+          exit $code
 
   android:
     needs: analyze
@@ -44,7 +63,17 @@ jobs:
           cache: true
       - run: flutter create --platforms=android $CREATE_ARGS .
       - run: flutter pub get
-      - run: flutter build apk --release
+      - name: 编译 APK
+        run: |
+          set +e
+          flutter build apk --release > build.txt 2>&1
+          code=$?
+          cat build.txt
+          if [ $code -ne 0 ]; then
+            msg=$(grep -iE 'error|exception|failed|what went wrong' -A3 build.txt | tail -80 | sed 's/%/%25/g' | awk '{printf "%s%%0A", $0}')
+            echo "::error title=flutter build apk::$msg"
+          fi
+          exit $code
       - run: cp build/app/outputs/flutter-apk/app-release.apk lingyi-android.apk
       - uses: actions/upload-artifact@v4
         with:
@@ -62,7 +91,18 @@ jobs:
           cache: true
       - run: flutter create --platforms=windows ${{ env.CREATE_ARGS }} .
       - run: flutter pub get
-      - run: flutter build windows --release
+      - name: 编译 Windows
+        shell: bash
+        run: |
+          set +e
+          flutter build windows --release > build.txt 2>&1
+          code=$?
+          cat build.txt
+          if [ $code -ne 0 ]; then
+            msg=$(grep -iE 'error|exception|failed' -A2 build.txt | tail -80 | sed 's/%/%25/g' | awk '{printf "%s%%0A", $0}')
+            echo "::error title=flutter build windows::$msg"
+          fi
+          exit $code
       - name: 打包
         shell: pwsh
         run: Compress-Archive -Path build\windows\x64\runner\Release\* -DestinationPath lingyi-windows.zip

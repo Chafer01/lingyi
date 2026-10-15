@@ -105,7 +105,9 @@ class Settings extends ChangeNotifier {
 
   // ---- 词库 ----
   /// 标准词库下载地址（gzip 压缩的 SQLite）。CI 会把它发布到仓库的 Release。
-  String get standardDictUrl => _s('standardDictUrl');
+  static const defaultDictUrl =
+      'https://github.com/Chafer01/lingyi/releases/download/dict-v1/standard.db.gz';
+  String get standardDictUrl => _s('standardDictUrl', defaultDictUrl);
   set standardDictUrl(String v) => _set('standardDictUrl', v.trim());
 
   // ---- 桌面 ----

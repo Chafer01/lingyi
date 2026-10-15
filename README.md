@@ -42,7 +42,7 @@ flutter run -d windows          # 或连接手机后 flutter run
    - 腾讯云机器翻译：每月 500 万字符免费。控制台 → 访问管理 → API 密钥。建议关闭“后付费”。
    - DeepL：免费版每月 50 万字符，密钥以 `:fx` 结尾。
    - AI：DeepSeek / 通义千问 / Kimi / 本地 Ollama 一键预设，填密钥即可。
-2. **标准词库**（可选）：在 Actions 里手动运行一次「生成标准词库」，然后把
+2. **标准词库**（可选）：设置 → 离线词库 → 下载标准词库（默认地址已填好）。若 fork 到自己的仓库，先在 Actions 里运行一次「生成标准词库」，再把
    `https://github.com/<用户名>/<仓库>/releases/download/dict-v1/standard.db.gz`
    填到设置 → 离线词库 → 下载地址。约 135 万词，覆盖 metasurface、beamforming、downtilt 等专业词。
 
