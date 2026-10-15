@@ -42,6 +42,35 @@ class PdfBody(BaseModel):
     extract_terms: bool = True
 
 
+def _timed_import(mod: str):
+    """导入模块并记录耗时；超过 60 秒把所有线程的调用栈写进日志，便于排查卡死。"""
+    import faulthandler
+    import logging
+    import sys
+    import time
+
+    if mod in sys.modules:
+        return
+    log = logging.getLogger("lingyi.import")
+    log.info("import %s ...", mod)
+    t = time.time()
+    out = getattr(sys.stderr, "fileno", None) and sys.stderr
+    timer = None
+    if out:
+        try:
+            timer = threading.Timer(60, lambda: faulthandler.dump_traceback(file=out, all_threads=True))
+            timer.daemon = True
+            timer.start()
+        except Exception:  # noqa: BLE001
+            timer = None
+    try:
+        __import__(mod)
+    finally:
+        if timer:
+            timer.cancel()
+    log.info("import %s done in %.1fs", mod, time.time() - t)
+
+
 def create_app(token: str, jobs: JobManager | None = None) -> FastAPI:
     app = FastAPI(title="lingyi-backend", version=__version__, docs_url=None, redoc_url=None)
     jobs = jobs or JobManager()
@@ -89,7 +118,7 @@ def create_app(token: str, jobs: JobManager | None = None) -> FastAPI:
         for name, mods in checks.items():
             try:
                 for mod in mods:
-                    __import__(mod)
+                    _timed_import(mod)
                 feats[name] = True
             except Exception as e:  # noqa: BLE001
                 feats[name] = False

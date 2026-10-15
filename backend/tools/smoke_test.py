@@ -80,7 +80,7 @@ def main():
         t = time.time()
         print("ping", call(port, "/ping", timeout=30), f"{time.time() - t:.1f}s")
         t = time.time()
-        h = call(port, "/health")
+        h = call(port, "/health", timeout=150)
         print(f"health {time.time() - t:.1f}s")
         print("health", h)
         assert all(h["features"].values()), h
