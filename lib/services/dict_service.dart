@@ -225,7 +225,7 @@ class DictService extends ChangeNotifier {
     final q = normalizeQuery(zh);
     if (db == null || q.isEmpty) return const [];
     final rows = db.select(
-      "SELECT * FROM $_table WHERE translation LIKE ? AND (frq > 0 OR bnc > 0 OR collins > 0) "
+      'SELECT * FROM $_table WHERE translation LIKE ? AND (frq > 0 OR bnc > 0 OR collins > 0) '
       'ORDER BY CASE WHEN frq > 0 THEN frq ELSE 999999 END LIMIT ?',
       ['%$q%', limit],
     );
