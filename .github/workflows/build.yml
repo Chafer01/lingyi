@@ -126,7 +126,7 @@ jobs:
             code=$?
             cat step.txt
             if [ $code -ne 0 ]; then
-              msg=$(tail -40 step.txt | sed 's/%/%25/g' | awk '{printf "%s%%0A", $0}')
+              msg=$(tail -80 step.txt | sed 's/%/%25/g' | awk '{printf "%s%%0A", $0}')
               echo "::error title=后端：$name::$msg"
               exit $code
             fi

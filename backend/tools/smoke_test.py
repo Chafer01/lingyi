@@ -104,9 +104,10 @@ def main():
         except urllib.error.HTTPError as e:
             assert e.code == 400
         print("全部通过")
-    except Exception:
+    except Exception as e:  # noqa: BLE001
+        print(f"失败：{e.__class__.__name__}: {e}", flush=True)
         dump_logs()
-        raise
+        sys.exit(1)
     finally:
         p.stdin.close()          # 模拟灵译退出
         try:
