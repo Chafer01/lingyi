@@ -4,6 +4,11 @@ name: 翻译接口实测
 # 结果提交到 eval-results 分支的 eval/results.md。
 on:
   workflow_dispatch:
+    inputs:
+      only:
+        description: '只测这些接口（逗号分隔，如 魔搭,智谱）；留空测全部'
+        required: false
+        default: ''
 
 permissions:
   contents: write
@@ -28,6 +33,7 @@ jobs:
           VOLC_SK: ${{ secrets.VOLC_SK }}
           BAIDU_APPID: ${{ secrets.BAIDU_APPID }}
           BAIDU_KEY: ${{ secrets.BAIDU_KEY }}
+          ONLY: ${{ inputs.only }}
         run: python3 tools/api_eval.py
       - name: 提交结果
         run: |

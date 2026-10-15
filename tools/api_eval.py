@@ -195,13 +195,42 @@ LLMS = [
       ("glm-4.7-flash", "chat_gloss"), ("glm-4.7-flash", "chat_plain")]),
     ("硅基流动", "https://api.siliconflow.cn/v1", "SILICONFLOW_API_KEY",
      [("tencent/Hunyuan-MT-7B", "mt"), ("tencent/Hunyuan-MT-7B", "mt_gloss")]),
-    ("魔搭", "https://api-inference.modelscope.cn/v1", "MODELSCOPE_API_KEY",
-     [("Qwen/Qwen3.5-27B", "chat_gloss"), ("Qwen/Qwen3.5-27B", "chat_plain")]),
+    ("魔搭", "https://api-inference.modelscope.cn/v1", "MODELSCOPE_API_KEY", "AUTO_MODELSCOPE"),
     ("Gemini", "https://generativelanguage.googleapis.com/v1beta/openai", "GEMINI_API_KEY",
      [("gemini-3.5-flash-lite", "chat_gloss"), ("gemini-3.8-flash", "chat_gloss")]),
     ("百度千帆", "https://qianfan.baidubce.com/v2", "QIANFAN_API_KEY", [("ernie-speed-128k", "chat_gloss")]),
     ("讯飞星火", "https://spark-api-open.xf-yun.com/v1", "SPARK_API_PASSWORD", [("lite", "chat_gloss")]),
 ]
+
+# 魔搭可用模型很多，按以下顺序从实时模型列表中各挑一个（正则匹配模型 ID）。
+MODELSCOPE_PICKS = [
+    r"^Qwen/Qwen3\.5-27B$",
+    r"^Qwen/Qwen3\.5-\d+B-A\d+B$",
+    r"^deepseek-ai/DeepSeek-V3",
+    r"^ZhipuAI/GLM-4\.\d",
+]
+
+
+def modelscope_models():
+    code, resp, _ = http("GET", "https://api-inference.modelscope.cn/v1/models")
+    if code != 200:
+        return []
+    try:
+        return sorted({m["id"] for m in json.loads(resp).get("data", [])})
+    except Exception:
+        return []
+
+
+def pick_modelscope(ids):
+    import re
+    picked = []
+    for pat in MODELSCOPE_PICKS:
+        cands = [i for i in ids if re.search(pat, i)]
+        if cands:
+            # 同一系列取版本号最大的
+            picked.append(sorted(cands)[-1])
+    return picked
+
 
 MODE_LABEL = {"chat_gloss": "带术语表", "chat_plain": "不带术语表", "mt": "官方提示", "mt_gloss": "官方提示+参考译法"}
 
@@ -237,6 +266,8 @@ def llm_translate(base, key, model, text, mode):
             system = SYSTEM_PLAIN.format(target=target)
         messages = [{"role": "system", "content": system}, {"role": "user", "content": text}]
     body = {"model": model, "messages": messages, "stream": False, **params}
+    if "modelscope" in base:
+        body["enable_thinking"] = False
     headers = {"Content-Type": "application/json", "Authorization": f"Bearer {key}"}
     retries = 0
     t_total = 0.0
@@ -370,8 +401,19 @@ def listed(r):
 
 def main():
     results = []
+    ms_ids = modelscope_models()
+    os.makedirs("eval", exist_ok=True)
+    with open("eval/modelscope_models.txt", "w", encoding="utf-8") as f:
+        f.write("\n".join(ms_ids) + "\n")
     for name, base, env, variants in LLMS:
         key = os.environ.get(env, "").strip()
+        if variants == "AUTO_MODELSCOPE":
+            picks = pick_modelscope(ms_ids) or ["Qwen/Qwen3.5-27B"]
+            print("魔搭自动选择：", picks, flush=True)
+            variants = [(m, "chat_gloss") for m in picks] + [(picks[0], "chat_plain")]
+        only = os.environ.get("ONLY", "").strip()
+        if only and name not in only.split(","):
+            continue
         if not key:
             print(f"== {name}（无密钥探测）", flush=True)
             results.append(probe(name, base, variants[0][0]))
@@ -381,22 +423,23 @@ def main():
             r = run_engine(name, f"{m} · {MODE_LABEL[mode]}",
                            lambda s, b=base, k=key, mm=m, md=mode: llm_translate(b, k, mm, s, md))
             results.append(r)
-    ak, sk = os.environ.get("VOLC_AK", "").strip(), os.environ.get("VOLC_SK", "").strip()
-    if ak and sk:
-        print("== 火山翻译（实测）", flush=True)
-        results.append(run_engine("火山翻译", "TranslateText", lambda s: volc_translate(ak, sk, s)))
-    else:
-        _, err, dt = volc_translate("AKLTprobe", "probe", "hi")
-        results.append({"engine": "火山翻译", "model": "TranslateText", "mode": "probe", "http": "-",
-                        "latency": round(dt, 2), "body": err})
-    appid, bkey = os.environ.get("BAIDU_APPID", "").strip(), os.environ.get("BAIDU_KEY", "").strip()
-    if appid and bkey:
-        print("== 百度翻译（实测）", flush=True)
-        results.append(run_engine("百度翻译", "通用文本翻译", lambda s: baidu_translate(appid, bkey, s)))
-    else:
-        _, err, dt = baidu_translate("20240001", "probe", "hi")
-        results.append({"engine": "百度翻译", "model": "通用文本翻译", "mode": "probe", "http": "-", "latency": round(dt, 2),
-                        "body": err})
+    if not os.environ.get("ONLY", "").strip():
+        ak, sk = os.environ.get("VOLC_AK", "").strip(), os.environ.get("VOLC_SK", "").strip()
+        if ak and sk:
+            print("== 火山翻译（实测）", flush=True)
+            results.append(run_engine("火山翻译", "TranslateText", lambda s: volc_translate(ak, sk, s)))
+        else:
+            _, err, dt = volc_translate("AKLTprobe", "probe", "hi")
+            results.append({"engine": "火山翻译", "model": "TranslateText", "mode": "probe", "http": "-",
+                            "latency": round(dt, 2), "body": err})
+        appid, bkey = os.environ.get("BAIDU_APPID", "").strip(), os.environ.get("BAIDU_KEY", "").strip()
+        if appid and bkey:
+            print("== 百度翻译（实测）", flush=True)
+            results.append(run_engine("百度翻译", "通用文本翻译", lambda s: baidu_translate(appid, bkey, s)))
+        else:
+            _, err, dt = baidu_translate("20240001", "probe", "hi")
+            results.append({"engine": "百度翻译", "model": "通用文本翻译", "mode": "probe", "http": "-", "latency": round(dt, 2),
+                            "body": err})
 
     os.makedirs("eval", exist_ok=True)
     with open("eval/results.json", "w", encoding="utf-8") as f:
