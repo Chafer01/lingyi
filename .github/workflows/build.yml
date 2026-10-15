@@ -1,0 +1,86 @@
+name: 编译
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  # 平台工程由 flutter create 生成；仓库里只保存需要定制的文件（清单、MainActivity、图标），
+  # 已存在的文件不会被覆盖。
+  CREATE_ARGS: --org com.chafer --project-name lingyi
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - run: flutter --version
+      - run: flutter pub get
+      - run: flutter analyze --no-fatal-infos --no-fatal-warnings
+      - run: flutter test
+
+  android:
+    needs: analyze
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - run: flutter create --platforms=android $CREATE_ARGS .
+      - run: flutter pub get
+      - run: flutter build apk --release
+      - run: cp build/app/outputs/flutter-apk/app-release.apk lingyi-android.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lingyi-android
+          path: lingyi-android.apk
+
+  windows:
+    needs: analyze
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - run: flutter create --platforms=windows ${{ env.CREATE_ARGS }} .
+      - run: flutter pub get
+      - run: flutter build windows --release
+      - name: 打包
+        shell: pwsh
+        run: Compress-Archive -Path build\windows\x64\runner\Release\* -DestinationPath lingyi-windows.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lingyi-windows
+          path: lingyi-windows.zip
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [android, windows]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            lingyi-android.apk
+            lingyi-windows.zip

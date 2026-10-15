@@ -1,0 +1,38 @@
+# Flutter / Dart
+.dart_tool/
+.packages
+.pub-cache/
+.pub/
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+*.iml
+.idea/
+.vscode/
+.metadata
+
+# 平台工程由 CI 中的 flutter create 生成，仓库只保存定制过的文件
+/windows/*
+!/windows/runner/
+/windows/runner/*
+!/windows/runner/resources/
+/android/*
+!/android/app/
+/android/app/*
+!/android/app/src/
+/android/app/src/*
+!/android/app/src/main/
+/android/app/src/main/*
+!/android/app/src/main/AndroidManifest.xml
+!/android/app/src/main/kotlin/
+!/android/app/src/main/res/
+/android/app/src/main/res/*
+!/android/app/src/main/res/mipmap-*/
+/ios/
+/linux/
+/macos/
+/web/
+
+# 词库构建产物
+*.db
+!assets/dict/*.gz
