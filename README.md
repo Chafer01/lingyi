@@ -40,11 +40,12 @@ flutter run -d windows          # 或连接手机后 flutter run
 ## 首次配置
 
 1. **翻译引擎**（设置 → 翻译引擎，至少配一个）
-   - 腾讯云机器翻译：每月 500 万字符免费。控制台 → 访问管理 → API 密钥。建议关闭“后付费”。
-   - 火山翻译：每月 200 万字符免费。火山引擎控制台开通机器翻译，创建 Access Key。
+   - 火山翻译：每月 200 万字符免费（以控制台为准）。火山引擎控制台开通机器翻译，创建 Access Key。
    - 百度翻译：个人认证并切换到高级版后每月 100 万字符免费。
+   - AI 翻译：默认智谱 GLM-4.7-Flash（官方免费，open.bigmodel.cn 创建 API Key），支持术语表。
+   - 腾讯云：已于 2026-10-01 停发免费额度，2027-10-01 起停止服务，仅供已有付费资源包时使用。
    - DeepL：免费版每月 50 万字符，密钥以 `:fx` 结尾。
-   - AI：DeepSeek / 通义千问 / Kimi / 本地 Ollama 一键预设，填密钥即可。
+   - 其他 AI：DeepSeek / 通义千问 / Kimi / 本地 Ollama 一键预设，填密钥即可。
 2. **标准词库**（可选）：设置 → 离线词库 → 下载标准词库（默认地址已填好）。若 fork 到自己的仓库，先在 Actions 里运行一次「生成标准词库」，再把
    `https://github.com/<用户名>/<仓库>/releases/download/dict-v1/standard.db.gz`
    填到设置 → 离线词库 → 下载地址。约 135 万词，覆盖 metasurface、beamforming、downtilt 等专业词。

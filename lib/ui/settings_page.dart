@@ -24,17 +24,7 @@ class SettingsPage extends StatelessWidget {
             padding: const EdgeInsets.only(left: 4, bottom: 12),
             child: Text('设置', style: Theme.of(context).textTheme.titleLarge),
           ),
-          _Section(title: '翻译引擎', subtitle: '可同时开启多个，结果并排显示', children: [
-            _EngineTile(
-              engine: tr.tencent,
-              help: '每月 500 万字符免费。腾讯云控制台 → 访问管理 → API 密钥。建议在机器翻译控制台关闭“后付费”，避免超额扣费。',
-              fields: [
-                _Field(label: 'SecretId', value: s.tencentId, onChanged: (v) => s.tencentId = v),
-                _Field(label: 'SecretKey', value: s.tencentKey, obscure: true, onChanged: (v) => s.tencentKey = v),
-                _Field(label: '地域', value: s.tencentRegion, onChanged: (v) => s.tencentRegion = v),
-              ],
-            ),
-            const Divider(height: 1),
+          _Section(title: '翻译引擎', subtitle: '可同时开启多个，结果并排显示。免费额度可能随厂商政策变化，建议至少配两个', children: [
             _EngineTile(
               engine: tr.volc,
               help: '每月 200 万字符免费。火山引擎控制台 → 机器翻译 开通服务；右上角头像 → API 访问密钥 创建 Access Key。',
@@ -63,12 +53,22 @@ class SettingsPage extends StatelessWidget {
             const Divider(height: 1),
             _EngineTile(
               engine: tr.llm,
-              help: '任何 OpenAI 兼容接口均可。用于“技术翻译”（强制使用术语表）和“AI 讲解”。',
+              help: '任何 OpenAI 兼容接口均可，用于技术翻译（强制使用术语表）和 AI 讲解。推荐智谱 GLM-4.7-Flash：官方免费，在 open.bigmodel.cn 注册后创建 API Key 即可；免费版只允许 1 个并发。',
               fields: [
                 const _LlmPresets(),
                 _Field(label: '接口地址', value: s.llmBaseUrl, onChanged: (v) => s.llmBaseUrl = v),
                 _Field(label: 'API 密钥', value: s.llmKey, obscure: true, onChanged: (v) => s.llmKey = v),
                 _Field(label: '模型', value: s.llmModel, onChanged: (v) => s.llmModel = v),
+              ],
+            ),
+            const Divider(height: 1),
+            _EngineTile(
+              engine: tr.tencent,
+              help: '⚠ 腾讯云已于 2026-10-01 停发免费额度，接口调用频率逐月缩减，2027-10-01 起完全停止服务。仅建议已有付费资源包的用户使用。',
+              fields: [
+                _Field(label: 'SecretId', value: s.tencentId, onChanged: (v) => s.tencentId = v),
+                _Field(label: 'SecretKey', value: s.tencentKey, obscure: true, onChanged: (v) => s.tencentKey = v),
+                _Field(label: '地域', value: s.tencentRegion, onChanged: (v) => s.tencentRegion = v),
               ],
             ),
           ]),
@@ -119,7 +119,7 @@ class SettingsPage extends StatelessWidget {
           ]),
           const SizedBox(height: 8),
           Center(
-            child: Text('灵译 0.2.0 · 词库数据来自 ECDICT',
+            child: Text('灵译 0.2.1 · 词库数据来自 ECDICT',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Theme.of(context).colorScheme.outline)),
           ),
         ],
@@ -267,6 +267,7 @@ class _LlmPresets extends StatelessWidget {
   const _LlmPresets();
 
   static const presets = [
+    ('智谱 GLM-4.7-Flash（免费）', 'https://open.bigmodel.cn/api/paas/v4', 'glm-4.7-flash'),
     ('DeepSeek', 'https://api.deepseek.com/v1', 'deepseek-chat'),
     ('通义千问', 'https://dashscope.aliyuncs.com/compatible-mode/v1', 'qwen-plus'),
     ('Kimi', 'https://api.moonshot.cn/v1', 'kimi-latest'),

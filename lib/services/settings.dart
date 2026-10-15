@@ -26,7 +26,7 @@ grating lobe = 栅瓣
 ''';
 
 /// 引擎显示顺序。
-const engineOrder = ['tencent', 'volc', 'baidu', 'deepl', 'llm'];
+const engineOrder = ['volc', 'baidu', 'llm', 'deepl', 'tencent'];
 
 /// 自动划词默认生效的程序：浏览器、PDF 阅读器、Office、笔记软件。
 /// 在这些程序里，对选中文字发送 Ctrl+C 是安全的。
@@ -135,16 +135,16 @@ class Settings extends ChangeNotifier {
   set deeplKey(String v) => _set('deeplKey', v.trim());
 
   // ---- 大模型（OpenAI 兼容接口：DeepSeek、通义千问、Kimi、Ollama 等）----
-  String get llmBaseUrl => _s('llmBaseUrl', 'https://api.deepseek.com/v1');
+  String get llmBaseUrl => _s('llmBaseUrl', 'https://open.bigmodel.cn/api/paas/v4');
   set llmBaseUrl(String v) => _set('llmBaseUrl', v.trim());
   String get llmKey => _s('llmKey');
   set llmKey(String v) => _set('llmKey', v.trim());
-  String get llmModel => _s('llmModel', 'deepseek-chat');
+  String get llmModel => _s('llmModel', 'glm-4.7-flash');
   set llmModel(String v) => _set('llmModel', v.trim());
 
   /// 启用的翻译引擎 id，按显示顺序。
   List<String> get enabledEngines =>
-      _p.getStringList('enabledEngines') ?? const ['tencent', 'volc', 'baidu', 'deepl', 'llm'];
+      _p.getStringList('enabledEngines') ?? const ['volc', 'baidu', 'llm'];
   set enabledEngines(List<String> v) => _set('enabledEngines', v);
 
   bool isEngineEnabled(String id) => enabledEngines.contains(id);

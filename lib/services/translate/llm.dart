@@ -82,6 +82,9 @@ class LlmEngine extends TranslateEngine {
         )
         .timeout(const Duration(seconds: 60));
     final text = utf8.decode(resp.bodyBytes);
+    if (resp.statusCode == 429) {
+      throw TranslateException('AI 接口：请求过于频繁（免费模型通常只允许 1 个并发，请稍后再试）');
+    }
     if (resp.statusCode != 200) {
       var msg = 'HTTP ${resp.statusCode}';
       try {
