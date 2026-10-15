@@ -281,7 +281,7 @@ def llm_translate(base, key, model, text, mode):
         break
     tag = f"（重试 {retries} 次）" if retries else ""
     if code != 200:
-        return None, f"HTTP {code}{tag}: {resp[:200]}", t_total
+        return None, f"HTTP {code}{tag}: {resp[:600]}", t_total
     try:
         j = json.loads(resp)
         out = j["choices"][0]["message"]["content"] or ""
@@ -369,10 +369,15 @@ def probe(name, base, model, key=""):
             "body": resp[:240], "models_http": mcode, "model_listed": listed}
 
 
+def active_tests():
+    n = int(os.environ.get("MAXTESTS", "0") or 0)
+    return TESTS[:n] if n > 0 else TESTS
+
+
 def run_engine(name, model, fn):
     rows, total_hit, total_terms, errors, latencies = [], 0, 0, 0, []
     out_hit = out_terms = 0
-    for t in TESTS:
+    for t in active_tests():
         out, err, dt = fn(t["src"])
         h, n, miss = score(t, out)
         total_hit += h
@@ -451,7 +456,7 @@ def main():
         if r["mode"] == "probe":
             md.append(f"| {r['engine']} | `{r['model']}` | 无密钥探测：HTTP {r.get('http')} | — | — | {r.get('latency')}s |")
         else:
-            md.append(f"| {r['engine']} | `{r['model']}` | 错误 {r['errors']}/{len(TESTS)} | {r['term_hit']}/{r['term_total']} | {r['out_hit']}/{r['out_total']} | {r['avg_latency']}s |")
+            md.append(f"| {r['engine']} | `{r['model']}` | 错误 {r["errors"]}/{len(r["rows"])} | {r['term_hit']}/{r['term_total']} | {r['out_hit']}/{r['out_total']} | {r['avg_latency']}s |")
     for r in results:
         if r["mode"] != "full":
             continue
