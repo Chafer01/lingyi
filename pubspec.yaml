@@ -1,7 +1,7 @@
 name: lingyi
 description: 灵译 — 查词、翻译、同传一体的个人翻译工具（Windows / Android）
 publish_to: 'none'
-version: 0.1.0+1
+version: 0.2.0+2
 
 environment:
   sdk: ^3.10.0

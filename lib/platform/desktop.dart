@@ -12,7 +12,7 @@ import '../util/text_utils.dart';
 import 'app_state.dart';
 import 'win_input.dart';
 
-/// Windows 桌面集成：托盘、全局热键划词、迷你弹窗、剪贴板监听、关闭到托盘。
+/// Windows 桌面集成：托盘、全局热键、自动划词（小图标/直接弹出）、迷你弹窗、剪贴板监听、关闭到托盘。
 class Desktop with WindowListener, TrayListener {
   Desktop._();
   static final Desktop instance = Desktop._();
@@ -20,24 +20,31 @@ class Desktop with WindowListener, TrayListener {
   static bool get supported => Platform.isWindows;
 
   static const _mainSize = Size(980, 700);
+  static const _mainMin = Size(380, 420);
   static const _miniSize = Size(440, 560);
+  static const _miniMin = Size(320, 260);
+  static const _iconSize = Size(40, 40);
+
+  /// 终端类窗口：Ctrl+C 在这里是“中断程序”，任何情况下都不自动取词。
+  static const _terminalExe = {
+    'cmd.exe', 'powershell.exe', 'pwsh.exe', 'windowsterminal.exe', 'conhost.exe',
+    'openconsole.exe', 'wsl.exe', 'bash.exe', 'mintty.exe', 'putty.exe', 'kitty.exe',
+    'wezterm-gui.exe', 'alacritty.exe', 'tabby.exe', 'mobaxterm.exe', 'xshell.exe',
+  };
+  static const _terminalClass = {
+    'consolewindowclass', 'cascadia_hosting_window_class', 'pseudoconsolewindow',
+    'mintty', 'puttyclass', 'virtualconsoleclass',
+  };
 
   final _state = AppState.instance;
   final _settings = Settings.instance;
 
-  Timer? _clipTimer;
-  String? _lastClip;
   bool _capturing = false;
   DateTime _shownAt = DateTime.fromMillisecondsSinceEpoch(0);
 
   Future<void> init() async {
     await windowManager.ensureInitialized();
-    const options = WindowOptions(
-      size: _mainSize,
-      minimumSize: Size(380, 420),
-      center: true,
-      title: '灵译',
-    );
+    const options = WindowOptions(size: _mainSize, minimumSize: _mainMin, center: true, title: '灵译');
     await windowManager.waitUntilReadyToShow(options, () async {
       await windowManager.show();
       await windowManager.focus();
@@ -51,27 +58,76 @@ class Desktop with WindowListener, TrayListener {
     await _updateTrayMenu();
 
     await hotKeyManager.unregisterAll();
-    await applyHotkey();
+    await _applyHotkey();
     _applyClipboardWatch();
+    _applyAutoSelect();
     _settings.addListener(_onSettingsChanged);
   }
 
   int _lastHotkey = -1;
   bool _lastClipWatch = false;
+  bool _lastAutoSelect = false;
 
   void _onSettingsChanged() {
     if (_settings.hotkeyIndex != _lastHotkey) {
-      applyHotkey();
+      _applyHotkey();
       _updateTrayMenu();
     }
     if (_settings.clipboardWatch != _lastClipWatch) _applyClipboardWatch();
+    if (_settings.autoSelect != _lastAutoSelect) {
+      _applyAutoSelect();
+      _updateTrayMenu();
+    }
   }
 
-  // ---------------- 热键 ----------------
+  // ---------------------------------------------------------------------------
+  // 取选中文字
+  // ---------------------------------------------------------------------------
+
+  /// 向前台程序发送 Ctrl+C 取得选中文字，并恢复原来的剪贴板文字。
+  /// 通过剪贴板序号判断复制是否真的发生：没有选中内容时返回 null，且不改动剪贴板。
+  Future<String?> _copySelection({required bool waitForModifiers}) async {
+    if (_capturing) return null;
+    _capturing = true;
+    try {
+      final old = (await Clipboard.getData(Clipboard.kTextPlain))?.text;
+      final seq = WinInput.clipboardSequence;
+
+      if (waitForModifiers) {
+        // 等用户松开热键的修饰键（最多 400ms），这样发送的就是干净的 Ctrl+C。
+        for (var i = 0; i < 20 && WinInput.anyModifierDown; i++) {
+          await Future<void>.delayed(const Duration(milliseconds: 20));
+        }
+      }
+      WinInput.sendCopy();
+
+      String? got;
+      for (var i = 0; i < 25; i++) {
+        await Future<void>.delayed(const Duration(milliseconds: 20));
+        if (WinInput.clipboardSequence != seq) {
+          // 有的程序分几次写入剪贴板，稍等一下再读。
+          await Future<void>.delayed(const Duration(milliseconds: 30));
+          got = (await Clipboard.getData(Clipboard.kTextPlain))?.text;
+          break;
+        }
+      }
+      if (got != null && old != null && got != old) {
+        await Clipboard.setData(ClipboardData(text: old));
+      }
+      _lastClip = old;
+      return got;
+    } finally {
+      _capturing = false;
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // 热键
+  // ---------------------------------------------------------------------------
 
   HotKey? _hotKey;
 
-  Future<void> applyHotkey() async {
+  Future<void> _applyHotkey() async {
     _lastHotkey = _settings.hotkeyIndex;
     if (_hotKey != null) {
       await hotKeyManager.unregister(_hotKey!);
@@ -90,7 +146,7 @@ class Desktop with WindowListener, TrayListener {
       scope: HotKeyScope.system,
     );
     try {
-      await hotKeyManager.register(hk, keyDownHandler: (_) => captureSelection());
+      await hotKeyManager.register(hk, keyDownHandler: (_) => _onHotkey());
       _hotKey = hk;
     } catch (_) {
       // 热键被其他程序占用时注册会失败，用户可在设置中更换。
@@ -104,41 +160,119 @@ class Desktop with WindowListener, TrayListener {
         'T': PhysicalKeyboardKey.keyT,
       }[letter];
 
-  /// 划词：模拟 Ctrl+C 读取选中文字，然后在鼠标旁弹出迷你窗口。
-  Future<void> captureSelection() async {
-    if (_capturing) return;
-    _capturing = true;
-    try {
-      final old = (await Clipboard.getData(Clipboard.kTextPlain))?.text;
-      const sentinel = '⁣lingyi⁣';
-      await Clipboard.setData(const ClipboardData(text: sentinel));
+  Future<void> _onHotkey() async {
+    final fg = WinInput.foreground();
+    // 在灵译自己的窗口里按热键只聚焦输入框；在终端里不发送 Ctrl+C（那是“中断程序”）。
+    final skip = fg.pid == WinInput.currentPid || _isTerminal(fg);
+    final text = skip ? null : await _copySelection(waitForModifiers: true);
+    await showMini(text?.trim() ?? '');
+  }
 
-      // 等用户松开热键的修饰键（最多 400ms），这样发送的就是干净的 Ctrl+C。
-      for (var i = 0; i < 20 && WinInput.anyModifierDown; i++) {
-        await Future<void>.delayed(const Duration(milliseconds: 20));
-      }
-      WinInput.sendCopy();
+  // ---------------------------------------------------------------------------
+  // 自动划词：轮询鼠标左键，识别“拖选”和“双击选词”
+  // ---------------------------------------------------------------------------
 
-      String? selected;
-      for (var i = 0; i < 25; i++) {
-        await Future<void>.delayed(const Duration(milliseconds: 20));
-        final t = (await Clipboard.getData(Clipboard.kTextPlain))?.text;
-        if (t != null && t != sentinel) {
-          selected = t;
-          break;
-        }
-      }
-      // 恢复用户原来的剪贴板内容。
-      await Clipboard.setData(ClipboardData(text: old ?? ''));
-      _lastClip = old;
+  Timer? _mouseTimer;
+  bool _wasDown = false;
+  int _downX = 0, _downY = 0;
+  int _lastUpX = -9999, _lastUpY = -9999;
+  DateTime _lastUpAt = DateTime.fromMillisecondsSinceEpoch(0);
+  String _lastAutoText = '';
+  DateTime _lastAutoAt = DateTime.fromMillisecondsSinceEpoch(0);
+  int _dblMs = 500;
 
-      await showMini(selected?.trim() ?? '');
-    } finally {
-      _capturing = false;
+  void _applyAutoSelect() {
+    _lastAutoSelect = _settings.autoSelect;
+    _mouseTimer?.cancel();
+    _mouseTimer = null;
+    if (!_settings.autoSelect) return;
+    _dblMs = WinInput.doubleClickMs.clamp(200, 900);
+    _wasDown = WinInput.leftButtonDown;
+    _mouseTimer = Timer.periodic(const Duration(milliseconds: 30), (_) => _pollMouse());
+  }
+
+  void _pollMouse() {
+    final down = WinInput.leftButtonDown;
+    if (down == _wasDown) return;
+    _wasDown = down;
+    final (x, y) = WinInput.cursorPos();
+    if (down) {
+      _downX = x;
+      _downY = y;
+      // 图标显示时，在别处按下鼠标就收起图标。
+      if (_state.view.value == WinView.icon && _iconVisible && !_inIcon(x, y)) hideIcon();
+      return;
+    }
+    final now = DateTime.now();
+    final drag = (x - _downX).abs() + (y - _downY).abs() >= 12;
+    final dbl = now.difference(_lastUpAt).inMilliseconds <= _dblMs &&
+        (x - _lastUpX).abs() < 6 &&
+        (y - _lastUpY).abs() < 6;
+    _lastUpAt = now;
+    _lastUpX = x;
+    _lastUpY = y;
+    if ((drag || dbl) && !_inIcon(x, y)) _onSelectGesture(x, y);
+  }
+
+  Set<String> _exeList(String text) => text
+      .split(RegExp(r'[\n,;]'))
+      .map((s) => s.trim().toLowerCase())
+      .where((s) => s.isNotEmpty)
+      .toSet();
+
+  bool _isTerminal(ForegroundInfo fg) =>
+      _terminalExe.contains(fg.exe.toLowerCase()) || _terminalClass.contains(fg.windowClass.toLowerCase());
+
+  bool _appAllowed(ForegroundInfo fg) {
+    final exe = fg.exe.toLowerCase();
+    if (exe.isEmpty) return false; // 取不到进程名（例如管理员权限的程序）时不冒险
+    if (_isTerminal(fg)) return false;
+    if (_settings.autoSelectAllApps) return !_exeList(_settings.autoSelectExclude).contains(exe);
+    return _exeList(_settings.autoSelectApps).contains(exe);
+  }
+
+  Future<void> _onSelectGesture(int x, int y) async {
+    if (_capturing || !_settings.autoSelect) return;
+    final fg = WinInput.foreground();
+    if (fg.pid == 0 || fg.pid == WinInput.currentPid || !_appAllowed(fg)) return;
+    // 主窗口正开着时不打扰。
+    if (_state.view.value == WinView.main &&
+        await windowManager.isVisible() &&
+        !await windowManager.isMinimized()) {
+      return;
+    }
+    // 剪贴板里是图片或文件时跳过，免得被选中的文字覆盖。
+    if (WinInput.clipboardHasNonText) return;
+
+    // 给目标程序一点时间更新选区；期间若用户又按下鼠标，就放弃这次。
+    await Future<void>.delayed(const Duration(milliseconds: 150));
+    if (WinInput.leftButtonDown) return;
+
+    final text = (await _copySelection(waitForModifiers: false))?.trim();
+    if (text == null || text.isEmpty || text.length > 3000) return;
+    final now = DateTime.now();
+    if (text == _lastAutoText && now.difference(_lastAutoAt) < const Duration(seconds: 3)) return;
+    _lastAutoText = text;
+    _lastAutoAt = now;
+
+    // 迷你窗口钉住时，直接在窗口里显示新的结果，方便连续划词。
+    if (_state.view.value == WinView.mini && _state.pinned.value && await windowManager.isVisible()) {
+      _state.push(text);
+      return;
+    }
+    if (_settings.autoSelectMode == AutoSelectMode.icon) {
+      await showIcon(text, x, y);
+    } else {
+      await showMini(text);
     }
   }
 
-  // ---------------- 剪贴板监听 ----------------
+  // ---------------------------------------------------------------------------
+  // 剪贴板监听（复制即翻译）
+  // ---------------------------------------------------------------------------
+
+  Timer? _clipTimer;
+  String? _lastClip;
 
   void _applyClipboardWatch() {
     _lastClipWatch = _settings.clipboardWatch;
@@ -159,55 +293,122 @@ class Desktop with WindowListener, TrayListener {
     });
   }
 
-  // ---------------- 窗口模式 ----------------
+  // ---------------------------------------------------------------------------
+  // 窗口形态切换
+  // ---------------------------------------------------------------------------
+
+  Future<void> _enter(WinView v) async {
+    final from = _state.view.value;
+    if (from == v) return;
+    _state.view.value = v;
+    if (v == WinView.main) {
+      _state.pinned.value = false;
+      await windowManager.setTitleBarStyle(TitleBarStyle.normal);
+      await windowManager.setAlwaysOnTop(false);
+      await windowManager.setSkipTaskbar(false);
+      await windowManager.setMinimumSize(_mainMin);
+      await windowManager.setSize(_mainSize);
+      await windowManager.center();
+      return;
+    }
+    if (from == WinView.main) {
+      await windowManager.setTitleBarStyle(TitleBarStyle.hidden, windowButtonVisibility: false);
+      await windowManager.setSkipTaskbar(true);
+    }
+    await windowManager.setAlwaysOnTop(true);
+    final size = v == WinView.icon ? _iconSize : _miniSize;
+    await windowManager.setMinimumSize(v == WinView.icon ? _iconSize : _miniMin);
+    await windowManager.setSize(size);
+  }
+
+  /// 计算靠近鼠标、且不超出屏幕的窗口位置（逻辑像素）。
+  Offset _nearCursor(int cx, int cy, Size size, {double gap = 16}) {
+    final ratio = PlatformDispatcher.instance.views.first.devicePixelRatio;
+    final (vx, vy, vw, vh) = WinInput.virtualScreen();
+    final left = vx / ratio, top = vy / ratio;
+    final right = (vx + vw) / ratio, bottom = (vy + vh) / ratio;
+    var x = cx / ratio + gap;
+    var y = cy / ratio + gap;
+    if (x + size.width > right) x = cx / ratio - size.width - gap;
+    if (y + size.height > bottom) y = bottom - size.height - 48;
+    return Offset(
+      x.clamp(left, right - size.width).toDouble(),
+      y.clamp(top, bottom - size.height).toDouble(),
+    );
+  }
 
   /// 在鼠标附近显示迷你窗口并查询 [text]（为空时只显示输入框）。
   Future<void> showMini(String text) async {
-    final ratio = PlatformDispatcher.instance.views.first.devicePixelRatio;
+    _iconTimer?.cancel();
+    _iconVisible = false;
     final (cx, cy) = WinInput.cursorPos();
-    final (vx, vy, vw, vh) = WinInput.virtualScreen();
-    // 转成逻辑像素，并保证窗口不超出屏幕。
-    var x = cx / ratio + 16;
-    var y = cy / ratio + 16;
-    final right = (vx + vw) / ratio, bottom = (vy + vh) / ratio;
-    if (x + _miniSize.width > right) x = cx / ratio - _miniSize.width - 16;
-    if (y + _miniSize.height > bottom) y = bottom - _miniSize.height - 48;
-    x = x.clamp(vx / ratio, right - _miniSize.width).toDouble();
-    y = y.clamp(vy / ratio, bottom - _miniSize.height).toDouble();
-
-    if (!_state.mini.value) {
-      _state.mini.value = true;
-      await windowManager.setMinimumSize(const Size(320, 300));
-      await windowManager.setSkipTaskbar(true);
-      await windowManager.setSize(_miniSize);
-    }
-    await windowManager.setAlwaysOnTop(true);
-    await windowManager.setPosition(Offset(x, y));
+    await _enter(WinView.mini);
+    await windowManager.setPosition(_nearCursor(cx, cy, _miniSize));
     _shownAt = DateTime.now();
     await windowManager.show();
     await windowManager.focus();
     _state.push(text);
   }
 
-  /// 从迷你窗口恢复为普通主窗口。
+  // ---- 小图标 ----
+
+  Timer? _iconTimer;
+  bool _iconVisible = false;
+  String _iconText = '';
+
+  /// 图标的位置（物理像素），用于判断鼠标是否点在图标上。
+  Rect _iconRect = Rect.zero;
+
+  bool _inIcon(int x, int y) => _iconVisible && _iconRect.inflate(4).contains(Offset(x.toDouble(), y.toDouble()));
+
+  Future<void> showIcon(String text, int cx, int cy) async {
+    _iconText = text;
+    await _enter(WinView.icon);
+    final pos = _nearCursor(cx, cy, _iconSize, gap: 10);
+    await windowManager.setPosition(pos);
+    final ratio = PlatformDispatcher.instance.views.first.devicePixelRatio;
+    _iconRect = Rect.fromLTWH(pos.dx * ratio, pos.dy * ratio, _iconSize.width * ratio, _iconSize.height * ratio);
+    // 不抢焦点，用户可以继续在原程序里操作。
+    await windowManager.show(inactive: true);
+    _iconVisible = true;
+    _iconTimer?.cancel();
+    _iconTimer = Timer(const Duration(seconds: 4), hideIcon);
+  }
+
+  /// 鼠标悬停在图标上时暂停自动收起。
+  void holdIcon(bool hovering) {
+    _iconTimer?.cancel();
+    if (!hovering && _iconVisible) _iconTimer = Timer(const Duration(seconds: 2), hideIcon);
+  }
+
+  Future<void> hideIcon() async {
+    _iconTimer?.cancel();
+    if (!_iconVisible) return;
+    _iconVisible = false;
+    if (_state.view.value == WinView.icon) await windowManager.hide();
+  }
+
+  /// 点击图标：展开为迷你窗口并翻译。
+  Future<void> expandIcon() => showMini(_iconText);
+
+  /// 恢复为普通主窗口。
   Future<void> showMain() async {
-    if (_state.mini.value) {
-      _state.mini.value = false;
-      _state.pinned.value = false;
-      await windowManager.setAlwaysOnTop(false);
-      await windowManager.setSkipTaskbar(false);
-      await windowManager.setMinimumSize(const Size(380, 420));
-      await windowManager.setSize(_mainSize);
-      await windowManager.center();
-    }
+    _iconTimer?.cancel();
+    _iconVisible = false;
+    await _enter(WinView.main);
     await windowManager.show();
     await windowManager.focus();
   }
 
-  Future<void> hide() => windowManager.hide();
+  Future<void> hide() async {
+    _iconVisible = false;
+    await windowManager.hide();
+  }
 
   Future<void> quit() async {
     _clipTimer?.cancel();
+    _mouseTimer?.cancel();
+    _iconTimer?.cancel();
     await hotKeyManager.unregisterAll();
     await trayManager.destroy();
     await windowManager.setPreventClose(false);
@@ -217,7 +418,7 @@ class Desktop with WindowListener, TrayListener {
   @override
   void onWindowBlur() {
     // 迷你窗口失去焦点时自动隐藏（钉住时除外）。刚弹出时的短暂失焦忽略掉。
-    if (_state.mini.value &&
+    if (_state.view.value == WinView.mini &&
         !_state.pinned.value &&
         DateTime.now().difference(_shownAt) > const Duration(milliseconds: 600)) {
       windowManager.hide();
@@ -226,19 +427,22 @@ class Desktop with WindowListener, TrayListener {
 
   @override
   void onWindowClose() async {
-    if (_settings.closeToTray) {
-      await windowManager.hide();
+    if (_state.view.value != WinView.main || _settings.closeToTray) {
+      await hide();
     } else {
       await quit();
     }
   }
 
-  // ---------------- 托盘 ----------------
+  // ---------------------------------------------------------------------------
+  // 托盘
+  // ---------------------------------------------------------------------------
 
   Future<void> _updateTrayMenu() async {
     await trayManager.setContextMenu(Menu(items: [
       MenuItem(key: 'show', label: '打开灵译'),
       MenuItem(key: 'lookup', label: '划词翻译（${_settings.hotkey.label}）'),
+      MenuItem.checkbox(key: 'auto', label: '选中文字自动翻译', checked: _settings.autoSelect),
       MenuItem.separator(),
       MenuItem(key: 'exit', label: '退出'),
     ]));
@@ -257,6 +461,8 @@ class Desktop with WindowListener, TrayListener {
         showMain();
       case 'lookup':
         showMini('');
+      case 'auto':
+        _settings.autoSelect = !_settings.autoSelect;
       case 'exit':
         quit();
     }

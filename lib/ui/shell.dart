@@ -1,8 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:window_manager/window_manager.dart';
 
 import '../platform/app_state.dart';
 import '../platform/desktop.dart';
+import 'app.dart';
 import 'history_page.dart';
 import 'lookup_view.dart';
 import 'settings_page.dart';
@@ -22,10 +26,11 @@ class Shell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final state = AppState.instance;
-    return ValueListenableBuilder<bool>(
-      valueListenable: state.mini,
-      builder: (context, mini, _) {
-        if (mini) return const _MiniShell();
+    return ValueListenableBuilder<WinView>(
+      valueListenable: state.view,
+      builder: (context, view, _) {
+        if (view == WinView.icon) return const _SelectionIcon();
+        if (view == WinView.mini) return const _MiniShell();
         return ValueListenableBuilder<int>(
           valueListenable: state.tab,
           builder: (context, tab, _) {
@@ -92,13 +97,26 @@ class _MiniShell extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 4),
             color: scheme.surfaceContainerHighest.withValues(alpha: 0.4),
             child: Row(children: [
-              const SizedBox(width: 8),
-              Text('灵译', style: TextStyle(fontWeight: FontWeight.w600, color: scheme.primary)),
-              const Spacer(),
+              // 没有系统标题栏，按住这里拖动窗口。
+              Expanded(
+                child: DragToMoveArea(
+                  child: SizedBox.expand(
+                    child: Row(children: [
+                      const SizedBox(width: 8),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(4),
+                        child: Image.asset('assets/icons/app_icon.png', width: 18, height: 18),
+                      ),
+                      const SizedBox(width: 6),
+                      Text('灵译', style: TextStyle(fontWeight: FontWeight.w600, color: scheme.primary)),
+                    ]),
+                  ),
+                ),
+              ),
               ValueListenableBuilder<bool>(
                 valueListenable: state.pinned,
                 builder: (context, pinned, _) => IconButton(
-                  tooltip: pinned ? '取消钉住' : '钉住（失去焦点时不隐藏）',
+                  tooltip: pinned ? '取消钉住' : '钉住：失去焦点不隐藏，可连续划词',
                   iconSize: 18,
                   isSelected: pinned,
                   icon: const Icon(Icons.push_pin_outlined),
@@ -122,6 +140,62 @@ class _MiniShell extends StatelessWidget {
           ),
           const Expanded(child: LookupView(compact: true)),
         ]),
+      ),
+    );
+  }
+}
+
+/// 选中文字后出现在鼠标旁的小图标：点击或悬停片刻即展开翻译。
+class _SelectionIcon extends StatefulWidget {
+  const _SelectionIcon();
+
+  @override
+  State<_SelectionIcon> createState() => _SelectionIconState();
+}
+
+class _SelectionIconState extends State<_SelectionIcon> {
+  bool _hover = false;
+  Timer? _hoverTimer;
+
+  @override
+  void dispose() {
+    _hoverTimer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        onEnter: (_) {
+          setState(() => _hover = true);
+          Desktop.instance.holdIcon(true);
+          // 悬停 0.5 秒也会展开，和有道的习惯一致。
+          _hoverTimer = Timer(const Duration(milliseconds: 500), Desktop.instance.expandIcon);
+        },
+        onExit: (_) {
+          setState(() => _hover = false);
+          _hoverTimer?.cancel();
+          Desktop.instance.holdIcon(false);
+        },
+        child: GestureDetector(
+          onTap: () {
+            _hoverTimer?.cancel();
+            Desktop.instance.expandIcon();
+          },
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 120),
+            // 铺满整个窗口（Windows 11 会自动给窗口加圆角）。
+            color: _hover ? const Color(0xFF1548D6) : brandBlue,
+            alignment: Alignment.center,
+            child: const Text(
+              '译',
+              style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w700, height: 1),
+            ),
+          ),
+        ),
       ),
     );
   }

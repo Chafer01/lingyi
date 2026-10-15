@@ -25,6 +25,53 @@ sidelobe = 旁瓣
 grating lobe = 栅瓣
 ''';
 
+/// 引擎显示顺序。
+const engineOrder = ['tencent', 'volc', 'baidu', 'deepl', 'llm'];
+
+/// 自动划词默认生效的程序：浏览器、PDF 阅读器、Office、笔记软件。
+/// 在这些程序里，对选中文字发送 Ctrl+C 是安全的。
+const defaultAutoSelectApps = '''chrome.exe
+msedge.exe
+firefox.exe
+brave.exe
+vivaldi.exe
+opera.exe
+360se.exe
+360chrome.exe
+QQBrowser.exe
+SogouExplorer.exe
+Acrobat.exe
+AcroRd32.exe
+SumatraPDF.exe
+FoxitPDFReader.exe
+FoxitReader.exe
+FoxitPhantomPDF.exe
+PDFXEdit.exe
+WINWORD.EXE
+POWERPNT.EXE
+OUTLOOK.EXE
+ONENOTE.EXE
+wps.exe
+wpp.exe
+Typora.exe
+Obsidian.exe
+Notion.exe
+zotero.exe
+notepad.exe
+notepad++.exe
+WeChat.exe
+Weixin.exe
+''';
+
+/// 选中文字后的行为。
+enum AutoSelectMode {
+  /// 在鼠标旁显示小图标，点击后翻译。
+  icon,
+
+  /// 直接弹出翻译窗口。
+  popup,
+}
+
 class HotkeyPreset {
   const HotkeyPreset(this.label, this.ctrl, this.alt, this.shift, this.key);
   final String label;
@@ -71,6 +118,18 @@ class Settings extends ChangeNotifier {
   String get tencentRegion => _s('tencentRegion', 'ap-guangzhou');
   set tencentRegion(String v) => _set('tencentRegion', v.trim());
 
+  // ---- 火山引擎 ----
+  String get volcAk => _s('volcAk');
+  set volcAk(String v) => _set('volcAk', v.trim());
+  String get volcSk => _s('volcSk');
+  set volcSk(String v) => _set('volcSk', v.trim());
+
+  // ---- 百度翻译 ----
+  String get baiduAppId => _s('baiduAppId');
+  set baiduAppId(String v) => _set('baiduAppId', v.trim());
+  String get baiduKey => _s('baiduKey');
+  set baiduKey(String v) => _set('baiduKey', v.trim());
+
   // ---- DeepL ----
   String get deeplKey => _s('deeplKey');
   set deeplKey(String v) => _set('deeplKey', v.trim());
@@ -85,14 +144,14 @@ class Settings extends ChangeNotifier {
 
   /// 启用的翻译引擎 id，按显示顺序。
   List<String> get enabledEngines =>
-      _p.getStringList('enabledEngines') ?? const ['tencent', 'deepl', 'llm'];
+      _p.getStringList('enabledEngines') ?? const ['tencent', 'volc', 'baidu', 'deepl', 'llm'];
   set enabledEngines(List<String> v) => _set('enabledEngines', v);
 
   bool isEngineEnabled(String id) => enabledEngines.contains(id);
   void setEngineEnabled(String id, bool on) {
     final list = List<String>.from(enabledEngines)..remove(id);
     if (on) {
-      const order = ['tencent', 'deepl', 'llm'];
+      const order = engineOrder;
       list.add(id);
       list.sort((a, b) => order.indexOf(a).compareTo(order.indexOf(b)));
     }
@@ -117,6 +176,25 @@ class Settings extends ChangeNotifier {
 
   bool get clipboardWatch => _p.getBool('clipboardWatch') ?? false;
   set clipboardWatch(bool v) => _set('clipboardWatch', v);
+
+  /// 选中文字后自动取词。
+  bool get autoSelect => _p.getBool('autoSelect') ?? true;
+  set autoSelect(bool v) => _set('autoSelect', v);
+
+  AutoSelectMode get autoSelectMode =>
+      AutoSelectMode.values[(_p.getInt('autoSelectMode') ?? 0).clamp(0, AutoSelectMode.values.length - 1)];
+  set autoSelectMode(AutoSelectMode v) => _set('autoSelectMode', v.index);
+
+  /// 生效范围：false = 只在列表中的程序，true = 所有程序（终端除外）。
+  bool get autoSelectAllApps => _p.getBool('autoSelectAllApps') ?? false;
+  set autoSelectAllApps(bool v) => _set('autoSelectAllApps', v);
+
+  /// 程序列表（每行一个 exe 名）。范围为“所有程序”时，作为排除列表使用。
+  String get autoSelectApps => _s('autoSelectApps', defaultAutoSelectApps);
+  set autoSelectApps(String v) => _set('autoSelectApps', v);
+
+  String get autoSelectExclude => _s('autoSelectExclude', 'Code.exe\n');
+  set autoSelectExclude(String v) => _set('autoSelectExclude', v);
 
   bool get closeToTray => _p.getBool('closeToTray') ?? true;
   set closeToTray(bool v) => _set('closeToTray', v);

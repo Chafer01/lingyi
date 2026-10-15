@@ -36,6 +36,24 @@ class SettingsPage extends StatelessWidget {
             ),
             const Divider(height: 1),
             _EngineTile(
+              engine: tr.volc,
+              help: '每月 200 万字符免费。火山引擎控制台 → 机器翻译 开通服务；右上角头像 → API 访问密钥 创建 Access Key。',
+              fields: [
+                _Field(label: 'Access Key ID', value: s.volcAk, onChanged: (v) => s.volcAk = v),
+                _Field(label: 'Secret Access Key', value: s.volcSk, obscure: true, onChanged: (v) => s.volcSk = v),
+              ],
+            ),
+            const Divider(height: 1),
+            _EngineTile(
+              engine: tr.baidu,
+              help: '百度翻译开放平台 → 通用文本翻译。完成个人认证并切换到高级版后，每月 100 万字符免费。',
+              fields: [
+                _Field(label: 'APP ID', value: s.baiduAppId, onChanged: (v) => s.baiduAppId = v),
+                _Field(label: '密钥', value: s.baiduKey, obscure: true, onChanged: (v) => s.baiduKey = v),
+              ],
+            ),
+            const Divider(height: 1),
+            _EngineTile(
               engine: tr.deepl,
               help: '免费版每月 50 万字符，密钥以 :fx 结尾。',
               fields: [
@@ -56,6 +74,7 @@ class SettingsPage extends StatelessWidget {
           ]),
           const _GlossarySection(),
           const _DictSection(),
+          if (Platform.isWindows) const _AutoSelectSection(),
           if (Platform.isWindows)
             _Section(title: 'Windows', children: [
               ListTile(
@@ -100,7 +119,7 @@ class SettingsPage extends StatelessWidget {
           ]),
           const SizedBox(height: 8),
           Center(
-            child: Text('灵译 0.1.0 · 词库数据来自 ECDICT',
+            child: Text('灵译 0.2.0 · 词库数据来自 ECDICT',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Theme.of(context).colorScheme.outline)),
           ),
         ],
@@ -452,6 +471,135 @@ class _DictSectionState extends State<_DictSection> {
           ),
         ],
       ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+
+class _AutoSelectSection extends StatefulWidget {
+  const _AutoSelectSection();
+
+  @override
+  State<_AutoSelectSection> createState() => _AutoSelectSectionState();
+}
+
+class _AutoSelectSectionState extends State<_AutoSelectSection> {
+  final _apps = TextEditingController();
+  bool _dirty = false;
+
+  String get _current =>
+      Settings.instance.autoSelectAllApps ? Settings.instance.autoSelectExclude : Settings.instance.autoSelectApps;
+
+  @override
+  void initState() {
+    super.initState();
+    _apps.text = _current;
+  }
+
+  @override
+  void dispose() {
+    _apps.dispose();
+    super.dispose();
+  }
+
+  void _save() {
+    final s = Settings.instance;
+    if (s.autoSelectAllApps) {
+      s.autoSelectExclude = _apps.text;
+    } else {
+      s.autoSelectApps = _apps.text;
+    }
+    setState(() => _dirty = false);
+    toast(context, '已保存');
+  }
+
+  @override
+  Widget build(BuildContext context) =>
+      ListenableBuilder(listenable: Settings.instance, builder: (context, _) => _build(context));
+
+  Widget _build(BuildContext context) {
+    final s = Settings.instance;
+    final theme = Theme.of(context);
+    final hint = theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.outline);
+    return _Section(
+      title: '划词翻译',
+      subtitle: '选中文字后自动翻译，热键 ${s.hotkey.label} 始终可用',
+      children: [
+        SwitchListTile(
+          title: const Text('选中文字自动翻译'),
+          subtitle: const Text('拖选或双击选中文字后触发。主窗口打开时不打扰。'),
+          value: s.autoSelect,
+          onChanged: (v) => s.autoSelect = v,
+        ),
+        if (s.autoSelect) ...[
+          ListTile(
+            title: const Text('选中后'),
+            trailing: SegmentedButton<AutoSelectMode>(
+              showSelectedIcon: false,
+              segments: const [
+                ButtonSegment(value: AutoSelectMode.icon, label: Text('显示小图标')),
+                ButtonSegment(value: AutoSelectMode.popup, label: Text('直接弹出')),
+              ],
+              selected: {s.autoSelectMode},
+              onSelectionChanged: (v) => s.autoSelectMode = v.first,
+            ),
+          ),
+          ListTile(
+            title: const Text('生效范围'),
+            trailing: SegmentedButton<bool>(
+              showSelectedIcon: false,
+              segments: const [
+                ButtonSegment(value: false, label: Text('列表中的程序')),
+                ButtonSegment(value: true, label: Text('所有程序')),
+              ],
+              selected: {s.autoSelectAllApps},
+              onSelectionChanged: (v) {
+                if (_dirty) _save();
+                s.autoSelectAllApps = v.first;
+                setState(() => _apps.text = _current);
+              },
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+              Text(
+                s.autoSelectAllApps
+                    ? '排除这些程序（每行一个 exe 文件名）。终端（CMD、PowerShell、Windows Terminal 等）始终排除。'
+                    : '只在这些程序中自动划词（每行一个 exe 文件名）。默认包含常用浏览器、PDF 阅读器和 Office。',
+                style: hint,
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: _apps,
+                minLines: 4,
+                maxLines: 10,
+                style: const TextStyle(fontFamily: 'monospace', fontSize: 13),
+                onChanged: (_) => setState(() => _dirty = true),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                '原理：选中后向该程序发送 Ctrl+C 读取文字，再恢复原来的剪贴板内容。'
+                '剪贴板里是图片或文件时会自动跳过；开启了 Windows 剪贴板历史（Win+V）的话，划过的文字会出现在历史里。',
+                style: hint,
+              ),
+              const SizedBox(height: 8),
+              Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+                TextButton(
+                  onPressed: () => setState(() {
+                    _apps.text = s.autoSelectAllApps ? 'Code.exe\n' : defaultAutoSelectApps;
+                    _dirty = true;
+                  }),
+                  child: const Text('恢复默认'),
+                ),
+                const SizedBox(width: 8),
+                FilledButton(onPressed: _dirty ? _save : null, child: const Text('保存')),
+              ]),
+            ]),
+          ),
+        ],
+      ],
     );
   }
 }

@@ -1,5 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lingyi/services/translate/baidu.dart';
 import 'package:lingyi/services/translate/tencent.dart';
+import 'package:lingyi/services/translate/volc.dart';
 import 'package:lingyi/util/text_utils.dart';
 
 void main() {
@@ -93,5 +95,28 @@ void main() {
       'Signature=f8c354da79d5e091fcb998fc7b52b82f30af4e8f6c9d8ccfe737dd38477243a8',
     );
     expect(h['X-TC-Timestamp'], '1760500000');
+  });
+
+  test('火山引擎签名与官方 SDK 一致', () {
+    // 期望值由火山官方 volc-sdk-python 的 SignerV4 计算。
+    final h = VolcEngine.signedHeaders(
+      accessKey: 'AKLTtest',
+      secretKey: 'volcSecretTest',
+      body: '{"TargetLanguage":"zh","TextList":["hello"]}',
+      now: DateTime.fromMillisecondsSinceEpoch(1760500000 * 1000, isUtc: true),
+    );
+    expect(h['X-Date'], '20251015T034640Z');
+    expect(h['X-Content-Sha256'], '5b531d1f4a82214c5a0af857be50e3c162e19dbc2ba1ef04a591f5432ed3dc15');
+    expect(
+      h['Authorization'],
+      'HMAC-SHA256 Credential=AKLTtest/20251015/cn-north-1/translate/request, '
+      'SignedHeaders=content-type;host;x-content-sha256;x-date, '
+      'Signature=3a477041287d6d019813c1d7aadeeb057caa82f485c1ed89fe3bf2880d6b819e',
+    );
+  });
+
+  test('百度翻译签名', () {
+    // 期望值由 Python hashlib 独立计算：MD5(appid + q + salt + 密钥)。
+    expect(BaiduEngine.sign('20240001', 'apple', '1435660288', 'testkey'), '6a6611a381f17dd1c854915f68ed38d4');
   });
 }

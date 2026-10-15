@@ -165,7 +165,9 @@ class _Idle extends StatelessWidget {
     final dict = DictService.instance;
     final tip = Platform.isAndroid
         ? '在任何 App 中选中文字，点菜单里的「灵译查词」即可直接翻译；也可以把文字分享给灵译。'
-        : '在任何程序中选中文字，按 ${Settings.instance.hotkey.label} 即可在鼠标旁弹出翻译。';
+        : Settings.instance.autoSelect
+            ? '在浏览器、PDF、Office 中选中文字，旁边会出现「译」图标，点一下即可翻译；其他程序中按 ${Settings.instance.hotkey.label}。'
+            : '在任何程序中选中文字，按 ${Settings.instance.hotkey.label} 即可在鼠标旁弹出翻译。';
     return ListView(padding: EdgeInsets.fromLTRB(pad, 4, pad, pad), children: [
       if (recent.isNotEmpty) ...[
         Text('最近查询', style: theme.textTheme.labelLarge?.copyWith(color: theme.colorScheme.outline)),

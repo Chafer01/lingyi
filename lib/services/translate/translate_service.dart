@@ -1,9 +1,11 @@
 import '../../util/text_utils.dart';
 import '../settings.dart';
+import 'baidu.dart';
 import 'deepl.dart';
 import 'engine.dart';
 import 'llm.dart';
 import 'tencent.dart';
+import 'volc.dart';
 
 /// 一个引擎的一次翻译任务。
 class EngineJob {
@@ -17,10 +19,12 @@ class TranslateService {
   static final TranslateService instance = TranslateService._();
 
   final tencent = TencentEngine();
+  final volc = VolcEngine();
+  final baidu = BaiduEngine();
   final deepl = DeepLEngine();
   final llm = LlmEngine();
 
-  List<TranslateEngine> get all => [tencent, deepl, llm];
+  List<TranslateEngine> get all => [tencent, volc, baidu, deepl, llm];
 
   TranslateEngine? byId(String id) {
     for (final e in all) {
