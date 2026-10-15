@@ -79,6 +79,32 @@ TESTS = [
         "src": "通过在反射板边缘加载扼流槽，前后比提升了约5 dB，同时旁瓣电平基本不变。",
         "terms": [["choke"], ["front-to-back"], ["sidelobe", "side lobe", "side-lobe"]],
     },
+    # ---- 以下术语不在术语表里，考察模型自身的射频知识 ----
+    {
+        "id": "x1", "out": True,
+        "src": "The radome introduces a slight beam squint at the upper end of the band.",
+        "terms": [["天线罩"], ["波束偏斜", "波束倾斜", "波束指向偏移", "波束偏移", "波束斜视"]],
+    },
+    {
+        "id": "x2", "out": True,
+        "src": "Mutual coupling between adjacent columns degrades the scan performance of the array.",
+        "terms": [["互耦"], ["扫描"]],
+    },
+    {
+        "id": "x3", "out": True,
+        "src": "Null filling below the main beam improves coverage close to the tower.",
+        "terms": [["零点填充", "零深填充", "零陷填充"], ["主波束", "主瓣"]],
+    },
+    {
+        "id": "x4", "out": True,
+        "src": "Parasitic elements were added to broaden the impedance bandwidth.",
+        "terms": [["寄生单元", "寄生振子", "寄生元件"], ["阻抗带宽"]],
+    },
+    {
+        "id": "x5", "out": True,
+        "src": "上旁瓣抑制大于18 dB，满足运营商对邻区干扰的控制要求。",
+        "terms": [["upper sidelobe", "upper side lobe", "upper side-lobe"], ["suppression"], ["operator", "carrier"]],
+    },
 ]
 
 GLOSSARY = """radiation pattern = 方向图
@@ -101,6 +127,27 @@ passive intermodulation = 无源互调
 front-to-back ratio = 前后比
 choke = 扼流槽
 reflector = 反射板"""
+
+
+def glossary_pairs():
+    out = []
+    for line in GLOSSARY.splitlines():
+        a, b = [x.strip() for x in line.split("=", 1)]
+        out.append((a, b))
+    return out
+
+
+def hits_for(text):
+    """本句命中的术语（源语言 → 目标语言）。"""
+    low = text.lower()
+    res = []
+    for en, zh in glossary_pairs():
+        if is_zh(text):
+            if zh in text:
+                res.append((zh, en))
+        elif en.lower() in low:
+            res.append((en, zh))
+    return res
 
 
 def is_zh(text):
@@ -139,45 +186,79 @@ SYSTEM = (
     "必须使用以下术语译法：\n{glossary}"
 )
 
-# OpenAI 兼容的大模型接口：(名称, base_url, 密钥环境变量, 模型列表, 是否专用翻译模型)
+# OpenAI 兼容的大模型接口：(名称, base_url, 密钥环境变量, [(模型, 方式), ...])
+# 方式：chat_gloss = 系统提示 + 术语表；chat_plain = 系统提示、不给术语表；
+#       mt = Hunyuan-MT 官方提示；mt_gloss = 官方提示前附参考译法（非官方格式）
 LLMS = [
-    ("智谱", "https://open.bigmodel.cn/api/paas/v4", "ZHIPU_API_KEY", ["glm-4.7-flash", "glm-4-flash-250414"], False),
-    ("硅基流动", "https://api.siliconflow.cn/v1", "SILICONFLOW_API_KEY", ["tencent/Hunyuan-MT-7B"], True),
-    ("魔搭", "https://api-inference.modelscope.cn/v1", "MODELSCOPE_API_KEY", ["Qwen/Qwen3.5-27B"], False),
+    ("智谱", "https://open.bigmodel.cn/api/paas/v4", "ZHIPU_API_KEY",
+     [("glm-4-flash-250414", "chat_gloss"), ("glm-4-flash-250414", "chat_plain"),
+      ("glm-4.7-flash", "chat_gloss"), ("glm-4.7-flash", "chat_plain")]),
+    ("硅基流动", "https://api.siliconflow.cn/v1", "SILICONFLOW_API_KEY",
+     [("tencent/Hunyuan-MT-7B", "mt"), ("tencent/Hunyuan-MT-7B", "mt_gloss")]),
+    ("魔搭", "https://api-inference.modelscope.cn/v1", "MODELSCOPE_API_KEY",
+     [("Qwen/Qwen3.5-27B", "chat_gloss"), ("Qwen/Qwen3.5-27B", "chat_plain")]),
     ("Gemini", "https://generativelanguage.googleapis.com/v1beta/openai", "GEMINI_API_KEY",
-     ["gemini-3.5-flash-lite", "gemini-3.8-flash"], False),
-    ("百度千帆", "https://qianfan.baidubce.com/v2", "QIANFAN_API_KEY", ["ernie-speed-128k"], False),
-    ("讯飞星火", "https://spark-api-open.xf-yun.com/v1", "SPARK_API_PASSWORD", ["lite"], False),
+     [("gemini-3.5-flash-lite", "chat_gloss"), ("gemini-3.8-flash", "chat_gloss")]),
+    ("百度千帆", "https://qianfan.baidubce.com/v2", "QIANFAN_API_KEY", [("ernie-speed-128k", "chat_gloss")]),
+    ("讯飞星火", "https://spark-api-open.xf-yun.com/v1", "SPARK_API_PASSWORD", [("lite", "chat_gloss")]),
 ]
 
+MODE_LABEL = {"chat_gloss": "带术语表", "chat_plain": "不带术语表", "mt": "官方提示", "mt_gloss": "官方提示+参考译法"}
 
-def llm_translate(base, key, model, text, mt_model):
+SYSTEM_PLAIN = (
+    "你是专业的科技翻译，熟悉射频、天线、电磁仿真和通信工程。把用户给出的文本翻译成{target}。"
+    "要求：准确、通顺、符合技术文档习惯；保留公式、变量名、单位和专有名词；不要解释，只输出译文。"
+)
+
+
+def llm_translate(base, key, model, text, mode):
     target = target_of(text)
-    if mt_model:
-        # Hunyuan-MT 官方推荐的提示格式：不加系统提示，直接给出指令。
-        prompt = (f"把下面的文本翻译成{'中文' if target == '简体中文' else 'English'}，不要额外解释。\n\n{text}"
-                  if target == "简体中文" else
-                  f"Translate the following segment into English, without additional explanation.\n\n{text}")
+    params = {"temperature": 0.2}
+    if mode in ("mt", "mt_gloss"):
+        lang = "中文" if target == "简体中文" else "English"
+        if target == "简体中文":
+            prompt = f"把下面的文本翻译成{lang}，不要额外解释。\n\n{text}"
+        else:
+            prompt = f"Translate the following segment into English, without additional explanation.\n\n{text}"
+        if mode == "mt_gloss":
+            pairs = hits_for(text)
+            if pairs:
+                ref = "\n".join(f"{a} 翻译成 {b}" for a, b in pairs)
+                prompt = f"参考下面的翻译：\n{ref}\n\n" + prompt
         messages = [{"role": "user", "content": prompt}]
+        params = {"temperature": 0.7, "top_p": 0.6}  # Hunyuan-MT 官方推荐参数
     else:
-        messages = [
-            {"role": "system", "content": SYSTEM.format(target=target, glossary=GLOSSARY)},
-            {"role": "user", "content": text},
-        ]
-    body = {"model": model, "messages": messages, "temperature": 0.2, "stream": False}
-    code, resp, dt = http("POST", f"{base}/chat/completions",
-                          {"Content-Type": "application/json", "Authorization": f"Bearer {key}"}, body)
+        if mode == "chat_gloss":
+            pairs = hits_for(text)
+            system = SYSTEM_PLAIN.format(target=target)
+            if pairs:
+                system += "必须使用以下术语译法：\n" + "\n".join(f"- {a} → {b}" for a, b in pairs)
+        else:
+            system = SYSTEM_PLAIN.format(target=target)
+        messages = [{"role": "system", "content": system}, {"role": "user", "content": text}]
+    body = {"model": model, "messages": messages, "stream": False, **params}
+    headers = {"Content-Type": "application/json", "Authorization": f"Bearer {key}"}
+    retries = 0
+    t_total = 0.0
+    while True:
+        code, resp, dt = http("POST", f"{base}/chat/completions", headers, body)
+        t_total += dt
+        if code == 429 and retries < 4:
+            retries += 1
+            time.sleep(3 * retries)
+            continue
+        break
+    tag = f"（重试 {retries} 次）" if retries else ""
     if code != 200:
-        return None, f"HTTP {code}: {resp[:300]}", dt
+        return None, f"HTTP {code}{tag}: {resp[:200]}", t_total
     try:
         j = json.loads(resp)
         out = j["choices"][0]["message"]["content"] or ""
-        # 部分推理模型会带 <think>…</think>
         if "</think>" in out:
             out = out.split("</think>", 1)[1]
-        return out.strip(), None, dt
+        return out.strip() + (f"  ⟨重试 {retries} 次⟩" if retries else ""), None, t_total
     except Exception as e:
-        return None, f"解析失败: {e}: {resp[:300]}", dt
+        return None, f"解析失败: {e}: {resp[:200]}", t_total
 
 
 def volc_translate(ak, sk, text):
@@ -259,11 +340,15 @@ def probe(name, base, model, key=""):
 
 def run_engine(name, model, fn):
     rows, total_hit, total_terms, errors, latencies = [], 0, 0, 0, []
+    out_hit = out_terms = 0
     for t in TESTS:
         out, err, dt = fn(t["src"])
         h, n, miss = score(t, out)
         total_hit += h
         total_terms += n
+        if t.get("out"):
+            out_hit += h
+            out_terms += n
         latencies.append(dt)
         if err:
             errors += 1
@@ -271,6 +356,7 @@ def run_engine(name, model, fn):
                      "latency": round(dt, 2)})
         time.sleep(1.2)  # 照顾免费档的限流
     return {"engine": name, "model": model, "mode": "full", "term_hit": total_hit, "term_total": total_terms,
+            "out_hit": out_hit, "out_total": out_terms,
             "errors": errors, "avg_latency": round(sum(latencies) / len(latencies), 2), "rows": rows}
 
 
@@ -284,18 +370,17 @@ def listed(r):
 
 def main():
     results = []
-    for name, base, env, models, mt in LLMS:
+    for name, base, env, variants in LLMS:
         key = os.environ.get(env, "").strip()
-        for m in models:
-            if key:
-                print(f"== {name} {m}（实测）", flush=True)
-                r = run_engine(name, m, lambda s, b=base, k=key, mm=m, t=mt: llm_translate(b, k, mm, s, t))
-                p = probe(name, base, m, key)
-                r["models_http"], r["model_listed"] = p["models_http"], p["model_listed"]
-                results.append(r)
-            else:
-                print(f"== {name} {m}（无密钥探测）", flush=True)
-                results.append(probe(name, base, m))
+        if not key:
+            print(f"== {name}（无密钥探测）", flush=True)
+            results.append(probe(name, base, variants[0][0]))
+            continue
+        for m, mode in variants:
+            print(f"== {name} {m} {mode}（实测）", flush=True)
+            r = run_engine(name, f"{m} · {MODE_LABEL[mode]}",
+                           lambda s, b=base, k=key, mm=m, md=mode: llm_translate(b, k, mm, s, md))
+            results.append(r)
     ak, sk = os.environ.get("VOLC_AK", "").strip(), os.environ.get("VOLC_SK", "").strip()
     if ak and sk:
         print("== 火山翻译（实测）", flush=True)
@@ -318,12 +403,12 @@ def main():
         json.dump({"time": datetime.now(timezone.utc).isoformat(), "results": results}, f, ensure_ascii=False, indent=1)
 
     md = [f"# 翻译接口实测（{datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')}）", ""]
-    md += ["| 接口 | 模型 | 方式 | 结果 | 模型列表中存在 | 术语命中 | 平均延迟 |", "|---|---|---|---|---|---|---|"]
+    md += ["| 接口 | 模型 · 方式 | 结果 | 术语命中（全部） | 其中术语表外 | 平均延迟 |", "|---|---|---|---|---|---|"]
     for r in results:
         if r["mode"] == "probe":
-            md.append(f"| {r['engine']} | `{r['model']}` | 无密钥探测 | HTTP {r.get('http')}：{str(r.get('body'))[:120].replace('|', '/').replace(chr(10), ' ')} | {listed(r)} | — | {r.get('latency')}s |")
+            md.append(f"| {r['engine']} | `{r['model']}` | 无密钥探测：HTTP {r.get('http')} | — | — | {r.get('latency')}s |")
         else:
-            md.append(f"| {r['engine']} | `{r['model']}` | 实测 | 错误 {r['errors']}/{len(TESTS)} | {listed(r)} | {r['term_hit']}/{r['term_total']} | {r['avg_latency']}s |")
+            md.append(f"| {r['engine']} | `{r['model']}` | 错误 {r['errors']}/{len(TESTS)} | {r['term_hit']}/{r['term_total']} | {r['out_hit']}/{r['out_total']} | {r['avg_latency']}s |")
     for r in results:
         if r["mode"] != "full":
             continue
