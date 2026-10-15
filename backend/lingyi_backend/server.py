@@ -71,6 +71,10 @@ def create_app(token: str, jobs: JobManager | None = None) -> FastAPI:
             res["image"] = _png_b64(img)
         return res
 
+    @app.get("/ping", dependencies=[Depends(auth)])
+    def ping():
+        return {"ok": True, "pid": os.getpid()}
+
     @app.get("/health", dependencies=[Depends(auth)])
     def health():
         feats = {}

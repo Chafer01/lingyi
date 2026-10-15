@@ -65,7 +65,10 @@ def wait_port(p, started: float, timeout: float = 120) -> int:
     import os
     import queue
     q: "queue.Queue[str]" = queue.Queue()
-    threading.Thread(target=lambda: q.put(p.stdout.readline()), daemon=True).start()
+    def drain():  # 持续读取，避免管道写满（与灵译的做法一致）
+        for line in p.stdout:
+            q.put(line)
+    threading.Thread(target=drain, daemon=True).start()
     port_file = Path(os.environ.get("LOCALAPPDATA") or Path.home() / ".cache") / "lingyi" / "backend.port"
     end = time.time() + timeout
     while time.time() < end:
@@ -88,7 +91,8 @@ def call(port, path, body=None):
     data = None if body is None else json.dumps(body).encode()
     req = urllib.request.Request(f"http://127.0.0.1:{port}{path}", data=data,
                                  headers={"X-Lingyi-Token": TOKEN, "Content-Type": "application/json"})
-    with urllib.request.urlopen(req, timeout=60) as r:
+    opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))
+    with opener.open(req, timeout=60) as r:
         return json.load(r)
 
 

@@ -36,6 +36,20 @@ def _watch_stdin():
     os._exit(0)
 
 
+def _redirect_output():
+    """报告就绪后，把标准输出 / 错误（包括 C 扩展直接写 fd 的内容）全部转到日志文件。
+
+    灵译只读第一行；如果之后还往管道里写而没人读，Windows 上管道缓冲很小，写满后整个后端会卡住。
+    """
+    log = open(_log_dir() / "backend.out.log", "a", encoding="utf-8", buffering=1)  # noqa: SIM115
+    for fd in (1, 2):
+        try:
+            os.dup2(log.fileno(), fd)
+        except OSError:
+            pass
+    sys.stdout = sys.stderr = log
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(prog="lingyi_backend")
     ap.add_argument("--host", default="127.0.0.1")
@@ -77,6 +91,7 @@ def main(argv=None):
             sys.stdout.flush()
     except Exception:  # noqa: BLE001
         pass
+    _redirect_output()
     logging.getLogger("lingyi").info("listening on %s:%s", args.host, port)
     server.run(sockets=[sock])
 

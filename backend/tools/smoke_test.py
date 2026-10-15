@@ -26,7 +26,10 @@ def wait_port(p, started: float, timeout: float = 120) -> int:
     import os
     import queue
     q: "queue.Queue[str]" = queue.Queue()
-    threading.Thread(target=lambda: q.put(p.stdout.readline()), daemon=True).start()
+    def drain():  # 持续读取，避免管道写满（与灵译的做法一致）
+        for line in p.stdout:
+            q.put(line)
+    threading.Thread(target=drain, daemon=True).start()
     port_file = Path(os.environ.get("LOCALAPPDATA") or Path.home() / ".cache") / "lingyi" / "backend.port"
     end = time.time() + timeout
     while time.time() < end:
@@ -45,12 +48,24 @@ def wait_port(p, started: float, timeout: float = 120) -> int:
     raise TimeoutError("后端启动超时")
 
 
-def call(port, path, body=None):
+def call(port, path, body=None, timeout=300):
     data = None if body is None else json.dumps(body).encode()
     req = urllib.request.Request(f"http://127.0.0.1:{port}{path}", data=data,
                                  headers={"X-Lingyi-Token": TOKEN, "Content-Type": "application/json"})
-    with urllib.request.urlopen(req, timeout=300) as r:
+    # 不走系统代理（CI 或公司网络可能设置了 HTTP_PROXY）
+    opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))
+    with opener.open(req, timeout=timeout) as r:
         return json.load(r)
+
+
+def dump_logs():
+    import os
+    d = Path(os.environ.get("LOCALAPPDATA") or Path.home() / ".cache") / "lingyi"
+    for name in ("backend.log", "backend.out.log"):
+        f = d / name
+        if f.exists():
+            print(f"----- {name}（末尾）-----")
+            print(f.read_text(encoding="utf-8", errors="replace")[-4000:])
 
 
 def main():
@@ -62,7 +77,11 @@ def main():
     try:
         port = wait_port(p, started)
         print("端口", port)
+        t = time.time()
+        print("ping", call(port, "/ping", timeout=30), f"{time.time() - t:.1f}s")
+        t = time.time()
         h = call(port, "/health")
+        print(f"health {time.time() - t:.1f}s")
         print("health", h)
         assert all(h["features"].values()), h
 
@@ -85,6 +104,9 @@ def main():
         except urllib.error.HTTPError as e:
             assert e.code == 400
         print("全部通过")
+    except Exception:
+        dump_logs()
+        raise
     finally:
         p.stdin.close()          # 模拟灵译退出
         try:
