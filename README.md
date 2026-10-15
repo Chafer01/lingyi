@@ -53,7 +53,7 @@ flutter run -d windows          # 或连接手机后 flutter run
 
 ```
 启动命令：python -m lingyi_backend
-工作目录：<仓库>\backend      （先执行 pip install -r requirements.txt，需 Python 3.12）
+工作目录：<仓库>\backend      （需 Python 3.12，先执行 pip install -r requirements.txt 和 pip install --no-deps -r requirements-nodeps.txt）
 ```
 
 后端单独测试：`cd backend && python -m pytest tests -q && python tools/smoke_test.py`

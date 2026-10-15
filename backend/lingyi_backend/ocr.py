@@ -30,8 +30,10 @@ def _formula():
     global _formula_engine
     with _lock:
         if _formula_engine is None:
-            from rapid_latex_ocr import LatexOCR
-            _formula_engine = LatexOCR()
+            import rapid_latex_ocr
+            # 0.0.9 起类名为 LaTeXOCR，旧版为 LatexOCR
+            cls = getattr(rapid_latex_ocr, "LaTeXOCR", None) or getattr(rapid_latex_ocr, "LatexOCR")
+            _formula_engine = cls()
         return _formula_engine
 
 

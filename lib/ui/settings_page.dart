@@ -677,7 +677,7 @@ class _BackendSection extends StatelessWidget {
           children: [
             Text(
               '留空时使用安装包自带的 backend\\lingyi_backend.exe。从源码运行时可填：python -m lingyi_backend，'
-              '工作目录填仓库里的 backend 文件夹（需先 pip install -r requirements.txt）。修改后点“重启”生效。',
+              '工作目录填仓库里的 backend 文件夹（需先按 backend 目录下的 requirements 安装依赖）。修改后点“重启”生效。',
               style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.outline),
             ),
             const SizedBox(height: 8),

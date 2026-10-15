@@ -1,12 +1,17 @@
 # 灵译后端（Python 3.12）。版本均为实测通过的组合。
+# 安装：pip install -r requirements.txt && pip install --no-deps -r requirements-nodeps.txt
 fastapi>=0.110,<1
 uvicorn>=0.29,<1
 pillow>=10
 rapidocr_onnxruntime==1.4.4
-rapid_latex_ocr==0.0.6
 latex2mathml>=3.77
 wordninja==2.0.0
 babeldoc==0.6.4
-# rapid_latex_ocr 在 numpy 2.3+ 下会报错；babeldoc 0.6.x 需要 bitstring 4.x
-numpy>=1.26,<2.3
+# rapid_latex_ocr 的依赖（它本身见 requirements-nodeps.txt）
+tokenizers>=0.13.2
+opencv-python
+PyYAML
+chardet
+# babeldoc 需要 numpy 2.x；numpy 2.3+ 会让公式识别报错。babeldoc 0.6.x 需要 bitstring 4.x
+numpy>=2.0,<2.3
 bitstring>=4.2,<5

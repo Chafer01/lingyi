@@ -108,7 +108,9 @@ jobs:
         with:
           python-version: '3.12'
           cache: pip
-          cache-dependency-path: backend/requirements.txt
+          cache-dependency-path: |
+            backend/requirements.txt
+            backend/requirements-nodeps.txt
       - name: 编译后端
         shell: bash
         working-directory: backend
@@ -130,6 +132,7 @@ jobs:
             fi
           }
           step "安装依赖" pip install -r requirements.txt pyinstaller pytest httpx
+          step "安装依赖（不带依赖）" pip install --no-deps -r requirements-nodeps.txt
           # 预先下载公式识别模型，打进安装包，用户首次使用无需联网
           step "下载公式模型" python -c "from rapid_latex_ocr import LatexOCR; LatexOCR()"
           step "单元测试" python -m pytest tests -q
