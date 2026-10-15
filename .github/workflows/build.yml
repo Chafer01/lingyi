@@ -116,6 +116,7 @@ jobs:
           PYTHONIOENCODING: utf-8
           PYTHONUTF8: '1'
         run: |
+          set +e
           # 每一步失败时把输出末尾写进注解，便于通过 API 查看
           step() {
             name="$1"; shift
