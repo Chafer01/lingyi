@@ -23,7 +23,9 @@ a = Analysis(
     datas=datas,
     binaries=binaries,
     hiddenimports=hiddenimports,
-    excludes=["tkinter", "matplotlib", "IPython", "pytest"],
+    # scipy / scikit-image 在 Windows 打包程序里导入会卡死，且只被 babeldoc 的扫描件检测用到，
+    # 已由 lingyi_backend/_compat.py 的精简实现替代
+    excludes=["tkinter", "matplotlib", "IPython", "pytest", "scipy", "skimage", "sklearn"],
 )
 pyz = PYZ(a.pure)
 exe = EXE(pyz, a.scripts, [], exclude_binaries=True, name="lingyi_backend",
