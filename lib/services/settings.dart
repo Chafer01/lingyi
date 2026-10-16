@@ -36,7 +36,7 @@ adjacent-cell interference = 邻区干扰
 ''';
 
 /// 引擎显示顺序。
-const engineOrder = ['volc', 'baidu', 'llm', 'deepl', 'tencent'];
+const engineOrder = ['llm', 'volc', 'baidu', 'deepl', 'tencent'];
 
 /// 自动划词默认生效的程序：浏览器、PDF 阅读器、Office、笔记软件。
 /// 在这些程序里，对选中文字发送 Ctrl+C 是安全的。
@@ -219,7 +219,7 @@ class Settings extends ChangeNotifier {
 
   /// 启用的翻译引擎 id，按显示顺序。
   List<String> get enabledEngines =>
-      _p.getStringList('enabledEngines') ?? const ['volc', 'baidu', 'llm'];
+      _p.getStringList('enabledEngines') ?? const ['llm'];
   set enabledEngines(List<String> v) => _set('enabledEngines', v);
 
   bool isEngineEnabled(String id) => enabledEngines.contains(id);

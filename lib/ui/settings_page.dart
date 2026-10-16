@@ -26,10 +26,24 @@ class SettingsPage extends StatelessWidget {
             padding: const EdgeInsets.only(left: 4, bottom: 12),
             child: Text('设置', style: Theme.of(context).textTheme.titleLarge),
           ),
-          _Section(title: '翻译引擎', subtitle: '可同时开启多个，结果并排显示。免费额度可能随厂商政策变化，建议至少配两个', children: [
+          _Section(title: '翻译引擎', subtitle: '可同时开启多个，结果并排显示。默认只用 AI 翻译（内部按线路自动切换）', children: [
+            _EngineTile(
+              engine: tr.llm,
+              help: '按下面的线路顺序尝试：前一个限流、额度用完、超时或出错时自动换下一个，结果下方会显示实际使用的模型。'
+                  '划词翻译、AI 讲解和 PDF 翻译都使用这条线路。\n'
+                  '魔搭：modelscope.cn 绑定阿里云账号、完成实名并验证邮箱后，在“访问令牌”页创建（ms- 开头），每天约 2000 次免费调用。\n'
+                  '智谱：open.bigmodel.cn 注册后在“API Keys”页创建，GLM-4-Flash 官方免费。',
+              fields: [
+                _Field(label: '魔搭 ModelScope 访问令牌', value: s.modelscopeKey, obscure: true, onChanged: (v) => s.modelscopeKey = v),
+                _Field(label: '智谱 API Key', value: s.zhipuKey, obscure: true, onChanged: (v) => s.zhipuKey = v),
+                const _AiChainEditor(),
+              ],
+            ),
+            const Divider(height: 1),
             _EngineTile(
               engine: tr.volc,
-              help: '每月 200 万字符免费。火山引擎控制台 → 机器翻译 开通服务；右上角头像 → API 访问密钥 创建 Access Key。',
+              help: '⚠ 付费：先用后付费，文本翻译 49 元/百万字符（按日结算），开通页未显示免费额度。'
+                  '火山引擎控制台 → 机器翻译 → 开通管理；访问控制里创建带 TranslateFullAccess 权限的密钥。',
               fields: [
                 _Field(label: 'Access Key ID', value: s.volcAk, onChanged: (v) => s.volcAk = v),
                 _Field(label: 'Secret Access Key', value: s.volcSk, obscure: true, onChanged: (v) => s.volcSk = v),
@@ -50,19 +64,6 @@ class SettingsPage extends StatelessWidget {
               help: '免费版每月 50 万字符，密钥以 :fx 结尾。',
               fields: [
                 _Field(label: 'API 密钥', value: s.deeplKey, obscure: true, onChanged: (v) => s.deeplKey = v),
-              ],
-            ),
-            const Divider(height: 1),
-            _EngineTile(
-              engine: tr.llm,
-              help: '按下面的线路顺序尝试：前一个限流、额度用完、超时或出错时自动换下一个，结果下方会显示实际使用的模型。'
-                  '划词翻译、AI 讲解和 PDF 翻译都使用这条线路。\n'
-                  '魔搭：modelscope.cn 绑定阿里云账号、完成实名并验证邮箱后，在“访问令牌”页创建（ms- 开头），每天约 2000 次免费调用。\n'
-                  '智谱：open.bigmodel.cn 注册后在“API Keys”页创建，GLM-4-Flash 官方免费。',
-              fields: [
-                _Field(label: '魔搭 ModelScope 访问令牌', value: s.modelscopeKey, obscure: true, onChanged: (v) => s.modelscopeKey = v),
-                _Field(label: '智谱 API Key', value: s.zhipuKey, obscure: true, onChanged: (v) => s.zhipuKey = v),
-                const _AiChainEditor(),
               ],
             ),
             const Divider(height: 1),

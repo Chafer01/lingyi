@@ -1,0 +1,54 @@
+name: AI 线路实测
+
+# 手动运行：用 Secrets 里的魔搭、智谱密钥，验证
+#   划词翻译 / AI 讲解（Dart 端 AiRouter）和 PDF 翻译（Python 后端 EndpointPool）
+# 都按 Qwen3.5-397B → Qwen3.5-27B → GLM-4-Flash 的顺序工作，首选失效时会自动切换。
+on:
+  workflow_dispatch:
+
+jobs:
+  dart:
+    name: 划词翻译与 AI 讲解（Dart）
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - name: 实测
+        env:
+          MODELSCOPE_API_KEY: ${{ secrets.MODELSCOPE_API_KEY }}
+          ZHIPU_API_KEY: ${{ secrets.ZHIPU_API_KEY }}
+        run: |
+          set +e
+          flutter test test/live/ai_chain_live_test.dart --reporter expanded > live.txt 2>&1
+          code=$?
+          cat live.txt
+          msg=$(grep -E '^\[|跳过|Expected|Actual|Some tests failed|All tests passed' live.txt | head -60 | sed 's/%/%25/g' | awk '{printf "%s%%0A", $0}')
+          if [ $code -ne 0 ]; then echo "::error title=Dart 实测::$msg"; else echo "::notice title=Dart 实测::$msg"; fi
+          exit $code
+
+  python:
+    name: PDF 翻译后端（Python）
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install numpy openai httpx
+      - name: 实测
+        working-directory: backend
+        env:
+          MODELSCOPE_API_KEY: ${{ secrets.MODELSCOPE_API_KEY }}
+          ZHIPU_API_KEY: ${{ secrets.ZHIPU_API_KEY }}
+        run: |
+          set +e
+          python tools/chain_live.py > live.txt 2>&1
+          code=$?
+          cat live.txt
+          msg=$(head -40 live.txt | sed 's/%/%25/g' | awk '{printf "%s%%0A", $0}')
+          if [ $code -ne 0 ]; then echo "::error title=后端实测::$msg"; else echo "::notice title=后端实测::$msg"; fi
+          exit $code

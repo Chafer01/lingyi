@@ -216,8 +216,11 @@ class AiRouter {
     } catch (_) {
       throw AiCallError('返回内容无法解析', status: 502);
     }
+    // 逐层取 choices[0].message.content；不在三元表达式里用 `?[`，避免 Dart 解析歧义。
     final choices = j is Map ? j['choices'] : null;
-    final content = (choices is List && choices.isNotEmpty) ? (choices.first as Map)['message']?['content'] : null;
+    final first = (choices is List && choices.isNotEmpty) ? choices.first : null;
+    final message = first is Map ? first['message'] : null;
+    final content = message is Map ? message['content'] : null;
     if (content is! String || content.trim().isEmpty) {
       // 部分平台把额度/内容错误放在 200 响应里
       final err = j is Map ? apiErrorMessage(200, text) : '';
