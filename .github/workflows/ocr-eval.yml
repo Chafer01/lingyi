@@ -9,6 +9,10 @@ on:
         description: '只测名称包含这些关键字的模型（逗号分隔，如 GLM-4.6V,Qwen3.5-397B）；留空测全部'
         required: false
         default: ''
+      diag:
+        description: '只运行智谱视觉模型诊断（true/false）'
+        required: false
+        default: 'false'
 
 permissions:
   contents: write
@@ -21,12 +25,19 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: 智谱诊断
+        if: inputs.diag == 'true'
+        env:
+          ZHIPU_API_KEY: ${{ secrets.ZHIPU_API_KEY }}
+        run: python3 tools/ocr_eval/diag_zhipu.py
       - name: 实测
+        if: inputs.diag != 'true'
         env:
           ZHIPU_API_KEY: ${{ secrets.ZHIPU_API_KEY }}
           MODELSCOPE_API_KEY: ${{ secrets.MODELSCOPE_API_KEY }}
         run: python3 tools/ocr_eval/run_eval.py --only "${{ inputs.only }}" --out /tmp/ocr
       - name: 提交结果
+        if: inputs.diag != 'true'
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@users.noreply.github.com"
