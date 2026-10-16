@@ -43,3 +43,7 @@ backend/dist/
 backend/**/__pycache__/
 backend/.pytest_cache/
 backend/e2e.txt
+
+# Python 缓存
+__pycache__/
+*.pyc
