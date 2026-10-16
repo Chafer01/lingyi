@@ -111,6 +111,16 @@ jobs:
             echo "::error title=flutter build windows::$msg"
           fi
           exit $code
+      - name: Windows 剪贴板测试（划词取词时备份/恢复图片）
+        shell: bash
+        run: |
+          set +e
+          flutter test test/win > wintest.txt 2>&1
+          code=$?
+          cat wintest.txt
+          msg=$(tail -40 wintest.txt | sed 's/%/%25/g' | awk '{printf "%s%%0A", $0}')
+          if [ $code -ne 0 ]; then echo "::error title=Windows 剪贴板测试::$msg"; else echo "::notice title=Windows 剪贴板测试通过::$msg"; fi
+          exit $code
       # ---- 本地后端（截图 OCR / 公式识别 / PDF 翻译）----
       - uses: actions/setup-python@v5
         with:

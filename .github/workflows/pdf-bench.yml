@@ -1,0 +1,48 @@
+name: PDF 速度实测
+
+on:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: '论文 PDF 地址'
+        required: false
+        default: 'https://arxiv.org/pdf/1706.03762'
+      pages:
+        description: '翻译哪些页'
+        required: false
+        default: '1-5'
+
+permissions:
+  contents: read
+
+jobs:
+  bench:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: |
+            backend/requirements.txt
+            backend/requirements-nodeps.txt
+      - name: 安装后端依赖
+        working-directory: backend
+        run: |
+          pip install -r requirements.txt
+          pip install --no-deps -r requirements-nodeps.txt
+      - name: 实测
+        working-directory: backend
+        env:
+          MODELSCOPE_API_KEY: ${{ secrets.MODELSCOPE_API_KEY }}
+          AMD_API_KEY: ${{ secrets.AMD_API_KEY }}
+          ZHIPU_API_KEY: ${{ secrets.ZHIPU_API_KEY }}
+        run: |
+          curl -sSL -o /tmp/paper.pdf "${{ inputs.url }}"
+          python -c "import pymupdf; d=pymupdf.open('/tmp/paper.pdf'); print('页数', d.page_count)"
+          python tools/pdf_bench.py /tmp/paper.pdf "${{ inputs.pages }}" 2>bench.err | tee bench.txt
+          tail -30 bench.err
+          msg=$(sed 's/%/%25/g' bench.txt | awk '{printf "%s%%0A", $0}')
+          echo "::notice title=PDF 速度实测::$msg"

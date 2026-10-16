@@ -94,13 +94,16 @@ class Desktop with WindowListener, TrayListener {
   // 取选中文字
   // ---------------------------------------------------------------------------
 
-  /// 向前台程序发送 Ctrl+C 取得选中文字，并恢复原来的剪贴板文字。
+  /// 向前台程序发送 Ctrl+C 取得选中文字，之后把剪贴板恢复原样（包括图片、文件等非文字内容）。
   /// 通过剪贴板序号判断复制是否真的发生：没有选中内容时返回 null，且不改动剪贴板。
   Future<String?> _copySelection({required bool waitForModifiers}) async {
     if (_capturing) return null;
     _capturing = true;
     try {
-      final old = (await Clipboard.getData(Clipboard.kTextPlain))?.text;
+      // 先完整备份剪贴板。以前剪贴板里是图片（例如刚截过图）时自动划词会直接跳过，
+      // 表现为“必须先按一次热键才能划词”——热键把选中的文字复制进去后，剪贴板才变回文字。
+      final snap = WinInput.saveClipboard();
+      final oldText = snap == null ? (await Clipboard.getData(Clipboard.kTextPlain))?.text : null;
       final seq = WinInput.clipboardSequence;
 
       if (waitForModifiers) {
@@ -121,10 +124,14 @@ class Desktop with WindowListener, TrayListener {
           break;
         }
       }
-      if (got != null && old != null && got != old) {
-        await Clipboard.setData(ClipboardData(text: old));
+      if (WinInput.clipboardSequence != seq) {
+        if (snap != null) {
+          WinInput.restoreClipboard(snap);
+        } else if (oldText != null) {
+          await Clipboard.setData(ClipboardData(text: oldText)); // 备份失败（内容太大）时至少恢复文字
+        }
       }
-      _lastClip = old;
+      _lastClip = (await Clipboard.getData(Clipboard.kTextPlain))?.text;
       return got;
     } finally {
       _capturing = false;
@@ -337,8 +344,7 @@ class Desktop with WindowListener, TrayListener {
     // 注意：不能用“主窗口可见”来判断——灵译启动后主窗口默认开着，常被浏览器等挡在后面，
     // 那样会导致自动划词一直不生效，直到按一次热键把窗口变成迷你弹窗为止。
     if (fg.pid == 0 || fg.pid == WinInput.currentPid || !_appAllowed(fg)) return;
-    // 剪贴板里是图片或文件时跳过，免得被选中的文字覆盖。
-    if (WinInput.clipboardHasNonText) return;
+    // 剪贴板里的图片、文件等会在取词后原样恢复（见 _copySelection），这里不再跳过。
 
     // 给目标程序一点时间更新选区；期间若用户又按下鼠标，就放弃这次。
     await Future<void>.delayed(const Duration(milliseconds: 150));
