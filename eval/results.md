@@ -1,0 +1,645 @@
+# 翻译接口实测（2026-10-16 06:27 UTC）
+
+| 接口 | 模型 · 方式 | 结果 | 术语命中（全部） | 其中术语表外 | 平均延迟 |
+|---|---|---|---|---|---|
+| 智谱 | `glm-4-flash-250414 · 带术语表` | 错误 0/16 | 40/42 | 9/11 | 1.08s |
+| 智谱 | `glm-4-flash-250414 · 不带术语表` | 错误 0/16 | 38/42 | 9/11 | 0.89s |
+| 智谱 | `glm-4.7-flash · 带术语表` | 错误 6/16 | 23/42 | 10/11 | 18.95s |
+| 智谱 | `glm-4.7-flash · 不带术语表` | 错误 13/16 | 8/42 | 0/11 | 10.92s |
+| 魔搭 | `Qwen/Qwen3.5-27B · 带术语表` | 错误 0/16 | 41/42 | 10/11 | 2.23s |
+| 魔搭 | `Qwen/Qwen3.5-397B-A17B · 带术语表` | 错误 0/16 | 42/42 | 11/11 | 3.79s |
+| 魔搭 | `ZhipuAI/GLM-4.7-Flash · 带术语表` | 错误 15/16 | 2/42 | 2/11 | 17.15s |
+| 魔搭 | `Qwen/Qwen3.5-27B · 不带术语表` | 错误 0/16 | 40/42 | 10/11 | 2.09s |
+| AMD | `DeepSeek-V4.1-Flash · 带术语表` | 错误 1/16 | 38/42 | 8/11 | 5.95s |
+| AMD | `DeepSeek-V4-Flash · 带术语表` | 错误 0/16 | 41/42 | 10/11 | 4.39s |
+| AMD | `Gemma-4-31B-IT · 带术语表` | 错误 0/16 | 41/42 | 11/11 | 2.62s |
+| AMD | `Qwen3.8-27B · 带术语表` | 错误 0/16 | 40/42 | 9/11 | 2.33s |
+| AMD | `MiMo-V2.6-Flash · 带术语表` | 错误 0/16 | 42/42 | 11/11 | 3.59s |
+
+## 智谱 · glm-4-flash-250414 · 带术语表
+
+- **en1** 原文：The antenna achieves a gain of 18 dBi with a half-power beamwidth of 65° in the azimuth plane.
+  - 译文：该天线在方位面内实现了18 dBi的增益，半功率波束宽度为65°。
+  - 术语 3/3
+- **en2** 原文：Electrical downtilt is adjusted by the remote electrical tilt (RET) unit, which drives the phase shifters in the feed network.
+  - 译文：电下倾通过远程电调（RET）单元进行调整，该单元驱动馈电网络中的移相器。
+  - 术语 4/4
+- **en3** 原文：Cross-polarization discrimination exceeds 15 dB within ±60° of boresight.
+  - 译文：在视轴±60°范围内，交叉极化鉴别度超过15 dB。
+  - 术语 2/2
+- **en4** 原文：The return loss is better than 15 dB across 1710–2690 MHz, corresponding to a VSWR below 1.43.
+  - 译文：回波损耗在1710–2690 MHz范围内优于15 dB，对应电压驻波比低于1.43。
+  - 术语 2/2
+- **en5** 原文：Grating lobes appear when the element spacing exceeds one wavelength at the highest operating frequency.
+  - 译文：当单元间距超过最高工作频率下的一个波长时，会出现栅瓣。
+  - 术语 3/3
+- **en6** 原文：A metasurface lens was placed above the dipole array to narrow the beam and suppress the sidelobes.
+  - 译文：在偶极子阵列上方放置了一个超表面透镜，以缩小波束并抑制旁瓣。
+  - 术语 3/3
+- **en7** 原文：Port-to-port isolation between the ±45° polarizations is greater than 28 dB.
+  - 译文：±45°极化之间的端口间隔离度大于28 dB。
+  - 术语 2/2
+- **en8** 原文：Passive intermodulation (PIM) is specified as 3rd order, measured with 2 × 43 dBm carriers, and must be below −153 dBc.
+  - 译文：无源互调（PIM）被规定为三阶，使用2 × 43 dBm载波进行测量，必须低于−153 dBc。
+  - 术语 3/3
+- **en9** 原文：The front-to-back ratio was improved by adding a choke on the reflector.
+  - 译文：通过在反射板上添加扼流槽，前后比得到了改善。
+  - 术语 3/3
+- **zh1** 原文：该天线采用双极化偶极子阵列，电下倾角可在0°至10°范围内连续调节。
+  - 译文：The antenna employs a dual-polarization dipole array, with the electrical downtilt angle adjustable continuously within the range of 0° to 10°.
+  - 术语 3/3
+- **zh2** 原文：通过在反射板边缘加载扼流槽，前后比提升了约5 dB，同时旁瓣电平基本不变。
+  - 译文：By loading a choke at the edge of the reflector, the front-to-back ratio is improved by about 5 dB, while the sidelobe level remains essentially unchanged.
+  - 术语 3/3
+- **x1** 原文：The radome introduces a slight beam squint at the upper end of the band.
+  - 译文：雷达罩在频段高端引入轻微的波束倾斜。
+  - 术语 1/2，缺：天线罩
+- **x2** 原文：Mutual coupling between adjacent columns degrades the scan performance of the array.
+  - 译文：相邻列之间的互耦会降低阵列的扫描性能。
+  - 术语 2/2
+- **x3** 原文：Null filling below the main beam improves coverage close to the tower.
+  - 译文：在主波束下方进行空填充可改善靠近塔楼的覆盖范围。
+  - 术语 1/2，缺：零点填充/零深填充/零陷填充
+- **x4** 原文：Parasitic elements were added to broaden the impedance bandwidth.
+  - 译文：在阻抗带宽方面，增加了寄生元件。
+  - 术语 2/2
+- **x5** 原文：上旁瓣抑制大于18 dB，满足运营商对邻区干扰的控制要求。
+  - 译文：The upper sidelobe suppression exceeds 18 dB, meeting the carrier's requirements for adjacent channel interference control.
+  - 术语 3/3
+
+## 智谱 · glm-4-flash-250414 · 不带术语表
+
+- **en1** 原文：The antenna achieves a gain of 18 dBi with a half-power beamwidth of 65° in the azimuth plane.
+  - 译文：该天线在方位面内实现了18 dBi的增益，半功率波束宽度为65°。
+  - 术语 3/3
+- **en2** 原文：Electrical downtilt is adjusted by the remote electrical tilt (RET) unit, which drives the phase shifters in the feed network.
+  - 译文：电气下倾通过远程电气下倾（RET）单元进行调整，该单元驱动馈电网络中的移相器。
+  - 术语 2/4，缺：电下倾, 电调
+- **en3** 原文：Cross-polarization discrimination exceeds 15 dB within ±60° of boresight.
+  - 译文：在视轴方向±60°范围内，交叉极化鉴别度超过15 dB。
+  - 术语 2/2
+- **en4** 原文：The return loss is better than 15 dB across 1710–2690 MHz, corresponding to a VSWR below 1.43.
+  - 译文：在1710–2690 MHz范围内，回波损耗优于15 dB，对应的电压驻波比低于1.43。
+  - 术语 2/2
+- **en5** 原文：Grating lobes appear when the element spacing exceeds one wavelength at the highest operating frequency.
+  - 译文：当单元间距超过最高工作频率的一个波长时，会出现栅瓣。
+  - 术语 3/3
+- **en6** 原文：A metasurface lens was placed above the dipole array to narrow the beam and suppress the sidelobes.
+  - 译文：在偶极子阵列上方放置了一层超表面透镜，以缩小波束并抑制旁瓣。
+  - 术语 3/3
+- **en7** 原文：Port-to-port isolation between the ±45° polarizations is greater than 28 dB.
+  - 译文：±45°极化之间的端口间隔离度大于28 dB。
+  - 术语 2/2
+- **en8** 原文：Passive intermodulation (PIM) is specified as 3rd order, measured with 2 × 43 dBm carriers, and must be below −153 dBc.
+  - 译文：无源互调（PIM）被指定为三阶，使用2 × 43 dBm载波进行测量，必须低于−153 dBc。
+  - 术语 3/3
+- **en9** 原文：The front-to-back ratio was improved by adding a choke on the reflector.
+  - 译文：通过在反射器上添加一个扼流圈，前后比得到了改善。
+  - 术语 3/3
+- **zh1** 原文：该天线采用双极化偶极子阵列，电下倾角可在0°至10°范围内连续调节。
+  - 译文：The antenna employs a dual-polarized dipole array, with the electrical tilt angle adjustable continuously within the range of 0° to 10°.
+  - 术语 3/3
+- **zh2** 原文：通过在反射板边缘加载扼流槽，前后比提升了约5 dB，同时旁瓣电平基本不变。
+  - 译文：By loading a choke on the edge of the reflector, the front-to-back ratio is improved by about 5 dB, while the side lobe level remains basically unchanged.
+  - 术语 3/3
+- **x1** 原文：The radome introduces a slight beam squint at the upper end of the band.
+  - 译文：雷达罩在频段高端引入轻微的波束倾斜。
+  - 术语 1/2，缺：天线罩
+- **x2** 原文：Mutual coupling between adjacent columns degrades the scan performance of the array.
+  - 译文：相邻列之间的互耦会降低阵列的扫描性能。
+  - 术语 2/2
+- **x3** 原文：Null filling below the main beam improves coverage close to the tower.
+  - 译文：在主波束下方进行空填充可改善靠近塔楼的覆盖范围。
+  - 术语 1/2，缺：零点填充/零深填充/零陷填充
+- **x4** 原文：Parasitic elements were added to broaden the impedance bandwidth.
+  - 译文：在阻抗带宽方面，增加了寄生元件。
+  - 术语 2/2
+- **x5** 原文：上旁瓣抑制大于18 dB，满足运营商对邻区干扰的控制要求。
+  - 译文：The upper sidelobe suppression is greater than 18 dB, meeting the operator's requirements for adjacent channel interference control.
+  - 术语 3/3
+
+## 智谱 · glm-4.7-flash · 带术语表
+
+- **en1** 原文：The antenna achieves a gain of 18 dBi with a half-power beamwidth of 65° in the azimuth plane.
+  - 译文：该天线在方位面内增益为18 dBi，半功率波束宽度为65°。  ⟨重试 4 次⟩
+  - 术语 3/3
+- **en2** 原文：Electrical downtilt is adjusted by the remote electrical tilt (RET) unit, which drives the phase shifters in the feed network.
+  - ❌ HTTP 0: TimeoutError: The read operation timed out
+- **en3** 原文：Cross-polarization discrimination exceeds 15 dB within ±60° of boresight.
+  - ❌ HTTP 429（重试 4 次）: {"error":{"code":"1302","message":"您的账户已达到速率限制，请您控制请求频率"}}
+- **en4** 原文：The return loss is better than 15 dB across 1710–2690 MHz, corresponding to a VSWR below 1.43.
+  - ❌ HTTP 429（重试 4 次）: {"error":{"code":"1305","message":"该模型当前访问量过大，请您稍后再试"}}
+- **en5** 原文：Grating lobes appear when the element spacing exceeds one wavelength at the highest operating frequency.
+  - ❌ HTTP 0（重试 2 次）: TimeoutError: The read operation timed out
+- **en6** 原文：A metasurface lens was placed above the dipole array to narrow the beam and suppress the sidelobes.
+  - ❌ HTTP 429（重试 4 次）: {"error":{"code":"1305","message":"该模型当前访问量过大，请您稍后再试"}}
+- **en7** 原文：Port-to-port isolation between the ±45° polarizations is greater than 28 dB.
+  - 译文：±45°极化间的端口隔离度大于28 dB。  ⟨重试 1 次⟩
+  - 术语 2/2
+- **en8** 原文：Passive intermodulation (PIM) is specified as 3rd order, measured with 2 × 43 dBm carriers, and must be below −153 dBc.
+  - 译文：无源互调 (PIM) 规定为 3 阶，采用 2 × 43 dBm 载波进行测量，且必须低于 -153 dBc。
+  - 术语 2/3，缺：三阶
+- **en9** 原文：The front-to-back ratio was improved by adding a choke on the reflector.
+  - ❌ HTTP 429（重试 4 次）: {"error":{"code":"1305","message":"该模型当前访问量过大，请您稍后再试"}}
+- **zh1** 原文：该天线采用双极化偶极子阵列，电下倾角可在0°至10°范围内连续调节。
+  - 译文：This antenna employs a dual-polarized dipole array, and the electrical downtilt angle can be continuously adjusted from 0° to 10°.
+  - 术语 3/3
+- **zh2** 原文：通过在反射板边缘加载扼流槽，前后比提升了约5 dB，同时旁瓣电平基本不变。
+  - 译文：By loading chokes at the edge of the reflector, the front-to-back ratio is improved by approximately 5 dB, while the sidelobe level remains essentially unchanged.
+  - 术语 3/3
+- **x1** 原文：The radome introduces a slight beam squint at the upper end of the band.
+  - 译文：雷达罩在频带高端引入了轻微的波束倾斜。  ⟨重试 2 次⟩
+  - 术语 1/2，缺：天线罩
+- **x2** 原文：Mutual coupling between adjacent columns degrades the scan performance of the array.
+  - 译文：相邻列间的互耦降低了阵列的扫描性能。  ⟨重试 1 次⟩
+  - 术语 2/2
+- **x3** 原文：Null filling below the main beam improves coverage close to the tower.
+  - 译文：主瓣下方的零陷填充改善了靠近塔的覆盖。  ⟨重试 2 次⟩
+  - 术语 2/2
+- **x4** 原文：Parasitic elements were added to broaden the impedance bandwidth.
+  - 译文：增加了寄生单元以拓宽阻抗带宽。  ⟨重试 2 次⟩
+  - 术语 2/2
+- **x5** 原文：上旁瓣抑制大于18 dB，满足运营商对邻区干扰的控制要求。
+  - 译文：Upper sidelobe suppression is greater than 18 dB, meeting the operator's requirements for adjacent cell interference control.
+  - 术语 3/3
+
+## 智谱 · glm-4.7-flash · 不带术语表
+
+- **en1** 原文：The antenna achieves a gain of 18 dBi with a half-power beamwidth of 65° in the azimuth plane.
+  - 译文：该天线在方位面实现了18 dBi的增益，半功率波束宽度为65°。
+  - 术语 3/3
+- **en2** 原文：Electrical downtilt is adjusted by the remote electrical tilt (RET) unit, which drives the phase shifters in the feed network.
+  - 译文：电下倾由远程电下倾（RET）单元进行调整，该单元驱动馈电网络中的移相器。  ⟨重试 2 次⟩
+  - 术语 3/4，缺：电调
+- **en3** 原文：Cross-polarization discrimination exceeds 15 dB within ±60° of boresight.
+  - 译文：视轴±60°范围内交叉极化鉴别率大于15 dB。
+  - 术语 2/2
+- **en4** 原文：The return loss is better than 15 dB across 1710–2690 MHz, corresponding to a VSWR below 1.43.
+  - ❌ HTTP 0（重试 2 次）: TimeoutError: The read operation timed out
+- **en5** 原文：Grating lobes appear when the element spacing exceeds one wavelength at the highest operating frequency.
+  - ❌ HTTP 429（重试 4 次）: {"error":{"code":"1305","message":"该模型当前访问量过大，请您稍后再试"}}
+- **en6** 原文：A metasurface lens was placed above the dipole array to narrow the beam and suppress the sidelobes.
+  - ❌ HTTP 429（重试 4 次）: {"error":{"code":"1305","message":"该模型当前访问量过大，请您稍后再试"}}
+- **en7** 原文：Port-to-port isolation between the ±45° polarizations is greater than 28 dB.
+  - ❌ HTTP 429（重试 4 次）: {"error":{"code":"1305","message":"该模型当前访问量过大，请您稍后再试"}}
+- **en8** 原文：Passive intermodulation (PIM) is specified as 3rd order, measured with 2 × 43 dBm carriers, and must be below −153 dBc.
+  - ❌ HTTP 429（重试 4 次）: {"error":{"code":"1305","message":"该模型当前访问量过大，请您稍后再试"}}
+- **en9** 原文：The front-to-back ratio was improved by adding a choke on the reflector.
+  - ❌ HTTP 429（重试 4 次）: {"error":{"code":"1305","message":"该模型当前访问量过大，请您稍后再试"}}
+- **zh1** 原文：该天线采用双极化偶极子阵列，电下倾角可在0°至10°范围内连续调节。
+  - ❌ HTTP 429（重试 4 次）: {"error":{"code":"1305","message":"该模型当前访问量过大，请您稍后再试"}}
+- **zh2** 原文：通过在反射板边缘加载扼流槽，前后比提升了约5 dB，同时旁瓣电平基本不变。
+  - ❌ HTTP 429（重试 4 次）: {"error":{"code":"1302","message":"您的账户已达到速率限制，请您控制请求频率"}}
+- **x1** 原文：The radome introduces a slight beam squint at the upper end of the band.
+  - ❌ HTTP 429（重试 4 次）: {"error":{"code":"1305","message":"该模型当前访问量过大，请您稍后再试"}}
+- **x2** 原文：Mutual coupling between adjacent columns degrades the scan performance of the array.
+  - ❌ HTTP 429（重试 4 次）: {"error":{"code":"1305","message":"该模型当前访问量过大，请您稍后再试"}}
+- **x3** 原文：Null filling below the main beam improves coverage close to the tower.
+  - ❌ HTTP 429（重试 4 次）: {"error":{"code":"1302","message":"您的账户已达到速率限制，请您控制请求频率"}}
+- **x4** 原文：Parasitic elements were added to broaden the impedance bandwidth.
+  - ❌ HTTP 429（重试 4 次）: {"error":{"code":"1302","message":"您的账户已达到速率限制，请您控制请求频率"}}
+- **x5** 原文：上旁瓣抑制大于18 dB，满足运营商对邻区干扰的控制要求。
+  - ❌ HTTP 429（重试 4 次）: {"error":{"code":"1305","message":"该模型当前访问量过大，请您稍后再试"}}
+
+## 魔搭 · Qwen/Qwen3.5-27B · 带术语表
+
+- **en1** 原文：The antenna achieves a gain of 18 dBi with a half-power beamwidth of 65° in the azimuth plane.
+  - 译文：该天线在方位面实现 18 dBi 的增益，半功率波束宽度为 65°。
+  - 术语 3/3
+- **en2** 原文：Electrical downtilt is adjusted by the remote electrical tilt (RET) unit, which drives the phase shifters in the feed network.
+  - 译文：电下倾由远程电调（RET）单元进行调节，该单元驱动馈电网络中的移相器。
+  - 术语 4/4
+- **en3** 原文：Cross-polarization discrimination exceeds 15 dB within ±60° of boresight.
+  - 译文：在视轴±60°范围内，交叉极化鉴别度超过15 dB。
+  - 术语 2/2
+- **en4** 原文：The return loss is better than 15 dB across 1710–2690 MHz, corresponding to a VSWR below 1.43.
+  - 译文：在 1710–2690 MHz 频段内，回波损耗优于 15 dB，对应的电压驻波比低于 1.43。
+  - 术语 2/2
+- **en5** 原文：Grating lobes appear when the element spacing exceeds one wavelength at the highest operating frequency.
+  - 译文：当单元间距超过最高工作频率处的一个波长时，会出现栅瓣。
+  - 术语 3/3
+- **en6** 原文：A metasurface lens was placed above the dipole array to narrow the beam and suppress the sidelobes.
+  - 译文：在偶极子阵列上方放置了一块超表面透镜，以窄化波束并抑制旁瓣。
+  - 术语 3/3
+- **en7** 原文：Port-to-port isolation between the ±45° polarizations is greater than 28 dB.
+  - 译文：±45°极化之间的端口隔离度大于 28 dB。
+  - 术语 2/2
+- **en8** 原文：Passive intermodulation (PIM) is specified as 3rd order, measured with 2 × 43 dBm carriers, and must be below −153 dBc.
+  - 译文：无源互调（PIM）指定为三阶，使用 2 × 43 dBm 载波进行测量，且必须低于 −153 dBc。
+  - 术语 3/3
+- **en9** 原文：The front-to-back ratio was improved by adding a choke on the reflector.
+  - 译文：通过在反射板上增加扼流槽，提高了前后比。
+  - 术语 3/3
+- **zh1** 原文：该天线采用双极化偶极子阵列，电下倾角可在0°至10°范围内连续调节。
+  - 译文：The antenna employs a dual-polarized dipole array, with an electrical downtilt continuously adjustable from 0° to 10°.
+  - 术语 3/3
+- **zh2** 原文：通过在反射板边缘加载扼流槽，前后比提升了约5 dB，同时旁瓣电平基本不变。
+  - 译文：By loading chokes on the edges of the reflector, the front-to-back ratio is improved by approximately 5 dB, while the sidelobe level remains essentially unchanged.
+  - 术语 3/3
+- **x1** 原文：The radome introduces a slight beam squint at the upper end of the band.
+  - 译文：天线罩在频段上端引入了轻微的波束倾斜。
+  - 术语 2/2
+- **x2** 原文：Mutual coupling between adjacent columns degrades the scan performance of the array.
+  - 译文：相邻列之间的互耦会恶化阵列的扫描性能。
+  - 术语 2/2
+- **x3** 原文：Null filling below the main beam improves coverage close to the tower.
+  - 译文：在主波束下方进行零填充可改善塔基附近的覆盖范围。
+  - 术语 1/2，缺：零点填充/零深填充/零陷填充
+- **x4** 原文：Parasitic elements were added to broaden the impedance bandwidth.
+  - 译文：引入寄生单元以展宽阻抗带宽。
+  - 术语 2/2
+- **x5** 原文：上旁瓣抑制大于18 dB，满足运营商对邻区干扰的控制要求。
+  - 译文：The upper sidelobe suppression exceeds 18 dB, meeting the operator's requirements for controlling interference to adjacent cells.
+  - 术语 3/3
+
+## 魔搭 · Qwen/Qwen3.5-397B-A17B · 带术语表
+
+- **en1** 原文：The antenna achieves a gain of 18 dBi with a half-power beamwidth of 65° in the azimuth plane.
+  - 译文：该天线在方位面实现 18 dBi 的增益，半功率波束宽度为 65°。
+  - 术语 3/3
+- **en2** 原文：Electrical downtilt is adjusted by the remote electrical tilt (RET) unit, which drives the phase shifters in the feed network.
+  - 译文：电下倾由远程电调（RET）单元进行调节，该单元驱动馈电网络中的移相器。
+  - 术语 4/4
+- **en3** 原文：Cross-polarization discrimination exceeds 15 dB within ±60° of boresight.
+  - 译文：在视轴±60°范围内，交叉极化鉴别度超过 15 dB。
+  - 术语 2/2
+- **en4** 原文：The return loss is better than 15 dB across 1710–2690 MHz, corresponding to a VSWR below 1.43.
+  - 译文：在 1710–2690 MHz 频段内，回波损耗优于 15 dB，对应电压驻波比低于 1.43。
+  - 术语 2/2
+- **en5** 原文：Grating lobes appear when the element spacing exceeds one wavelength at the highest operating frequency.
+  - 译文：当单元间距在最高工作频率下超过一个波长时，会出现栅瓣。
+  - 术语 3/3
+- **en6** 原文：A metasurface lens was placed above the dipole array to narrow the beam and suppress the sidelobes.
+  - 译文：在偶极子阵列上方放置了一个超表面透镜，以收窄波束并抑制旁瓣。  ⟨重试 1 次⟩
+  - 术语 3/3
+- **en7** 原文：Port-to-port isolation between the ±45° polarizations is greater than 28 dB.
+  - 译文：±45°极化之间的端口隔离度大于 28 dB。
+  - 术语 2/2
+- **en8** 原文：Passive intermodulation (PIM) is specified as 3rd order, measured with 2 × 43 dBm carriers, and must be below −153 dBc.
+  - 译文：无源互调（PIM）规定为三阶，采用两个 43 dBm 载波进行测量，且必须低于 −153 dBc。
+  - 术语 3/3
+- **en9** 原文：The front-to-back ratio was improved by adding a choke on the reflector.
+  - 译文：通过在反射板上增加扼流槽，改善了前后比。
+  - 术语 3/3
+- **zh1** 原文：该天线采用双极化偶极子阵列，电下倾角可在0°至10°范围内连续调节。
+  - 译文：The antenna employs a dual-polarized dipole array, with the electrical downtilt angle continuously adjustable from 0° to 10°.
+  - 术语 3/3
+- **zh2** 原文：通过在反射板边缘加载扼流槽，前后比提升了约5 dB，同时旁瓣电平基本不变。
+  - 译文：By loading chokes at the edges of the reflector, the front-to-back ratio is improved by approximately 5 dB, while the sidelobe level remains essentially unchanged.
+  - 术语 3/3
+- **x1** 原文：The radome introduces a slight beam squint at the upper end of the band.
+  - 译文：天线罩在频段高端引入了轻微的波束偏斜。
+  - 术语 2/2
+- **x2** 原文：Mutual coupling between adjacent columns degrades the scan performance of the array.
+  - 译文：相邻列之间的互耦会降低阵列的扫描性能。
+  - 术语 2/2
+- **x3** 原文：Null filling below the main beam improves coverage close to the tower.
+  - 译文：主波束下方的零深填充可改善塔身附近的覆盖效果。
+  - 术语 2/2
+- **x4** 原文：Parasitic elements were added to broaden the impedance bandwidth.
+  - 译文：添加了寄生单元以展宽阻抗带宽。
+  - 术语 2/2
+- **x5** 原文：上旁瓣抑制大于18 dB，满足运营商对邻区干扰的控制要求。
+  - 译文：The upper sidelobe suppression exceeds 18 dB, meeting the operator's requirements for adjacent-cell interference control.  ⟨重试 1 次⟩
+  - 术语 3/3
+
+## 魔搭 · ZhipuAI/GLM-4.7-Flash · 带术语表
+
+- **en1** 原文：The antenna achieves a gain of 18 dBi with a half-power beamwidth of 65° in the azimuth plane.
+  - ❌ HTTP 0（重试 3 次）: TimeoutError: The read operation timed out
+- **en2** 原文：Electrical downtilt is adjusted by the remote electrical tilt (RET) unit, which drives the phase shifters in the feed network.
+  - ❌ HTTP 429（重试 4 次）: {"error":{"code":"1302","message":"您的账户已达到速率限制，请您控制请求频率"}}
+- **en3** 原文：Cross-polarization discrimination exceeds 15 dB within ±60° of boresight.
+  - ❌ HTTP 429（重试 4 次）: {"error":{"code":"1302","message":"您的账户已达到速率限制，请您控制请求频率"}}
+- **en4** 原文：The return loss is better than 15 dB across 1710–2690 MHz, corresponding to a VSWR below 1.43.
+  - ❌ HTTP 429（重试 4 次）: {"error":{"code":"1305","message":"该模型当前访问量过大，请您稍后再试"}}
+- **en5** 原文：Grating lobes appear when the element spacing exceeds one wavelength at the highest operating frequency.
+  - ❌ HTTP 429（重试 4 次）: {"error":{"code":"1305","message":"该模型当前访问量过大，请您稍后再试"}}
+- **en6** 原文：A metasurface lens was placed above the dipole array to narrow the beam and suppress the sidelobes.
+  - ❌ HTTP 429（重试 4 次）: {"error":{"code":"1305","message":"该模型当前访问量过大，请您稍后再试"}}
+- **en7** 原文：Port-to-port isolation between the ±45° polarizations is greater than 28 dB.
+  - ❌ HTTP 429（重试 4 次）: {"error":{"code":"1305","message":"该模型当前访问量过大，请您稍后再试"}}
+- **en8** 原文：Passive intermodulation (PIM) is specified as 3rd order, measured with 2 × 43 dBm carriers, and must be below −153 dBc.
+  - ❌ HTTP 0: TimeoutError: The read operation timed out
+- **en9** 原文：The front-to-back ratio was improved by adding a choke on the reflector.
+  - ❌ HTTP 429（重试 4 次）: {"error":{"code":"1305","message":"该模型当前访问量过大，请您稍后再试"}}
+- **zh1** 原文：该天线采用双极化偶极子阵列，电下倾角可在0°至10°范围内连续调节。
+  - ❌ HTTP 429（重试 4 次）: {"error":{"code":"1305","message":"该模型当前访问量过大，请您稍后再试"}}
+- **zh2** 原文：通过在反射板边缘加载扼流槽，前后比提升了约5 dB，同时旁瓣电平基本不变。
+  - ❌ HTTP 429（重试 4 次）: {"error":{"code":"1302","message":"您的账户已达到速率限制，请您控制请求频率"}}
+- **x1** 原文：The radome introduces a slight beam squint at the upper end of the band.
+  - ❌ HTTP 429（重试 4 次）: {"error":{"code":"1305","message":"该模型当前访问量过大，请您稍后再试"}}
+- **x2** 原文：Mutual coupling between adjacent columns degrades the scan performance of the array.
+  - ❌ HTTP 429（重试 4 次）: {"error":{"code":"1305","message":"该模型当前访问量过大，请您稍后再试"}}
+- **x3** 原文：Null filling below the main beam improves coverage close to the tower.
+  - ❌ HTTP 0: TimeoutError: The read operation timed out
+- **x4** 原文：Parasitic elements were added to broaden the impedance bandwidth.
+  - ❌ HTTP 429（重试 4 次）: {"error":{"code":"1305","message":"该模型当前访问量过大，请您稍后再试"}}
+- **x5** 原文：上旁瓣抑制大于18 dB，满足运营商对邻区干扰的控制要求。
+  - 译文：The sidelobe suppression is greater than 18 dB, meeting the operator's requirements for controlling adjacent cell interference.
+  - 术语 2/3，缺：upper sidelobe/upper side lobe/upper side-lobe
+
+## 魔搭 · Qwen/Qwen3.5-27B · 不带术语表
+
+- **en1** 原文：The antenna achieves a gain of 18 dBi with a half-power beamwidth of 65° in the azimuth plane.
+  - 译文：该天线在方位面实现 18 dBi 的增益，半功率波束宽度为 65°。
+  - 术语 3/3
+- **en2** 原文：Electrical downtilt is adjusted by the remote electrical tilt (RET) unit, which drives the phase shifters in the feed network.
+  - 译文：电下倾角由远程电调（RET）单元进行调节，该单元驱动馈电网络中的移相器。
+  - 术语 4/4
+- **en3** 原文：Cross-polarization discrimination exceeds 15 dB within ±60° of boresight.
+  - 译文：在波束轴线±60°范围内，交叉极化鉴别度超过15 dB。
+  - 术语 1/2，缺：视轴/主轴/最大辐射方向/法向
+- **en4** 原文：The return loss is better than 15 dB across 1710–2690 MHz, corresponding to a VSWR below 1.43.
+  - 译文：在 1710–2690 MHz 频段内，回波损耗优于 15 dB，对应的电压驻波比（VSWR）低于 1.43。
+  - 术语 2/2
+- **en5** 原文：Grating lobes appear when the element spacing exceeds one wavelength at the highest operating frequency.
+  - 译文：当单元间距超过最高工作频率处的一个波长时，会出现栅瓣。
+  - 术语 3/3
+- **en6** 原文：A metasurface lens was placed above the dipole array to narrow the beam and suppress the sidelobes.
+  - 译文：在偶极子阵列上方放置了一块超表面透镜，以压缩波束并抑制旁瓣。
+  - 术语 3/3
+- **en7** 原文：Port-to-port isolation between the ±45° polarizations is greater than 28 dB.
+  - 译文：±45°极化之间的端口隔离度大于 28 dB。
+  - 术语 2/2
+- **en8** 原文：Passive intermodulation (PIM) is specified as 3rd order, measured with 2 × 43 dBm carriers, and must be below −153 dBc.
+  - 译文：无源互调（PIM）定义为三阶，使用 2 × 43 dBm 载波进行测量，且必须低于 −153 dBc。
+  - 术语 3/3
+- **en9** 原文：The front-to-back ratio was improved by adding a choke on the reflector.
+  - 译文：通过在反射器上增加扼流圈，改善了前后比。
+  - 术语 3/3
+- **zh1** 原文：该天线采用双极化偶极子阵列，电下倾角可在0°至10°范围内连续调节。
+  - 译文：The antenna employs a dual-polarized dipole array, with an electrical downtilt continuously adjustable from 0° to 10°.
+  - 术语 3/3
+- **zh2** 原文：通过在反射板边缘加载扼流槽，前后比提升了约5 dB，同时旁瓣电平基本不变。
+  - 译文：By loading choke slots at the edges of the reflector, the front-to-back ratio is improved by approximately 5 dB, while the sidelobe level remains essentially unchanged.
+  - 术语 3/3
+- **x1** 原文：The radome introduces a slight beam squint at the upper end of the band.
+  - 译文：天线罩在频段上端引入了轻微的波束倾斜。
+  - 术语 2/2
+- **x2** 原文：Mutual coupling between adjacent columns degrades the scan performance of the array.
+  - 译文：相邻列之间的互耦会恶化阵列的扫描性能。
+  - 术语 2/2
+- **x3** 原文：Null filling below the main beam improves coverage close to the tower.
+  - 译文：在主波束下方进行零填充可改善塔基附近的覆盖范围。
+  - 术语 1/2，缺：零点填充/零深填充/零陷填充
+- **x4** 原文：Parasitic elements were added to broaden the impedance bandwidth.
+  - 译文：引入寄生单元以展宽阻抗带宽。
+  - 术语 2/2
+- **x5** 原文：上旁瓣抑制大于18 dB，满足运营商对邻区干扰的控制要求。
+  - 译文：The upper sidelobe suppression exceeds 18 dB, meeting the operator's requirements for controlling interference to adjacent cells.
+  - 术语 3/3
+
+## AMD · DeepSeek-V4.1-Flash · 带术语表
+
+- **en1** 原文：The antenna achieves a gain of 18 dBi with a half-power beamwidth of 65° in the azimuth plane.
+  - 译文：该天线在方位面内实现18 dBi的增益，半功率波束宽度为65°。
+  - 术语 3/3
+- **en2** 原文：Electrical downtilt is adjusted by the remote electrical tilt (RET) unit, which drives the phase shifters in the feed network.
+  - 译文：电下倾由远程电调（RET）单元调节，该单元驱动馈电网络中的移相器。
+  - 术语 4/4
+- **en3** 原文：Cross-polarization discrimination exceeds 15 dB within ±60° of boresight.
+  - 译文：在视轴±60°范围内，交叉极化鉴别率超过15 dB。
+  - 术语 2/2
+- **en4** 原文：The return loss is better than 15 dB across 1710–2690 MHz, corresponding to a VSWR below 1.43.
+  - 译文：在1710–2690 MHz频段内，回波损耗优于15 dB，对应电压驻波比低于1.43。  ⟨重试 1 次⟩
+  - 术语 2/2
+- **en5** 原文：Grating lobes appear when the element spacing exceeds one wavelength at the highest operating frequency.
+  - 译文：当单元间距在最高工作频率下超过一个波长时，会出现栅瓣。  ⟨重试 1 次⟩
+  - 术语 3/3
+- **en6** 原文：A metasurface lens was placed above the dipole array to narrow the beam and suppress the sidelobes.
+  - 译文：超表面透镜被放置在偶极子阵列上方，以收窄波束并抑制旁瓣。
+  - 术语 3/3
+- **en7** 原文：Port-to-port isolation between the ±45° polarizations is greater than 28 dB.
+  - 译文：±45° 极化之间的端口间隔离度大于 28 dB。  ⟨重试 1 次⟩
+  - 术语 2/2
+- **en8** 原文：Passive intermodulation (PIM) is specified as 3rd order, measured with 2 × 43 dBm carriers, and must be below −153 dBc.
+  - 译文：无源互调（PIM）规定为3阶，使用2 × 43 dBm载波测量，且必须低于−153 dBc。
+  - 术语 2/3，缺：三阶
+- **en9** 原文：The front-to-back ratio was improved by adding a choke on the reflector.
+  - 译文：通过在反射板上增加扼流槽，前后比得到了改善。  ⟨重试 1 次⟩
+  - 术语 3/3
+- **zh1** 原文：该天线采用双极化偶极子阵列，电下倾角可在0°至10°范围内连续调节。
+  - 译文：The antenna employs a dual-polarized dipole array, and the electrical downtilt can be continuously adjusted within the range of 0° to 10°.
+  - 术语 3/3
+- **zh2** 原文：通过在反射板边缘加载扼流槽，前后比提升了约5 dB，同时旁瓣电平基本不变。
+  - 译文：By loading chokes on the edges of the reflector, the front-to-back ratio is improved by about 5 dB, while the sidelobe level remains essentially unchanged.
+  - 术语 3/3
+- **x1** 原文：The radome introduces a slight beam squint at the upper end of the band.
+  - 译文：天线罩在频段高端引入了轻微的波束偏斜。
+  - 术语 2/2
+- **x2** 原文：Mutual coupling between adjacent columns degrades the scan performance of the array.
+  - 译文：相邻列之间的互耦会降低阵列的扫描性能。  ⟨重试 2 次⟩
+  - 术语 2/2
+- **x3** 原文：Null filling below the main beam improves coverage close to the tower.
+  - 译文：主波束下方的零点填充改善了靠近铁塔的覆盖。
+  - 术语 2/2
+- **x4** 原文：Parasitic elements were added to broaden the impedance bandwidth.
+  - 译文：添加了寄生元件以拓宽阻抗带宽。  ⟨重试 2 次⟩
+  - 术语 2/2
+- **x5** 原文：上旁瓣抑制大于18 dB，满足运营商对邻区干扰的控制要求。
+  - ❌ HTTP 429（重试 4 次）: {"detail":{"error":{"message":"Model 'DeepSeek-V4.1-Flash' is at its concurrency limit (16); please retry later or use another model","type":"rate_limit_error","code":"model_concurrency_rate_limit_exceeded"}}}
+
+## AMD · DeepSeek-V4-Flash · 带术语表
+
+- **en1** 原文：The antenna achieves a gain of 18 dBi with a half-power beamwidth of 65° in the azimuth plane.
+  - 译文：该天线在方位面内实现了18 dBi的增益，半功率波束宽度为65°。
+  - 术语 3/3
+- **en2** 原文：Electrical downtilt is adjusted by the remote electrical tilt (RET) unit, which drives the phase shifters in the feed network.
+  - 译文：电下倾通过远程电调（RET）单元进行调整，该单元驱动馈电网络中的移相器。
+  - 术语 4/4
+- **en3** 原文：Cross-polarization discrimination exceeds 15 dB within ±60° of boresight.
+  - 译文：在视轴±60°范围内，交叉极化鉴别度超过15 dB。
+  - 术语 2/2
+- **en4** 原文：The return loss is better than 15 dB across 1710–2690 MHz, corresponding to a VSWR below 1.43.
+  - 译文：在1710–2690 MHz频段内，回波损耗优于15 dB，对应的电压驻波比低于1.43。
+  - 术语 2/2
+- **en5** 原文：Grating lobes appear when the element spacing exceeds one wavelength at the highest operating frequency.
+  - 译文：当单元间距超过最高工作频率下的一个波长时，会出现栅瓣。
+  - 术语 3/3
+- **en6** 原文：A metasurface lens was placed above the dipole array to narrow the beam and suppress the sidelobes.
+  - 译文：将超表面透镜置于偶极子阵列上方，以收窄波束并抑制旁瓣。
+  - 术语 3/3
+- **en7** 原文：Port-to-port isolation between the ±45° polarizations is greater than 28 dB.
+  - 译文：±45°极化之间的端口间隔离度大于28 dB。
+  - 术语 2/2
+- **en8** 原文：Passive intermodulation (PIM) is specified as 3rd order, measured with 2 × 43 dBm carriers, and must be below −153 dBc.
+  - 译文：无源互调（PIM）规定为三阶，使用2 × 43 dBm载波测量，且必须低于−153 dBc。
+  - 术语 3/3
+- **en9** 原文：The front-to-back ratio was improved by adding a choke on the reflector.
+  - 译文：通过在反射板上添加扼流槽，前后比得到了改善。
+  - 术语 3/3
+- **zh1** 原文：该天线采用双极化偶极子阵列，电下倾角可在0°至10°范围内连续调节。
+  - 译文：The antenna employs a dual-polarized dipole array, with the electrical downtilt angle continuously adjustable within the range of 0° to 10°.
+  - 术语 3/3
+- **zh2** 原文：通过在反射板边缘加载扼流槽，前后比提升了约5 dB，同时旁瓣电平基本不变。
+  - 译文：By loading chokes at the edge of the reflector, the front-to-back ratio is improved by approximately 5 dB, while the sidelobe level remains essentially unchanged.
+  - 术语 3/3
+- **x1** 原文：The radome introduces a slight beam squint at the upper end of the band.
+  - 译文：天线罩在频带高端引入了轻微的光束偏斜。
+  - 术语 1/2，缺：波束偏斜/波束倾斜/波束指向偏移/波束偏移/波束斜视
+- **x2** 原文：Mutual coupling between adjacent columns degrades the scan performance of the array.
+  - 译文：相邻列之间的互耦会降低阵列的扫描性能。
+  - 术语 2/2
+- **x3** 原文：Null filling below the main beam improves coverage close to the tower.
+  - 译文：主波束下方的零陷填充可改善塔附近的覆盖。
+  - 术语 2/2
+- **x4** 原文：Parasitic elements were added to broaden the impedance bandwidth.
+  - 译文：添加了寄生单元以拓宽阻抗带宽。
+  - 术语 2/2
+- **x5** 原文：上旁瓣抑制大于18 dB，满足运营商对邻区干扰的控制要求。
+  - 译文：The upper sidelobe suppression is greater than 18 dB, meeting the operator's requirements for controlling interference in adjacent sectors.
+  - 术语 3/3
+
+## AMD · Gemma-4-31B-IT · 带术语表
+
+- **en1** 原文：The antenna achieves a gain of 18 dBi with a half-power beamwidth of 65° in the azimuth plane.
+  - 译文：该天线在方位面实现了 18 dBi 的增益，半功率波束宽度为 65°。
+  - 术语 3/3
+- **en2** 原文：Electrical downtilt is adjusted by the remote electrical tilt (RET) unit, which drives the phase shifters in the feed network.
+  - 译文：电下倾由远程电调 (RET) 单元调节，该单元驱动馈电网络中的移相器。
+  - 术语 4/4
+- **en3** 原文：Cross-polarization discrimination exceeds 15 dB within ±60° of boresight.
+  - 译文：在视轴 ±60° 范围内，交叉极化鉴别度超过 15 dB。
+  - 术语 2/2
+- **en4** 原文：The return loss is better than 15 dB across 1710–2690 MHz, corresponding to a VSWR below 1.43.
+  - 译文：在 1710–2690 MHz 范围内，回波损耗优于 15 dB，对应的电压驻波比低于 1.43。
+  - 术语 2/2
+- **en5** 原文：Grating lobes appear when the element spacing exceeds one wavelength at the highest operating frequency.
+  - 译文：当单元间距超过最高工作频率下的一个波长时，会出现栅瓣。
+  - 术语 3/3
+- **en6** 原文：A metasurface lens was placed above the dipole array to narrow the beam and suppress the sidelobes.
+  - 译文：在偶极子阵列上方放置了一个超表面透镜，以缩窄波束并抑制旁瓣。
+  - 术语 3/3
+- **en7** 原文：Port-to-port isolation between the ±45° polarizations is greater than 28 dB.
+  - 译文：±45°极化之间的端口间隔离度大于 28 dB。
+  - 术语 2/2
+- **en8** 原文：Passive intermodulation (PIM) is specified as 3rd order, measured with 2 × 43 dBm carriers, and must be below −153 dBc.
+  - 译文：无源互调 (PIM) 规定为 3 阶，使用 2 × 43 dBm 载波进行测量，且必须低于 −153 dBc。
+  - 术语 2/3，缺：三阶
+- **en9** 原文：The front-to-back ratio was improved by adding a choke on the reflector.
+  - 译文：通过在反射板上添加扼流槽，提高了前后比。
+  - 术语 3/3
+- **zh1** 原文：该天线采用双极化偶极子阵列，电下倾角可在0°至10°范围内连续调节。
+  - 译文：The antenna employs a dual-polarized dipole array, with the electrical downtilt angle continuously adjustable from 0° to 10°.
+  - 术语 3/3
+- **zh2** 原文：通过在反射板边缘加载扼流槽，前后比提升了约5 dB，同时旁瓣电平基本不变。
+  - 译文：By loading chokes on the edges of the reflector, the front-to-back ratio is improved by approximately 5 dB, while the sidelobe level remains basically unchanged.
+  - 术语 3/3
+- **x1** 原文：The radome introduces a slight beam squint at the upper end of the band.
+  - 译文：天线罩在频段高端引起了轻微的波束偏移（beam squint）。
+  - 术语 2/2
+- **x2** 原文：Mutual coupling between adjacent columns degrades the scan performance of the array.
+  - 译文：相邻列之间的互耦会降低阵列的扫描性能。
+  - 术语 2/2
+- **x3** 原文：Null filling below the main beam improves coverage close to the tower.
+  - 译文：主波束下方的零点填充可改善靠近塔基的覆盖。
+  - 术语 2/2
+- **x4** 原文：Parasitic elements were added to broaden the impedance bandwidth.
+  - 译文：添加寄生元件以展宽阻抗带宽。
+  - 术语 2/2
+- **x5** 原文：上旁瓣抑制大于18 dB，满足运营商对邻区干扰的控制要求。
+  - 译文：The upper sidelobe suppression is greater than 18 dB, meeting the operator's requirements for adjacent cell interference control.
+  - 术语 3/3
+
+## AMD · Qwen3.8-27B · 带术语表
+
+- **en1** 原文：The antenna achieves a gain of 18 dBi with a half-power beamwidth of 65° in the azimuth plane.
+  - 译文：该天线在方位面实现18 dBi的增益，半功率波束宽度为65°。
+  - 术语 3/3
+- **en2** 原文：Electrical downtilt is adjusted by the remote electrical tilt (RET) unit, which drives the phase shifters in the feed network.
+  - 译文：电下倾由远程电调单元进行调节，该单元驱动馈电网络中的移相器。
+  - 术语 4/4
+- **en3** 原文：Cross-polarization discrimination exceeds 15 dB within ±60° of boresight.
+  - 译文：在视轴±60°范围内，交叉极化鉴别度大于15 dB。  ⟨重试 1 次⟩
+  - 术语 2/2
+- **en4** 原文：The return loss is better than 15 dB across 1710–2690 MHz, corresponding to a VSWR below 1.43.
+  - 译文：在1710–2690 MHz频段内，回波损耗优于15 dB，对应的电压驻波比低于1.43。
+  - 术语 2/2
+- **en5** 原文：Grating lobes appear when the element spacing exceeds one wavelength at the highest operating frequency.
+  - 译文：当单元间距超过最高工作频率对应波长时，会出现栅瓣。
+  - 术语 3/3
+- **en6** 原文：A metasurface lens was placed above the dipole array to narrow the beam and suppress the sidelobes.
+  - 译文：在偶极子阵列上方放置了一个超表面透镜，以收窄波束并抑制旁瓣。
+  - 术语 3/3
+- **en7** 原文：Port-to-port isolation between the ±45° polarizations is greater than 28 dB.
+  - 译文：±45° 极化之间的端口间隔离度大于 28 dB。
+  - 术语 2/2
+- **en8** 原文：Passive intermodulation (PIM) is specified as 3rd order, measured with 2 × 43 dBm carriers, and must be below −153 dBc.
+  - 译文：无源互调（PIM）规定为三阶，采用 2 × 43 dBm 载波进行测量，且必须低于 −153 dBc。
+  - 术语 3/3
+- **en9** 原文：The front-to-back ratio was improved by adding a choke on the reflector.
+  - 译文：通过在反射板上增加扼流槽，提高了前后比。
+  - 术语 3/3
+- **zh1** 原文：该天线采用双极化偶极子阵列，电下倾角可在0°至10°范围内连续调节。
+  - 译文：The antenna employs a dual-polarized dipole array, with the electrical downtilt angle continuously adjustable from 0° to 10°.
+  - 术语 3/3
+- **zh2** 原文：通过在反射板边缘加载扼流槽，前后比提升了约5 dB，同时旁瓣电平基本不变。
+  - 译文：By loading chokes on the edges of the reflector, the front-to-back ratio was improved by approximately 5 dB, while the sidelobe level remained essentially unchanged.
+  - 术语 3/3
+- **x1** 原文：The radome introduces a slight beam squint at the upper end of the band.
+  - 译文：天线罩在频段上端引入轻微的波束偏转。
+  - 术语 1/2，缺：波束偏斜/波束倾斜/波束指向偏移/波束偏移/波束斜视
+- **x2** 原文：Mutual coupling between adjacent columns degrades the scan performance of the array.
+  - 译文：相邻列之间的互耦会降低阵列的扫描性能。
+  - 术语 2/2
+- **x3** 原文：Null filling below the main beam improves coverage close to the tower.
+  - 译文：在主瓣下方填充零点可改善塔基附近的覆盖范围。
+  - 术语 1/2，缺：零点填充/零深填充/零陷填充
+- **x4** 原文：Parasitic elements were added to broaden the impedance bandwidth.
+  - 译文：通过添加寄生单元来展宽阻抗带宽。
+  - 术语 2/2
+- **x5** 原文：上旁瓣抑制大于18 dB，满足运营商对邻区干扰的控制要求。
+  - 译文：The upper sidelobe suppression is greater than 18 dB, meeting the operator's requirements for controlling adjacent area interference.
+  - 术语 3/3
+
+## AMD · MiMo-V2.6-Flash · 带术语表
+
+- **en1** 原文：The antenna achieves a gain of 18 dBi with a half-power beamwidth of 65° in the azimuth plane.
+  - 译文：该天线增益为18 dBi，方位面半功率波束宽度为65°。
+  - 术语 3/3
+- **en2** 原文：Electrical downtilt is adjusted by the remote electrical tilt (RET) unit, which drives the phase shifters in the feed network.
+  - 译文：电下倾通过远程电调（RET）单元进行调节，该单元驱动馈电网络中的移相器。
+  - 术语 4/4
+- **en3** 原文：Cross-polarization discrimination exceeds 15 dB within ±60° of boresight.
+  - 译文：在视轴 ±60° 范围内，交叉极化鉴别度超过 15 dB。
+  - 术语 2/2
+- **en4** 原文：The return loss is better than 15 dB across 1710–2690 MHz, corresponding to a VSWR below 1.43.
+  - 译文：在1710–2690 MHz频段内，回波损耗优于15 dB，对应的电压驻波比低于1.43。
+  - 术语 2/2
+- **en5** 原文：Grating lobes appear when the element spacing exceeds one wavelength at the highest operating frequency.
+  - 译文：当单元间距在最高工作频率处超过一个波长时，就会出现栅瓣。
+  - 术语 3/3
+- **en6** 原文：A metasurface lens was placed above the dipole array to narrow the beam and suppress the sidelobes.
+  - 译文：在偶极子阵列上方放置了一个超表面透镜，以收窄波束并抑制旁瓣。
+  - 术语 3/3
+- **en7** 原文：Port-to-port isolation between the ±45° polarizations is greater than 28 dB.
+  - 译文：±45°极化之间的端口隔离度大于28 dB。
+  - 术语 2/2
+- **en8** 原文：Passive intermodulation (PIM) is specified as 3rd order, measured with 2 × 43 dBm carriers, and must be below −153 dBc.
+  - 译文：无源互调（PIM）规定为三阶，采用 2 × 43 dBm 载波进行测量，必须低于 −153 dBc。
+  - 术语 3/3
+- **en9** 原文：The front-to-back ratio was improved by adding a choke on the reflector.
+  - 译文：通过在反射板上增加扼流槽，前后比得到了改善。
+  - 术语 3/3
+- **zh1** 原文：该天线采用双极化偶极子阵列，电下倾角可在0°至10°范围内连续调节。
+  - 译文：The antenna employs a dual-polarized dipole array, with an electrical downtilt that can be continuously adjusted within the range of 0° to 10°.
+  - 术语 3/3
+- **zh2** 原文：通过在反射板边缘加载扼流槽，前后比提升了约5 dB，同时旁瓣电平基本不变。
+  - 译文：By loading a choke at the edge of the reflector, the front-to-back ratio was improved by approximately 5 dB, while the sidelobe level remained essentially unchanged.
+  - 术语 3/3
+- **x1** 原文：The radome introduces a slight beam squint at the upper end of the band.
+  - 译文：天线罩在频段高端会引入轻微的波束偏斜。
+  - 术语 2/2
+- **x2** 原文：Mutual coupling between adjacent columns degrades the scan performance of the array.
+  - 译文：相邻列之间的互耦会降低阵列的扫描性能。
+  - 术语 2/2
+- **x3** 原文：Null filling below the main beam improves coverage close to the tower.
+  - 译文：在主波束下方进行零点填充，可改善塔附近的覆盖。
+  - 术语 2/2
+- **x4** 原文：Parasitic elements were added to broaden the impedance bandwidth.
+  - 译文：添加了寄生单元以展宽阻抗带宽。
+  - 术语 2/2
+- **x5** 原文：上旁瓣抑制大于18 dB，满足运营商对邻区干扰的控制要求。
+  - 译文：Upper sidelobe suppression greater than 18 dB, meeting the operator's requirements for adjacent-cell interference control.
+  - 术语 3/3

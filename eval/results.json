@@ -1,0 +1,2081 @@
+{
+ "time": "2026-10-16T06:27:30.083492+00:00",
+ "results": [
+  {
+   "engine": "智谱",
+   "model": "glm-4-flash-250414 · 带术语表",
+   "mode": "full",
+   "term_hit": 40,
+   "term_total": 42,
+   "out_hit": 9,
+   "out_total": 11,
+   "errors": 0,
+   "avg_latency": 1.08,
+   "rows": [
+    {
+     "id": "en1",
+     "out": "该天线在方位面内实现了18 dBi的增益，半功率波束宽度为65°。",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 0.9
+    },
+    {
+     "id": "en2",
+     "out": "电下倾通过远程电调（RET）单元进行调整，该单元驱动馈电网络中的移相器。",
+     "err": null,
+     "hit": 4,
+     "n": 4,
+     "miss": [],
+     "latency": 0.8
+    },
+    {
+     "id": "en3",
+     "out": "在视轴±60°范围内，交叉极化鉴别度超过15 dB。",
+     "err": null,
+     "hit": 2,
+     "n": 2,
+     "miss": [],
+     "latency": 0.73
+    },
+    {
+     "id": "en4",
+     "out": "回波损耗在1710–2690 MHz范围内优于15 dB，对应电压驻波比低于1.43。",
+     "err": null,
+     "hit": 2,
+     "n": 2,
+     "miss": [],
+     "latency": 1.62
+    },
+    {
+     "id": "en5",
+     "out": "当单元间距超过最高工作频率下的一个波长时，会出现栅瓣。",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 0.67
+    },
+    {
+     "id": "en6",
+     "out": "在偶极子阵列上方放置了一个超表面透镜，以缩小波束并抑制旁瓣。",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 1.2
+    },
+    {
+     "id": "en7",
+     "out": "±45°极化之间的端口间隔离度大于28 dB。",
+     "err": null,
+     "hit": 2,
+     "n": 2,
+     "miss": [],
+     "latency": 0.92
+    },
+    {
+     "id": "en8",
+     "out": "无源互调（PIM）被规定为三阶，使用2 × 43 dBm载波进行测量，必须低于−153 dBc。",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 1.02
+    },
+    {
+     "id": "en9",
+     "out": "通过在反射板上添加扼流槽，前后比得到了改善。",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 1.76
+    },
+    {
+     "id": "zh1",
+     "out": "The antenna employs a dual-polarization dipole array, with the electrical downtilt angle adjustable continuously within the range of 0° to 10°.",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 2.28
+    },
+    {
+     "id": "zh2",
+     "out": "By loading a choke at the edge of the reflector, the front-to-back ratio is improved by about 5 dB, while the sidelobe level remains essentially unchanged.",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 1.36
+    },
+    {
+     "id": "x1",
+     "out": "雷达罩在频段高端引入轻微的波束倾斜。",
+     "err": null,
+     "hit": 1,
+     "n": 2,
+     "miss": [
+      "天线罩"
+     ],
+     "latency": 0.74
+    },
+    {
+     "id": "x2",
+     "out": "相邻列之间的互耦会降低阵列的扫描性能。",
+     "err": null,
+     "hit": 2,
+     "n": 2,
+     "miss": [],
+     "latency": 0.65
+    },
+    {
+     "id": "x3",
+     "out": "在主波束下方进行空填充可改善靠近塔楼的覆盖范围。",
+     "err": null,
+     "hit": 1,
+     "n": 2,
+     "miss": [
+      "零点填充/零深填充/零陷填充"
+     ],
+     "latency": 0.69
+    },
+    {
+     "id": "x4",
+     "out": "在阻抗带宽方面，增加了寄生元件。",
+     "err": null,
+     "hit": 2,
+     "n": 2,
+     "miss": [],
+     "latency": 0.89
+    },
+    {
+     "id": "x5",
+     "out": "The upper sidelobe suppression exceeds 18 dB, meeting the carrier's requirements for adjacent channel interference control.",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 0.96
+    }
+   ]
+  },
+  {
+   "engine": "智谱",
+   "model": "glm-4-flash-250414 · 不带术语表",
+   "mode": "full",
+   "term_hit": 38,
+   "term_total": 42,
+   "out_hit": 9,
+   "out_total": 11,
+   "errors": 0,
+   "avg_latency": 0.89,
+   "rows": [
+    {
+     "id": "en1",
+     "out": "该天线在方位面内实现了18 dBi的增益，半功率波束宽度为65°。",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 0.98
+    },
+    {
+     "id": "en2",
+     "out": "电气下倾通过远程电气下倾（RET）单元进行调整，该单元驱动馈电网络中的移相器。",
+     "err": null,
+     "hit": 2,
+     "n": 4,
+     "miss": [
+      "电下倾",
+      "电调"
+     ],
+     "latency": 0.95
+    },
+    {
+     "id": "en3",
+     "out": "在视轴方向±60°范围内，交叉极化鉴别度超过15 dB。",
+     "err": null,
+     "hit": 2,
+     "n": 2,
+     "miss": [],
+     "latency": 0.88
+    },
+    {
+     "id": "en4",
+     "out": "在1710–2690 MHz范围内，回波损耗优于15 dB，对应的电压驻波比低于1.43。",
+     "err": null,
+     "hit": 2,
+     "n": 2,
+     "miss": [],
+     "latency": 1.39
+    },
+    {
+     "id": "en5",
+     "out": "当单元间距超过最高工作频率的一个波长时，会出现栅瓣。",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 0.7
+    },
+    {
+     "id": "en6",
+     "out": "在偶极子阵列上方放置了一层超表面透镜，以缩小波束并抑制旁瓣。",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 0.84
+    },
+    {
+     "id": "en7",
+     "out": "±45°极化之间的端口间隔离度大于28 dB。",
+     "err": null,
+     "hit": 2,
+     "n": 2,
+     "miss": [],
+     "latency": 0.68
+    },
+    {
+     "id": "en8",
+     "out": "无源互调（PIM）被指定为三阶，使用2 × 43 dBm载波进行测量，必须低于−153 dBc。",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 0.92
+    },
+    {
+     "id": "en9",
+     "out": "通过在反射器上添加一个扼流圈，前后比得到了改善。",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 0.91
+    },
+    {
+     "id": "zh1",
+     "out": "The antenna employs a dual-polarized dipole array, with the electrical tilt angle adjustable continuously within the range of 0° to 10°.",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 1.18
+    },
+    {
+     "id": "zh2",
+     "out": "By loading a choke on the edge of the reflector, the front-to-back ratio is improved by about 5 dB, while the side lobe level remains basically unchanged.",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 1.04
+    },
+    {
+     "id": "x1",
+     "out": "雷达罩在频段高端引入轻微的波束倾斜。",
+     "err": null,
+     "hit": 1,
+     "n": 2,
+     "miss": [
+      "天线罩"
+     ],
+     "latency": 0.63
+    },
+    {
+     "id": "x2",
+     "out": "相邻列之间的互耦会降低阵列的扫描性能。",
+     "err": null,
+     "hit": 2,
+     "n": 2,
+     "miss": [],
+     "latency": 0.61
+    },
+    {
+     "id": "x3",
+     "out": "在主波束下方进行空填充可改善靠近塔楼的覆盖范围。",
+     "err": null,
+     "hit": 1,
+     "n": 2,
+     "miss": [
+      "零点填充/零深填充/零陷填充"
+     ],
+     "latency": 1.05
+    },
+    {
+     "id": "x4",
+     "out": "在阻抗带宽方面，增加了寄生元件。",
+     "err": null,
+     "hit": 2,
+     "n": 2,
+     "miss": [],
+     "latency": 0.57
+    },
+    {
+     "id": "x5",
+     "out": "The upper sidelobe suppression is greater than 18 dB, meeting the operator's requirements for adjacent channel interference control.",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 0.88
+    }
+   ]
+  },
+  {
+   "engine": "智谱",
+   "model": "glm-4.7-flash · 带术语表",
+   "mode": "full",
+   "term_hit": 23,
+   "term_total": 42,
+   "out_hit": 10,
+   "out_total": 11,
+   "errors": 6,
+   "avg_latency": 18.95,
+   "rows": [
+    {
+     "id": "en1",
+     "out": "该天线在方位面内增益为18 dBi，半功率波束宽度为65°。  ⟨重试 4 次⟩",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 58.53
+    },
+    {
+     "id": "en2",
+     "out": null,
+     "err": "HTTP 0: TimeoutError: The read operation timed out",
+     "hit": 0,
+     "n": 4,
+     "miss": [],
+     "latency": 60.32
+    },
+    {
+     "id": "en3",
+     "out": null,
+     "err": "HTTP 429（重试 4 次）: {\"error\":{\"code\":\"1302\",\"message\":\"您的账户已达到速率限制，请您控制请求频率\"}}",
+     "hit": 0,
+     "n": 2,
+     "miss": [],
+     "latency": 2.94
+    },
+    {
+     "id": "en4",
+     "out": null,
+     "err": "HTTP 429（重试 4 次）: {\"error\":{\"code\":\"1305\",\"message\":\"该模型当前访问量过大，请您稍后再试\"}}",
+     "hit": 0,
+     "n": 2,
+     "miss": [],
+     "latency": 2.39
+    },
+    {
+     "id": "en5",
+     "out": null,
+     "err": "HTTP 0（重试 2 次）: TimeoutError: The read operation timed out",
+     "hit": 0,
+     "n": 3,
+     "miss": [],
+     "latency": 60.83
+    },
+    {
+     "id": "en6",
+     "out": null,
+     "err": "HTTP 429（重试 4 次）: {\"error\":{\"code\":\"1305\",\"message\":\"该模型当前访问量过大，请您稍后再试\"}}",
+     "hit": 0,
+     "n": 3,
+     "miss": [],
+     "latency": 2.4
+    },
+    {
+     "id": "en7",
+     "out": "±45°极化间的端口隔离度大于28 dB。  ⟨重试 1 次⟩",
+     "err": null,
+     "hit": 2,
+     "n": 2,
+     "miss": [],
+     "latency": 6.39
+    },
+    {
+     "id": "en8",
+     "out": "无源互调 (PIM) 规定为 3 阶，采用 2 × 43 dBm 载波进行测量，且必须低于 -153 dBc。",
+     "err": null,
+     "hit": 2,
+     "n": 3,
+     "miss": [
+      "三阶"
+     ],
+     "latency": 32.02
+    },
+    {
+     "id": "en9",
+     "out": null,
+     "err": "HTTP 429（重试 4 次）: {\"error\":{\"code\":\"1305\",\"message\":\"该模型当前访问量过大，请您稍后再试\"}}",
+     "hit": 0,
+     "n": 3,
+     "miss": [],
+     "latency": 2.24
+    },
+    {
+     "id": "zh1",
+     "out": "This antenna employs a dual-polarized dipole array, and the electrical downtilt angle can be continuously adjusted from 0° to 10°.",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 14.05
+    },
+    {
+     "id": "zh2",
+     "out": "By loading chokes at the edge of the reflector, the front-to-back ratio is improved by approximately 5 dB, while the sidelobe level remains essentially unchanged.",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 10.97
+    },
+    {
+     "id": "x1",
+     "out": "雷达罩在频带高端引入了轻微的波束倾斜。  ⟨重试 2 次⟩",
+     "err": null,
+     "hit": 1,
+     "n": 2,
+     "miss": [
+      "天线罩"
+     ],
+     "latency": 11.31
+    },
+    {
+     "id": "x2",
+     "out": "相邻列间的互耦降低了阵列的扫描性能。  ⟨重试 1 次⟩",
+     "err": null,
+     "hit": 2,
+     "n": 2,
+     "miss": [],
+     "latency": 6.25
+    },
+    {
+     "id": "x3",
+     "out": "主瓣下方的零陷填充改善了靠近塔的覆盖。  ⟨重试 2 次⟩",
+     "err": null,
+     "hit": 2,
+     "n": 2,
+     "miss": [],
+     "latency": 9.1
+    },
+    {
+     "id": "x4",
+     "out": "增加了寄生单元以拓宽阻抗带宽。  ⟨重试 2 次⟩",
+     "err": null,
+     "hit": 2,
+     "n": 2,
+     "miss": [],
+     "latency": 10.62
+    },
+    {
+     "id": "x5",
+     "out": "Upper sidelobe suppression is greater than 18 dB, meeting the operator's requirements for adjacent cell interference control.",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 12.8
+    }
+   ]
+  },
+  {
+   "engine": "智谱",
+   "model": "glm-4.7-flash · 不带术语表",
+   "mode": "full",
+   "term_hit": 8,
+   "term_total": 42,
+   "out_hit": 0,
+   "out_total": 11,
+   "errors": 13,
+   "avg_latency": 10.92,
+   "rows": [
+    {
+     "id": "en1",
+     "out": "该天线在方位面实现了18 dBi的增益，半功率波束宽度为65°。",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 27.41
+    },
+    {
+     "id": "en2",
+     "out": "电下倾由远程电下倾（RET）单元进行调整，该单元驱动馈电网络中的移相器。  ⟨重试 2 次⟩",
+     "err": null,
+     "hit": 3,
+     "n": 4,
+     "miss": [
+      "电调"
+     ],
+     "latency": 17.1
+    },
+    {
+     "id": "en3",
+     "out": "视轴±60°范围内交叉极化鉴别率大于15 dB。",
+     "err": null,
+     "hit": 2,
+     "n": 2,
+     "miss": [],
+     "latency": 43.78
+    },
+    {
+     "id": "en4",
+     "out": null,
+     "err": "HTTP 0（重试 2 次）: TimeoutError: The read operation timed out",
+     "hit": 0,
+     "n": 2,
+     "miss": [],
+     "latency": 61.04
+    },
+    {
+     "id": "en5",
+     "out": null,
+     "err": "HTTP 429（重试 4 次）: {\"error\":{\"code\":\"1305\",\"message\":\"该模型当前访问量过大，请您稍后再试\"}}",
+     "hit": 0,
+     "n": 3,
+     "miss": [],
+     "latency": 2.47
+    },
+    {
+     "id": "en6",
+     "out": null,
+     "err": "HTTP 429（重试 4 次）: {\"error\":{\"code\":\"1305\",\"message\":\"该模型当前访问量过大，请您稍后再试\"}}",
+     "hit": 0,
+     "n": 3,
+     "miss": [],
+     "latency": 2.21
+    },
+    {
+     "id": "en7",
+     "out": null,
+     "err": "HTTP 429（重试 4 次）: {\"error\":{\"code\":\"1305\",\"message\":\"该模型当前访问量过大，请您稍后再试\"}}",
+     "hit": 0,
+     "n": 2,
+     "miss": [],
+     "latency": 2.33
+    },
+    {
+     "id": "en8",
+     "out": null,
+     "err": "HTTP 429（重试 4 次）: {\"error\":{\"code\":\"1305\",\"message\":\"该模型当前访问量过大，请您稍后再试\"}}",
+     "hit": 0,
+     "n": 3,
+     "miss": [],
+     "latency": 1.87
+    },
+    {
+     "id": "en9",
+     "out": null,
+     "err": "HTTP 429（重试 4 次）: {\"error\":{\"code\":\"1305\",\"message\":\"该模型当前访问量过大，请您稍后再试\"}}",
+     "hit": 0,
+     "n": 3,
+     "miss": [],
+     "latency": 1.92
+    },
+    {
+     "id": "zh1",
+     "out": null,
+     "err": "HTTP 429（重试 4 次）: {\"error\":{\"code\":\"1305\",\"message\":\"该模型当前访问量过大，请您稍后再试\"}}",
+     "hit": 0,
+     "n": 3,
+     "miss": [],
+     "latency": 1.84
+    },
+    {
+     "id": "zh2",
+     "out": null,
+     "err": "HTTP 429（重试 4 次）: {\"error\":{\"code\":\"1302\",\"message\":\"您的账户已达到速率限制，请您控制请求频率\"}}",
+     "hit": 0,
+     "n": 3,
+     "miss": [],
+     "latency": 2.62
+    },
+    {
+     "id": "x1",
+     "out": null,
+     "err": "HTTP 429（重试 4 次）: {\"error\":{\"code\":\"1305\",\"message\":\"该模型当前访问量过大，请您稍后再试\"}}",
+     "hit": 0,
+     "n": 2,
+     "miss": [],
+     "latency": 2.53
+    },
+    {
+     "id": "x2",
+     "out": null,
+     "err": "HTTP 429（重试 4 次）: {\"error\":{\"code\":\"1305\",\"message\":\"该模型当前访问量过大，请您稍后再试\"}}",
+     "hit": 0,
+     "n": 2,
+     "miss": [],
+     "latency": 2.16
+    },
+    {
+     "id": "x3",
+     "out": null,
+     "err": "HTTP 429（重试 4 次）: {\"error\":{\"code\":\"1302\",\"message\":\"您的账户已达到速率限制，请您控制请求频率\"}}",
+     "hit": 0,
+     "n": 2,
+     "miss": [],
+     "latency": 1.78
+    },
+    {
+     "id": "x4",
+     "out": null,
+     "err": "HTTP 429（重试 4 次）: {\"error\":{\"code\":\"1302\",\"message\":\"您的账户已达到速率限制，请您控制请求频率\"}}",
+     "hit": 0,
+     "n": 2,
+     "miss": [],
+     "latency": 1.87
+    },
+    {
+     "id": "x5",
+     "out": null,
+     "err": "HTTP 429（重试 4 次）: {\"error\":{\"code\":\"1305\",\"message\":\"该模型当前访问量过大，请您稍后再试\"}}",
+     "hit": 0,
+     "n": 3,
+     "miss": [],
+     "latency": 1.83
+    }
+   ]
+  },
+  {
+   "engine": "魔搭",
+   "model": "Qwen/Qwen3.5-27B · 带术语表",
+   "mode": "full",
+   "term_hit": 41,
+   "term_total": 42,
+   "out_hit": 10,
+   "out_total": 11,
+   "errors": 0,
+   "avg_latency": 2.23,
+   "rows": [
+    {
+     "id": "en1",
+     "out": "该天线在方位面实现 18 dBi 的增益，半功率波束宽度为 65°。",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 1.86
+    },
+    {
+     "id": "en2",
+     "out": "电下倾由远程电调（RET）单元进行调节，该单元驱动馈电网络中的移相器。",
+     "err": null,
+     "hit": 4,
+     "n": 4,
+     "miss": [],
+     "latency": 1.84
+    },
+    {
+     "id": "en3",
+     "out": "在视轴±60°范围内，交叉极化鉴别度超过15 dB。",
+     "err": null,
+     "hit": 2,
+     "n": 2,
+     "miss": [],
+     "latency": 7.06
+    },
+    {
+     "id": "en4",
+     "out": "在 1710–2690 MHz 频段内，回波损耗优于 15 dB，对应的电压驻波比低于 1.43。",
+     "err": null,
+     "hit": 2,
+     "n": 2,
+     "miss": [],
+     "latency": 1.97
+    },
+    {
+     "id": "en5",
+     "out": "当单元间距超过最高工作频率处的一个波长时，会出现栅瓣。",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 1.81
+    },
+    {
+     "id": "en6",
+     "out": "在偶极子阵列上方放置了一块超表面透镜，以窄化波束并抑制旁瓣。",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 2.48
+    },
+    {
+     "id": "en7",
+     "out": "±45°极化之间的端口隔离度大于 28 dB。",
+     "err": null,
+     "hit": 2,
+     "n": 2,
+     "miss": [],
+     "latency": 1.76
+    },
+    {
+     "id": "en8",
+     "out": "无源互调（PIM）指定为三阶，使用 2 × 43 dBm 载波进行测量，且必须低于 −153 dBc。",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 1.97
+    },
+    {
+     "id": "en9",
+     "out": "通过在反射板上增加扼流槽，提高了前后比。",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 1.94
+    },
+    {
+     "id": "zh1",
+     "out": "The antenna employs a dual-polarized dipole array, with an electrical downtilt continuously adjustable from 0° to 10°.",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 1.7
+    },
+    {
+     "id": "zh2",
+     "out": "By loading chokes on the edges of the reflector, the front-to-back ratio is improved by approximately 5 dB, while the sidelobe level remains essentially unchanged.",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 2.31
+    },
+    {
+     "id": "x1",
+     "out": "天线罩在频段上端引入了轻微的波束倾斜。",
+     "err": null,
+     "hit": 2,
+     "n": 2,
+     "miss": [],
+     "latency": 1.95
+    },
+    {
+     "id": "x2",
+     "out": "相邻列之间的互耦会恶化阵列的扫描性能。",
+     "err": null,
+     "hit": 2,
+     "n": 2,
+     "miss": [],
+     "latency": 1.66
+    },
+    {
+     "id": "x3",
+     "out": "在主波束下方进行零填充可改善塔基附近的覆盖范围。",
+     "err": null,
+     "hit": 1,
+     "n": 2,
+     "miss": [
+      "零点填充/零深填充/零陷填充"
+     ],
+     "latency": 1.69
+    },
+    {
+     "id": "x4",
+     "out": "引入寄生单元以展宽阻抗带宽。",
+     "err": null,
+     "hit": 2,
+     "n": 2,
+     "miss": [],
+     "latency": 1.91
+    },
+    {
+     "id": "x5",
+     "out": "The upper sidelobe suppression exceeds 18 dB, meeting the operator's requirements for controlling interference to adjacent cells.",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 1.79
+    }
+   ]
+  },
+  {
+   "engine": "魔搭",
+   "model": "Qwen/Qwen3.5-397B-A17B · 带术语表",
+   "mode": "full",
+   "term_hit": 42,
+   "term_total": 42,
+   "out_hit": 11,
+   "out_total": 11,
+   "errors": 0,
+   "avg_latency": 3.79,
+   "rows": [
+    {
+     "id": "en1",
+     "out": "该天线在方位面实现 18 dBi 的增益，半功率波束宽度为 65°。",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 3.77
+    },
+    {
+     "id": "en2",
+     "out": "电下倾由远程电调（RET）单元进行调节，该单元驱动馈电网络中的移相器。",
+     "err": null,
+     "hit": 4,
+     "n": 4,
+     "miss": [],
+     "latency": 3.51
+    },
+    {
+     "id": "en3",
+     "out": "在视轴±60°范围内，交叉极化鉴别度超过 15 dB。",
+     "err": null,
+     "hit": 2,
+     "n": 2,
+     "miss": [],
+     "latency": 4.09
+    },
+    {
+     "id": "en4",
+     "out": "在 1710–2690 MHz 频段内，回波损耗优于 15 dB，对应电压驻波比低于 1.43。",
+     "err": null,
+     "hit": 2,
+     "n": 2,
+     "miss": [],
+     "latency": 3.32
+    },
+    {
+     "id": "en5",
+     "out": "当单元间距在最高工作频率下超过一个波长时，会出现栅瓣。",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 4.06
+    },
+    {
+     "id": "en6",
+     "out": "在偶极子阵列上方放置了一个超表面透镜，以收窄波束并抑制旁瓣。  ⟨重试 1 次⟩",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 5.37
+    },
+    {
+     "id": "en7",
+     "out": "±45°极化之间的端口隔离度大于 28 dB。",
+     "err": null,
+     "hit": 2,
+     "n": 2,
+     "miss": [],
+     "latency": 3.7
+    },
+    {
+     "id": "en8",
+     "out": "无源互调（PIM）规定为三阶，采用两个 43 dBm 载波进行测量，且必须低于 −153 dBc。",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 4.87
+    },
+    {
+     "id": "en9",
+     "out": "通过在反射板上增加扼流槽，改善了前后比。",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 3.93
+    },
+    {
+     "id": "zh1",
+     "out": "The antenna employs a dual-polarized dipole array, with the electrical downtilt angle continuously adjustable from 0° to 10°.",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 3.29
+    },
+    {
+     "id": "zh2",
+     "out": "By loading chokes at the edges of the reflector, the front-to-back ratio is improved by approximately 5 dB, while the sidelobe level remains essentially unchanged.",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 4.22
+    },
+    {
+     "id": "x1",
+     "out": "天线罩在频段高端引入了轻微的波束偏斜。",
+     "err": null,
+     "hit": 2,
+     "n": 2,
+     "miss": [],
+     "latency": 3.84
+    },
+    {
+     "id": "x2",
+     "out": "相邻列之间的互耦会降低阵列的扫描性能。",
+     "err": null,
+     "hit": 2,
+     "n": 2,
+     "miss": [],
+     "latency": 2.89
+    },
+    {
+     "id": "x3",
+     "out": "主波束下方的零深填充可改善塔身附近的覆盖效果。",
+     "err": null,
+     "hit": 2,
+     "n": 2,
+     "miss": [],
+     "latency": 2.58
+    },
+    {
+     "id": "x4",
+     "out": "添加了寄生单元以展宽阻抗带宽。",
+     "err": null,
+     "hit": 2,
+     "n": 2,
+     "miss": [],
+     "latency": 2.65
+    },
+    {
+     "id": "x5",
+     "out": "The upper sidelobe suppression exceeds 18 dB, meeting the operator's requirements for adjacent-cell interference control.  ⟨重试 1 次⟩",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 4.51
+    }
+   ]
+  },
+  {
+   "engine": "魔搭",
+   "model": "ZhipuAI/GLM-4.7-Flash · 带术语表",
+   "mode": "full",
+   "term_hit": 2,
+   "term_total": 42,
+   "out_hit": 2,
+   "out_total": 11,
+   "errors": 15,
+   "avg_latency": 17.15,
+   "rows": [
+    {
+     "id": "en1",
+     "out": null,
+     "err": "HTTP 0（重试 3 次）: TimeoutError: The read operation timed out",
+     "hit": 0,
+     "n": 3,
+     "miss": [],
+     "latency": 64.09
+    },
+    {
+     "id": "en2",
+     "out": null,
+     "err": "HTTP 429（重试 4 次）: {\"error\":{\"code\":\"1302\",\"message\":\"您的账户已达到速率限制，请您控制请求频率\"}}",
+     "hit": 0,
+     "n": 4,
+     "miss": [],
+     "latency": 5.62
+    },
+    {
+     "id": "en3",
+     "out": null,
+     "err": "HTTP 429（重试 4 次）: {\"error\":{\"code\":\"1302\",\"message\":\"您的账户已达到速率限制，请您控制请求频率\"}}",
+     "hit": 0,
+     "n": 2,
+     "miss": [],
+     "latency": 5.69
+    },
+    {
+     "id": "en4",
+     "out": null,
+     "err": "HTTP 429（重试 4 次）: {\"error\":{\"code\":\"1305\",\"message\":\"该模型当前访问量过大，请您稍后再试\"}}",
+     "hit": 0,
+     "n": 2,
+     "miss": [],
+     "latency": 6.13
+    },
+    {
+     "id": "en5",
+     "out": null,
+     "err": "HTTP 429（重试 4 次）: {\"error\":{\"code\":\"1305\",\"message\":\"该模型当前访问量过大，请您稍后再试\"}}",
+     "hit": 0,
+     "n": 3,
+     "miss": [],
+     "latency": 5.89
+    },
+    {
+     "id": "en6",
+     "out": null,
+     "err": "HTTP 429（重试 4 次）: {\"error\":{\"code\":\"1305\",\"message\":\"该模型当前访问量过大，请您稍后再试\"}}",
+     "hit": 0,
+     "n": 3,
+     "miss": [],
+     "latency": 5.78
+    },
+    {
+     "id": "en7",
+     "out": null,
+     "err": "HTTP 429（重试 4 次）: {\"error\":{\"code\":\"1305\",\"message\":\"该模型当前访问量过大，请您稍后再试\"}}",
+     "hit": 0,
+     "n": 2,
+     "miss": [],
+     "latency": 5.74
+    },
+    {
+     "id": "en8",
+     "out": null,
+     "err": "HTTP 0: TimeoutError: The read operation timed out",
+     "hit": 0,
+     "n": 3,
+     "miss": [],
+     "latency": 60.98
+    },
+    {
+     "id": "en9",
+     "out": null,
+     "err": "HTTP 429（重试 4 次）: {\"error\":{\"code\":\"1305\",\"message\":\"该模型当前访问量过大，请您稍后再试\"}}",
+     "hit": 0,
+     "n": 3,
+     "miss": [],
+     "latency": 5.64
+    },
+    {
+     "id": "zh1",
+     "out": null,
+     "err": "HTTP 429（重试 4 次）: {\"error\":{\"code\":\"1305\",\"message\":\"该模型当前访问量过大，请您稍后再试\"}}",
+     "hit": 0,
+     "n": 3,
+     "miss": [],
+     "latency": 5.94
+    },
+    {
+     "id": "zh2",
+     "out": null,
+     "err": "HTTP 429（重试 4 次）: {\"error\":{\"code\":\"1302\",\"message\":\"您的账户已达到速率限制，请您控制请求频率\"}}",
+     "hit": 0,
+     "n": 3,
+     "miss": [],
+     "latency": 6.02
+    },
+    {
+     "id": "x1",
+     "out": null,
+     "err": "HTTP 429（重试 4 次）: {\"error\":{\"code\":\"1305\",\"message\":\"该模型当前访问量过大，请您稍后再试\"}}",
+     "hit": 0,
+     "n": 2,
+     "miss": [],
+     "latency": 5.83
+    },
+    {
+     "id": "x2",
+     "out": null,
+     "err": "HTTP 429（重试 4 次）: {\"error\":{\"code\":\"1305\",\"message\":\"该模型当前访问量过大，请您稍后再试\"}}",
+     "hit": 0,
+     "n": 2,
+     "miss": [],
+     "latency": 5.42
+    },
+    {
+     "id": "x3",
+     "out": null,
+     "err": "HTTP 0: TimeoutError: The read operation timed out",
+     "hit": 0,
+     "n": 2,
+     "miss": [],
+     "latency": 60.85
+    },
+    {
+     "id": "x4",
+     "out": null,
+     "err": "HTTP 429（重试 4 次）: {\"error\":{\"code\":\"1305\",\"message\":\"该模型当前访问量过大，请您稍后再试\"}}",
+     "hit": 0,
+     "n": 2,
+     "miss": [],
+     "latency": 6.01
+    },
+    {
+     "id": "x5",
+     "out": "The sidelobe suppression is greater than 18 dB, meeting the operator's requirements for controlling adjacent cell interference.",
+     "err": null,
+     "hit": 2,
+     "n": 3,
+     "miss": [
+      "upper sidelobe/upper side lobe/upper side-lobe"
+     ],
+     "latency": 18.85
+    }
+   ]
+  },
+  {
+   "engine": "魔搭",
+   "model": "Qwen/Qwen3.5-27B · 不带术语表",
+   "mode": "full",
+   "term_hit": 40,
+   "term_total": 42,
+   "out_hit": 10,
+   "out_total": 11,
+   "errors": 0,
+   "avg_latency": 2.09,
+   "rows": [
+    {
+     "id": "en1",
+     "out": "该天线在方位面实现 18 dBi 的增益，半功率波束宽度为 65°。",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 1.98
+    },
+    {
+     "id": "en2",
+     "out": "电下倾角由远程电调（RET）单元进行调节，该单元驱动馈电网络中的移相器。",
+     "err": null,
+     "hit": 4,
+     "n": 4,
+     "miss": [],
+     "latency": 1.82
+    },
+    {
+     "id": "en3",
+     "out": "在波束轴线±60°范围内，交叉极化鉴别度超过15 dB。",
+     "err": null,
+     "hit": 1,
+     "n": 2,
+     "miss": [
+      "视轴/主轴/最大辐射方向/法向"
+     ],
+     "latency": 2.29
+    },
+    {
+     "id": "en4",
+     "out": "在 1710–2690 MHz 频段内，回波损耗优于 15 dB，对应的电压驻波比（VSWR）低于 1.43。",
+     "err": null,
+     "hit": 2,
+     "n": 2,
+     "miss": [],
+     "latency": 2.56
+    },
+    {
+     "id": "en5",
+     "out": "当单元间距超过最高工作频率处的一个波长时，会出现栅瓣。",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 1.68
+    },
+    {
+     "id": "en6",
+     "out": "在偶极子阵列上方放置了一块超表面透镜，以压缩波束并抑制旁瓣。",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 2.09
+    },
+    {
+     "id": "en7",
+     "out": "±45°极化之间的端口隔离度大于 28 dB。",
+     "err": null,
+     "hit": 2,
+     "n": 2,
+     "miss": [],
+     "latency": 1.7
+    },
+    {
+     "id": "en8",
+     "out": "无源互调（PIM）定义为三阶，使用 2 × 43 dBm 载波进行测量，且必须低于 −153 dBc。",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 1.97
+    },
+    {
+     "id": "en9",
+     "out": "通过在反射器上增加扼流圈，改善了前后比。",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 1.65
+    },
+    {
+     "id": "zh1",
+     "out": "The antenna employs a dual-polarized dipole array, with an electrical downtilt continuously adjustable from 0° to 10°.",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 1.82
+    },
+    {
+     "id": "zh2",
+     "out": "By loading choke slots at the edges of the reflector, the front-to-back ratio is improved by approximately 5 dB, while the sidelobe level remains essentially unchanged.",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 3.03
+    },
+    {
+     "id": "x1",
+     "out": "天线罩在频段上端引入了轻微的波束倾斜。",
+     "err": null,
+     "hit": 2,
+     "n": 2,
+     "miss": [],
+     "latency": 1.77
+    },
+    {
+     "id": "x2",
+     "out": "相邻列之间的互耦会恶化阵列的扫描性能。",
+     "err": null,
+     "hit": 2,
+     "n": 2,
+     "miss": [],
+     "latency": 1.7
+    },
+    {
+     "id": "x3",
+     "out": "在主波束下方进行零填充可改善塔基附近的覆盖范围。",
+     "err": null,
+     "hit": 1,
+     "n": 2,
+     "miss": [
+      "零点填充/零深填充/零陷填充"
+     ],
+     "latency": 2.85
+    },
+    {
+     "id": "x4",
+     "out": "引入寄生单元以展宽阻抗带宽。",
+     "err": null,
+     "hit": 2,
+     "n": 2,
+     "miss": [],
+     "latency": 1.64
+    },
+    {
+     "id": "x5",
+     "out": "The upper sidelobe suppression exceeds 18 dB, meeting the operator's requirements for controlling interference to adjacent cells.",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 2.89
+    }
+   ]
+  },
+  {
+   "engine": "AMD",
+   "model": "DeepSeek-V4.1-Flash · 带术语表",
+   "mode": "full",
+   "term_hit": 38,
+   "term_total": 42,
+   "out_hit": 8,
+   "out_total": 11,
+   "errors": 1,
+   "avg_latency": 5.95,
+   "rows": [
+    {
+     "id": "en1",
+     "out": "该天线在方位面内实现18 dBi的增益，半功率波束宽度为65°。",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 2.76
+    },
+    {
+     "id": "en2",
+     "out": "电下倾由远程电调（RET）单元调节，该单元驱动馈电网络中的移相器。",
+     "err": null,
+     "hit": 4,
+     "n": 4,
+     "miss": [],
+     "latency": 36.94
+    },
+    {
+     "id": "en3",
+     "out": "在视轴±60°范围内，交叉极化鉴别率超过15 dB。",
+     "err": null,
+     "hit": 2,
+     "n": 2,
+     "miss": [],
+     "latency": 5.07
+    },
+    {
+     "id": "en4",
+     "out": "在1710–2690 MHz频段内，回波损耗优于15 dB，对应电压驻波比低于1.43。  ⟨重试 1 次⟩",
+     "err": null,
+     "hit": 2,
+     "n": 2,
+     "miss": [],
+     "latency": 5.01
+    },
+    {
+     "id": "en5",
+     "out": "当单元间距在最高工作频率下超过一个波长时，会出现栅瓣。  ⟨重试 1 次⟩",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 5.03
+    },
+    {
+     "id": "en6",
+     "out": "超表面透镜被放置在偶极子阵列上方，以收窄波束并抑制旁瓣。",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 2.34
+    },
+    {
+     "id": "en7",
+     "out": "±45° 极化之间的端口间隔离度大于 28 dB。  ⟨重试 1 次⟩",
+     "err": null,
+     "hit": 2,
+     "n": 2,
+     "miss": [],
+     "latency": 3.3
+    },
+    {
+     "id": "en8",
+     "out": "无源互调（PIM）规定为3阶，使用2 × 43 dBm载波测量，且必须低于−153 dBc。",
+     "err": null,
+     "hit": 2,
+     "n": 3,
+     "miss": [
+      "三阶"
+     ],
+     "latency": 3.36
+    },
+    {
+     "id": "en9",
+     "out": "通过在反射板上增加扼流槽，前后比得到了改善。  ⟨重试 1 次⟩",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 2.77
+    },
+    {
+     "id": "zh1",
+     "out": "The antenna employs a dual-polarized dipole array, and the electrical downtilt can be continuously adjusted within the range of 0° to 10°.",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 3.78
+    },
+    {
+     "id": "zh2",
+     "out": "By loading chokes on the edges of the reflector, the front-to-back ratio is improved by about 5 dB, while the sidelobe level remains essentially unchanged.",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 3.16
+    },
+    {
+     "id": "x1",
+     "out": "天线罩在频段高端引入了轻微的波束偏斜。",
+     "err": null,
+     "hit": 2,
+     "n": 2,
+     "miss": [],
+     "latency": 1.96
+    },
+    {
+     "id": "x2",
+     "out": "相邻列之间的互耦会降低阵列的扫描性能。  ⟨重试 2 次⟩",
+     "err": null,
+     "hit": 2,
+     "n": 2,
+     "miss": [],
+     "latency": 4.46
+    },
+    {
+     "id": "x3",
+     "out": "主波束下方的零点填充改善了靠近铁塔的覆盖。",
+     "err": null,
+     "hit": 2,
+     "n": 2,
+     "miss": [],
+     "latency": 2.47
+    },
+    {
+     "id": "x4",
+     "out": "添加了寄生元件以拓宽阻抗带宽。  ⟨重试 2 次⟩",
+     "err": null,
+     "hit": 2,
+     "n": 2,
+     "miss": [],
+     "latency": 5.91
+    },
+    {
+     "id": "x5",
+     "out": null,
+     "err": "HTTP 429（重试 4 次）: {\"detail\":{\"error\":{\"message\":\"Model 'DeepSeek-V4.1-Flash' is at its concurrency limit (16); please retry later or use another model\",\"type\":\"rate_limit_error\",\"code\":\"model_concurrency_rate_limit_exceeded\"}}}",
+     "hit": 0,
+     "n": 3,
+     "miss": [],
+     "latency": 6.86
+    }
+   ]
+  },
+  {
+   "engine": "AMD",
+   "model": "DeepSeek-V4-Flash · 带术语表",
+   "mode": "full",
+   "term_hit": 41,
+   "term_total": 42,
+   "out_hit": 10,
+   "out_total": 11,
+   "errors": 0,
+   "avg_latency": 4.39,
+   "rows": [
+    {
+     "id": "en1",
+     "out": "该天线在方位面内实现了18 dBi的增益，半功率波束宽度为65°。",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 2.09
+    },
+    {
+     "id": "en2",
+     "out": "电下倾通过远程电调（RET）单元进行调整，该单元驱动馈电网络中的移相器。",
+     "err": null,
+     "hit": 4,
+     "n": 4,
+     "miss": [],
+     "latency": 3.35
+    },
+    {
+     "id": "en3",
+     "out": "在视轴±60°范围内，交叉极化鉴别度超过15 dB。",
+     "err": null,
+     "hit": 2,
+     "n": 2,
+     "miss": [],
+     "latency": 2.0
+    },
+    {
+     "id": "en4",
+     "out": "在1710–2690 MHz频段内，回波损耗优于15 dB，对应的电压驻波比低于1.43。",
+     "err": null,
+     "hit": 2,
+     "n": 2,
+     "miss": [],
+     "latency": 2.76
+    },
+    {
+     "id": "en5",
+     "out": "当单元间距超过最高工作频率下的一个波长时，会出现栅瓣。",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 2.36
+    },
+    {
+     "id": "en6",
+     "out": "将超表面透镜置于偶极子阵列上方，以收窄波束并抑制旁瓣。",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 3.62
+    },
+    {
+     "id": "en7",
+     "out": "±45°极化之间的端口间隔离度大于28 dB。",
+     "err": null,
+     "hit": 2,
+     "n": 2,
+     "miss": [],
+     "latency": 2.15
+    },
+    {
+     "id": "en8",
+     "out": "无源互调（PIM）规定为三阶，使用2 × 43 dBm载波测量，且必须低于−153 dBc。",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 3.13
+    },
+    {
+     "id": "en9",
+     "out": "通过在反射板上添加扼流槽，前后比得到了改善。",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 7.97
+    },
+    {
+     "id": "zh1",
+     "out": "The antenna employs a dual-polarized dipole array, with the electrical downtilt angle continuously adjustable within the range of 0° to 10°.",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 2.9
+    },
+    {
+     "id": "zh2",
+     "out": "By loading chokes at the edge of the reflector, the front-to-back ratio is improved by approximately 5 dB, while the sidelobe level remains essentially unchanged.",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 2.63
+    },
+    {
+     "id": "x1",
+     "out": "天线罩在频带高端引入了轻微的光束偏斜。",
+     "err": null,
+     "hit": 1,
+     "n": 2,
+     "miss": [
+      "波束偏斜/波束倾斜/波束指向偏移/波束偏移/波束斜视"
+     ],
+     "latency": 2.22
+    },
+    {
+     "id": "x2",
+     "out": "相邻列之间的互耦会降低阵列的扫描性能。",
+     "err": null,
+     "hit": 2,
+     "n": 2,
+     "miss": [],
+     "latency": 2.42
+    },
+    {
+     "id": "x3",
+     "out": "主波束下方的零陷填充可改善塔附近的覆盖。",
+     "err": null,
+     "hit": 2,
+     "n": 2,
+     "miss": [],
+     "latency": 25.28
+    },
+    {
+     "id": "x4",
+     "out": "添加了寄生单元以拓宽阻抗带宽。",
+     "err": null,
+     "hit": 2,
+     "n": 2,
+     "miss": [],
+     "latency": 2.38
+    },
+    {
+     "id": "x5",
+     "out": "The upper sidelobe suppression is greater than 18 dB, meeting the operator's requirements for controlling interference in adjacent sectors.",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 2.98
+    }
+   ]
+  },
+  {
+   "engine": "AMD",
+   "model": "Gemma-4-31B-IT · 带术语表",
+   "mode": "full",
+   "term_hit": 41,
+   "term_total": 42,
+   "out_hit": 11,
+   "out_total": 11,
+   "errors": 0,
+   "avg_latency": 2.62,
+   "rows": [
+    {
+     "id": "en1",
+     "out": "该天线在方位面实现了 18 dBi 的增益，半功率波束宽度为 65°。",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 2.01
+    },
+    {
+     "id": "en2",
+     "out": "电下倾由远程电调 (RET) 单元调节，该单元驱动馈电网络中的移相器。",
+     "err": null,
+     "hit": 4,
+     "n": 4,
+     "miss": [],
+     "latency": 2.13
+    },
+    {
+     "id": "en3",
+     "out": "在视轴 ±60° 范围内，交叉极化鉴别度超过 15 dB。",
+     "err": null,
+     "hit": 2,
+     "n": 2,
+     "miss": [],
+     "latency": 5.37
+    },
+    {
+     "id": "en4",
+     "out": "在 1710–2690 MHz 范围内，回波损耗优于 15 dB，对应的电压驻波比低于 1.43。",
+     "err": null,
+     "hit": 2,
+     "n": 2,
+     "miss": [],
+     "latency": 4.25
+    },
+    {
+     "id": "en5",
+     "out": "当单元间距超过最高工作频率下的一个波长时，会出现栅瓣。",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 1.67
+    },
+    {
+     "id": "en6",
+     "out": "在偶极子阵列上方放置了一个超表面透镜，以缩窄波束并抑制旁瓣。",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 2.05
+    },
+    {
+     "id": "en7",
+     "out": "±45°极化之间的端口间隔离度大于 28 dB。",
+     "err": null,
+     "hit": 2,
+     "n": 2,
+     "miss": [],
+     "latency": 1.6
+    },
+    {
+     "id": "en8",
+     "out": "无源互调 (PIM) 规定为 3 阶，使用 2 × 43 dBm 载波进行测量，且必须低于 −153 dBc。",
+     "err": null,
+     "hit": 2,
+     "n": 3,
+     "miss": [
+      "三阶"
+     ],
+     "latency": 2.36
+    },
+    {
+     "id": "en9",
+     "out": "通过在反射板上添加扼流槽，提高了前后比。",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 1.99
+    },
+    {
+     "id": "zh1",
+     "out": "The antenna employs a dual-polarized dipole array, with the electrical downtilt angle continuously adjustable from 0° to 10°.",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 3.1
+    },
+    {
+     "id": "zh2",
+     "out": "By loading chokes on the edges of the reflector, the front-to-back ratio is improved by approximately 5 dB, while the sidelobe level remains basically unchanged.",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 2.17
+    },
+    {
+     "id": "x1",
+     "out": "天线罩在频段高端引起了轻微的波束偏移（beam squint）。",
+     "err": null,
+     "hit": 2,
+     "n": 2,
+     "miss": [],
+     "latency": 1.82
+    },
+    {
+     "id": "x2",
+     "out": "相邻列之间的互耦会降低阵列的扫描性能。",
+     "err": null,
+     "hit": 2,
+     "n": 2,
+     "miss": [],
+     "latency": 3.41
+    },
+    {
+     "id": "x3",
+     "out": "主波束下方的零点填充可改善靠近塔基的覆盖。",
+     "err": null,
+     "hit": 2,
+     "n": 2,
+     "miss": [],
+     "latency": 1.69
+    },
+    {
+     "id": "x4",
+     "out": "添加寄生元件以展宽阻抗带宽。",
+     "err": null,
+     "hit": 2,
+     "n": 2,
+     "miss": [],
+     "latency": 1.55
+    },
+    {
+     "id": "x5",
+     "out": "The upper sidelobe suppression is greater than 18 dB, meeting the operator's requirements for adjacent cell interference control.",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 4.75
+    }
+   ]
+  },
+  {
+   "engine": "AMD",
+   "model": "Qwen3.8-27B · 带术语表",
+   "mode": "full",
+   "term_hit": 40,
+   "term_total": 42,
+   "out_hit": 9,
+   "out_total": 11,
+   "errors": 0,
+   "avg_latency": 2.33,
+   "rows": [
+    {
+     "id": "en1",
+     "out": "该天线在方位面实现18 dBi的增益，半功率波束宽度为65°。",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 2.39
+    },
+    {
+     "id": "en2",
+     "out": "电下倾由远程电调单元进行调节，该单元驱动馈电网络中的移相器。",
+     "err": null,
+     "hit": 4,
+     "n": 4,
+     "miss": [],
+     "latency": 2.41
+    },
+    {
+     "id": "en3",
+     "out": "在视轴±60°范围内，交叉极化鉴别度大于15 dB。  ⟨重试 1 次⟩",
+     "err": null,
+     "hit": 2,
+     "n": 2,
+     "miss": [],
+     "latency": 2.91
+    },
+    {
+     "id": "en4",
+     "out": "在1710–2690 MHz频段内，回波损耗优于15 dB，对应的电压驻波比低于1.43。",
+     "err": null,
+     "hit": 2,
+     "n": 2,
+     "miss": [],
+     "latency": 2.5
+    },
+    {
+     "id": "en5",
+     "out": "当单元间距超过最高工作频率对应波长时，会出现栅瓣。",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 2.07
+    },
+    {
+     "id": "en6",
+     "out": "在偶极子阵列上方放置了一个超表面透镜，以收窄波束并抑制旁瓣。",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 2.01
+    },
+    {
+     "id": "en7",
+     "out": "±45° 极化之间的端口间隔离度大于 28 dB。",
+     "err": null,
+     "hit": 2,
+     "n": 2,
+     "miss": [],
+     "latency": 2.32
+    },
+    {
+     "id": "en8",
+     "out": "无源互调（PIM）规定为三阶，采用 2 × 43 dBm 载波进行测量，且必须低于 −153 dBc。",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 2.75
+    },
+    {
+     "id": "en9",
+     "out": "通过在反射板上增加扼流槽，提高了前后比。",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 2.67
+    },
+    {
+     "id": "zh1",
+     "out": "The antenna employs a dual-polarized dipole array, with the electrical downtilt angle continuously adjustable from 0° to 10°.",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 2.91
+    },
+    {
+     "id": "zh2",
+     "out": "By loading chokes on the edges of the reflector, the front-to-back ratio was improved by approximately 5 dB, while the sidelobe level remained essentially unchanged.",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 2.43
+    },
+    {
+     "id": "x1",
+     "out": "天线罩在频段上端引入轻微的波束偏转。",
+     "err": null,
+     "hit": 1,
+     "n": 2,
+     "miss": [
+      "波束偏斜/波束倾斜/波束指向偏移/波束偏移/波束斜视"
+     ],
+     "latency": 1.75
+    },
+    {
+     "id": "x2",
+     "out": "相邻列之间的互耦会降低阵列的扫描性能。",
+     "err": null,
+     "hit": 2,
+     "n": 2,
+     "miss": [],
+     "latency": 1.75
+    },
+    {
+     "id": "x3",
+     "out": "在主瓣下方填充零点可改善塔基附近的覆盖范围。",
+     "err": null,
+     "hit": 1,
+     "n": 2,
+     "miss": [
+      "零点填充/零深填充/零陷填充"
+     ],
+     "latency": 1.73
+    },
+    {
+     "id": "x4",
+     "out": "通过添加寄生单元来展宽阻抗带宽。",
+     "err": null,
+     "hit": 2,
+     "n": 2,
+     "miss": [],
+     "latency": 1.87
+    },
+    {
+     "id": "x5",
+     "out": "The upper sidelobe suppression is greater than 18 dB, meeting the operator's requirements for controlling adjacent area interference.",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 2.79
+    }
+   ]
+  },
+  {
+   "engine": "AMD",
+   "model": "MiMo-V2.6-Flash · 带术语表",
+   "mode": "full",
+   "term_hit": 42,
+   "term_total": 42,
+   "out_hit": 11,
+   "out_total": 11,
+   "errors": 0,
+   "avg_latency": 3.59,
+   "rows": [
+    {
+     "id": "en1",
+     "out": "该天线增益为18 dBi，方位面半功率波束宽度为65°。",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 2.95
+    },
+    {
+     "id": "en2",
+     "out": "电下倾通过远程电调（RET）单元进行调节，该单元驱动馈电网络中的移相器。",
+     "err": null,
+     "hit": 4,
+     "n": 4,
+     "miss": [],
+     "latency": 2.78
+    },
+    {
+     "id": "en3",
+     "out": "在视轴 ±60° 范围内，交叉极化鉴别度超过 15 dB。",
+     "err": null,
+     "hit": 2,
+     "n": 2,
+     "miss": [],
+     "latency": 2.78
+    },
+    {
+     "id": "en4",
+     "out": "在1710–2690 MHz频段内，回波损耗优于15 dB，对应的电压驻波比低于1.43。",
+     "err": null,
+     "hit": 2,
+     "n": 2,
+     "miss": [],
+     "latency": 3.72
+    },
+    {
+     "id": "en5",
+     "out": "当单元间距在最高工作频率处超过一个波长时，就会出现栅瓣。",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 2.9
+    },
+    {
+     "id": "en6",
+     "out": "在偶极子阵列上方放置了一个超表面透镜，以收窄波束并抑制旁瓣。",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 4.46
+    },
+    {
+     "id": "en7",
+     "out": "±45°极化之间的端口隔离度大于28 dB。",
+     "err": null,
+     "hit": 2,
+     "n": 2,
+     "miss": [],
+     "latency": 3.11
+    },
+    {
+     "id": "en8",
+     "out": "无源互调（PIM）规定为三阶，采用 2 × 43 dBm 载波进行测量，必须低于 −153 dBc。",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 4.56
+    },
+    {
+     "id": "en9",
+     "out": "通过在反射板上增加扼流槽，前后比得到了改善。",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 2.63
+    },
+    {
+     "id": "zh1",
+     "out": "The antenna employs a dual-polarized dipole array, with an electrical downtilt that can be continuously adjusted within the range of 0° to 10°.",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 3.74
+    },
+    {
+     "id": "zh2",
+     "out": "By loading a choke at the edge of the reflector, the front-to-back ratio was improved by approximately 5 dB, while the sidelobe level remained essentially unchanged.",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 3.91
+    },
+    {
+     "id": "x1",
+     "out": "天线罩在频段高端会引入轻微的波束偏斜。",
+     "err": null,
+     "hit": 2,
+     "n": 2,
+     "miss": [],
+     "latency": 3.96
+    },
+    {
+     "id": "x2",
+     "out": "相邻列之间的互耦会降低阵列的扫描性能。",
+     "err": null,
+     "hit": 2,
+     "n": 2,
+     "miss": [],
+     "latency": 3.55
+    },
+    {
+     "id": "x3",
+     "out": "在主波束下方进行零点填充，可改善塔附近的覆盖。",
+     "err": null,
+     "hit": 2,
+     "n": 2,
+     "miss": [],
+     "latency": 3.28
+    },
+    {
+     "id": "x4",
+     "out": "添加了寄生单元以展宽阻抗带宽。",
+     "err": null,
+     "hit": 2,
+     "n": 2,
+     "miss": [],
+     "latency": 4.39
+    },
+    {
+     "id": "x5",
+     "out": "Upper sidelobe suppression greater than 18 dB, meeting the operator's requirements for adjacent-cell interference control.",
+     "err": null,
+     "hit": 3,
+     "n": 3,
+     "miss": [],
+     "latency": 4.79
+    }
+   ]
+  }
+ ]
+}
