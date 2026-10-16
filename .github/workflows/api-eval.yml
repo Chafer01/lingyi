@@ -37,6 +37,7 @@ jobs:
           VOLC_SK: ${{ secrets.VOLC_SK }}
           BAIDU_APPID: ${{ secrets.BAIDU_APPID }}
           BAIDU_KEY: ${{ secrets.BAIDU_KEY }}
+          AMD_API_KEY: ${{ secrets.AMD_API_KEY }}
           ONLY: ${{ inputs.only }}
           MAXTESTS: ${{ inputs.maxtests }}
         run: python3 tools/api_eval.py

@@ -200,6 +200,9 @@ LLMS = [
      [("gemini-3.5-flash-lite", "chat_gloss"), ("gemini-3.8-flash", "chat_gloss")]),
     ("百度千帆", "https://qianfan.baidubce.com/v2", "QIANFAN_API_KEY", [("ernie-speed-128k", "chat_gloss")]),
     ("讯飞星火", "https://spark-api-open.xf-yun.com/v1", "SPARK_API_PASSWORD", [("lite", "chat_gloss")]),
+    ("AMD", "https://developer.amd.com.cn/radeon/api/v1", "AMD_API_KEY",
+     [("DeepSeek-V4.1-Flash", "chat_gloss"), ("DeepSeek-V4-Flash", "chat_gloss"), ("Gemma-4-31B-IT", "chat_gloss"),
+      ("Qwen3.8-27B", "chat_gloss"), ("MiMo-V2.6-Flash", "chat_gloss")]),
 ]
 
 # 魔搭可用模型很多，按以下顺序从实时模型列表中各挑一个（正则匹配模型 ID）。
@@ -268,6 +271,8 @@ def llm_translate(base, key, model, text, mode):
     body = {"model": model, "messages": messages, "stream": False, **params}
     if "modelscope" in base:
         body["enable_thinking"] = False
+    if "amd.com" in base and model.startswith("Qwen"):
+        body["chat_template_kwargs"] = {"enable_thinking": False}
     headers = {"Content-Type": "application/json", "Authorization": f"Bearer {key}"}
     retries = 0
     t_total = 0.0
