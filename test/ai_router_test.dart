@@ -23,19 +23,23 @@ List<AiEndpoint> defaultEndpoints() => LlmEngine.buildEndpoints(
       chain: defaultAiChain,
       modelscopeKey: 'ms-test',
       zhipuKey: 'zp-test',
+      amdKey: 'rc-test',
     );
 
 void main() {
   setUp(AiRouter.resetCooldowns);
 
-  test('默认线路：397B → 27B → 智谱 GLM-4-Flash', () {
+  test('默认线路：397B → 27B → AMD MiMo → AMD Gemma → 智谱 GLM-4-Flash', () {
     final eps = defaultEndpoints();
     expect(eps.map((e) => e.model).toList(),
-        ['Qwen/Qwen3.5-397B-A17B', 'Qwen/Qwen3.5-27B', 'glm-4-flash-250414']);
+        ['Qwen/Qwen3.5-397B-A17B', 'Qwen/Qwen3.5-27B', 'MiMo-V2.6-Flash', 'Gemma-4-31B-IT', 'glm-4-flash-250414']);
     expect(eps[0].baseUrl, modelscopeBaseUrl);
-    expect(eps[2].baseUrl, zhipuBaseUrl);
+    expect(eps[2].baseUrl, amdBaseUrl);
+    expect(eps[2].apiKey, 'rc-test');
+    expect(eps[3].baseUrl, amdBaseUrl);
+    expect(eps[4].baseUrl, zhipuBaseUrl);
     expect(eps[0].extraBody['enable_thinking'], false);
-    expect(eps[2].extraBody, isEmpty);
+    expect(eps[4].extraBody, isEmpty);
   });
 
   test('没填密钥的平台被跳过', () {

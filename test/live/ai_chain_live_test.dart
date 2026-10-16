@@ -1,4 +1,4 @@
-// 用真实密钥验证 AI 线路（魔搭 Qwen3.5-397B → Qwen3.5-27B → 智谱 GLM-4-Flash）。
+// 用真实密钥验证 AI 线路（魔搭 Qwen3.5-397B → Qwen3.5-27B → AMD MiMo-V2.6-Flash → Gemma-4-31B → 智谱 GLM-4-Flash）。
 // 由“AI 线路实测”工作流运行；没有密钥时整组跳过，不影响平时的 flutter test。
 import 'dart:io';
 
@@ -8,13 +8,16 @@ import 'package:lingyi/services/translate/llm.dart';
 
 final _ms = Platform.environment['MODELSCOPE_API_KEY'] ?? '';
 final _zp = Platform.environment['ZHIPU_API_KEY'] ?? '';
-final _skip = (_ms.isEmpty || _zp.isEmpty) ? '没有配置 MODELSCOPE_API_KEY / ZHIPU_API_KEY，跳过实测' : null;
+final _amd = Platform.environment['AMD_API_KEY'] ?? '';
+final _skip = (_ms.isEmpty || _zp.isEmpty || _amd.isEmpty)
+    ? '没有配置 MODELSCOPE_API_KEY / ZHIPU_API_KEY / AMD_API_KEY，跳过实测'
+    : null;
 
 const _system = '你是专业的科技翻译，熟悉射频、天线、电磁仿真和通信工程。把用户给出的文本翻译成简体中文。'
     '要求：准确、通顺、符合技术文档习惯；保留公式、变量名、单位和专有名词；不要解释，只输出译文。'
     '必须使用以下术语译法：\n- radome → 天线罩\n- beam squint → 波束偏斜\n- null filling → 零点填充';
 
-List<AiEndpoint> _chain() => LlmEngine.buildEndpoints(chain: defaultAiChain, modelscopeKey: _ms, zhipuKey: _zp);
+List<AiEndpoint> _chain() => LlmEngine.buildEndpoints(chain: defaultAiChain, modelscopeKey: _ms, zhipuKey: _zp, amdKey: _amd);
 
 void _log(String tag, AiReply r) {
   // ignore: avoid_print
@@ -28,7 +31,7 @@ void main() {
   test('默认线路顺序与配置', () {
     final eps = _chain();
     expect(eps.map((e) => e.model).toList(),
-        ['Qwen/Qwen3.5-397B-A17B', 'Qwen/Qwen3.5-27B', 'glm-4-flash-250414']);
+        ['Qwen/Qwen3.5-397B-A17B', 'Qwen/Qwen3.5-27B', 'MiMo-V2.6-Flash', 'Gemma-4-31B-IT', 'glm-4-flash-250414']);
   }, skip: _skip);
 
   test('线路上每个模型单独都能调通', () async {

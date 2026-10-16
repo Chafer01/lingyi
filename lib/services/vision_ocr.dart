@@ -16,6 +16,11 @@ const visionRoutes = <AiRoute>[
   AiRoute('vl-ms-397b', 'modelscope', 'Qwen/Qwen3.5-397B-A17B', 'Qwen3.5-397B（魔搭）',
       extraBody: {'enable_thinking': false}, note: '实测公式 5/5，约 4 秒'),
   // 智谱 GLM-4.1V-Thinking-Flash：两次实测公式 5/5、3/5，编号 5/5，行内符号偶尔写成普通字母，需要先思考（约 8 秒）。
+  // AMD Token Factory（DeepSeek-V4-Flash-Vision-Exp、Qwen3.8-27B）：公式 5/5、编号 5/5，约 6–8 秒。
+  AiRoute('vl-amd-dsv', 'amd', 'DeepSeek-V4-Flash-Vision-Exp', 'DeepSeek-V4-Flash-Vision（AMD）',
+      note: '实测公式 5/5、行内符号 100%，约 8 秒'),
+  AiRoute('vl-amd-q27', 'amd', 'Qwen3.8-27B', 'Qwen3.8-27B（AMD）',
+      extraBody: {'chat_template_kwargs': {'enable_thinking': false}}, note: '实测公式 5/5，约 6 秒'),
   // 智谱 GLM-4V-Flash：公式 4/5、行内符号 93%、错字率 0.1%，约 3.5 秒；输出上限 1024 个 token，长截图可能截断。
   AiRoute('vl-zp-4v', 'zhipu', 'glm-4v-flash', 'GLM-4V-Flash（智谱）',
       extraBody: {'max_tokens': 1024}, note: '实测公式 4/5，约 3.5 秒'),
@@ -23,7 +28,7 @@ const visionRoutes = <AiRoute>[
       note: '实测公式 5/5，约 8 秒'),
 ];
 
-const defaultVisionChain = ['vl-ms-27b', 'vl-ms-397b', 'vl-zp-4v', 'vl-zp-41v'];
+const defaultVisionChain = ['vl-ms-27b', 'vl-ms-397b', 'vl-amd-dsv', 'vl-amd-q27', 'vl-zp-4v', 'vl-zp-41v'];
 
 /// 与 tools/ocr_eval/run_eval.py 的 PROMPT 保持一致（实测结果基于这段提示）。
 const visionPrompt = '请识别图片中的全部文字和数学公式，按原文顺序输出。要求：\n'
@@ -50,14 +55,20 @@ class VisionOcr {
   final _router = AiRouter();
 
   List<AiEndpoint> get endpoints =>
-      buildEndpoints(modelscopeKey: Settings.instance.modelscopeKey, zhipuKey: Settings.instance.zhipuKey);
+      buildEndpoints(
+          modelscopeKey: Settings.instance.modelscopeKey,
+          zhipuKey: Settings.instance.zhipuKey,
+          amdKey: Settings.instance.amdKey);
 
   bool get configured => endpoints.isNotEmpty;
 
   String get chainLabel => endpoints.map((e) => e.label).join(' → ');
 
   static List<AiEndpoint> buildEndpoints(
-      {required String modelscopeKey, String zhipuKey = '', List<String> chain = defaultVisionChain}) {
+      {required String modelscopeKey,
+      String zhipuKey = '',
+      String amdKey = '',
+      List<String> chain = defaultVisionChain}) {
     final out = <AiEndpoint>[];
     for (final id in chain) {
       AiRoute? r;
@@ -68,6 +79,7 @@ class VisionOcr {
       final (base, key) = switch (r.provider) {
         'modelscope' => (modelscopeBaseUrl, modelscopeKey),
         'zhipu' => (zhipuBaseUrl, zhipuKey),
+        'amd' => (amdBaseUrl, amdKey),
         _ => ('', ''),
       };
       if (key.isEmpty) continue;

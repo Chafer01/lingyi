@@ -12,7 +12,7 @@ class AiRoute {
   const AiRoute(this.id, this.provider, this.model, this.label, {this.extraBody = const {}, this.note = ''});
   final String id;
 
-  /// modelscope / zhipu / custom
+  /// modelscope / zhipu / amd / custom
   final String provider;
   final String model;
 
@@ -27,6 +27,9 @@ class AiRoute {
 const modelscopeBaseUrl = 'https://api-inference.modelscope.cn/v1';
 const zhipuBaseUrl = 'https://open.bigmodel.cn/api/paas/v4';
 
+/// AMD 中国开发者云 Radeon Cloud · Token Factory（免费共享模型，账户每日约 $10 额度，上海时间每日重置）。
+const amdBaseUrl = 'https://developer.amd.com.cn/radeon/api/v1';
+
 /// 魔搭的 Qwen3.5 默认开启思考，会慢很多且可能把思考过程混进输出。
 const _noThinking = {'enable_thinking': false};
 
@@ -35,14 +38,25 @@ const aiRoutes = <AiRoute>[
       extraBody: _noThinking, note: '实测术语最准（41/42），约 3 秒'),
   AiRoute('ms-27b', 'modelscope', 'Qwen/Qwen3.5-27B', 'Qwen3.5-27B（魔搭）',
       extraBody: _noThinking, note: '与 397B 额度分开计算，约 2 秒'),
+  AiRoute('amd-mimo', 'amd', 'MiMo-V2.6-Flash', 'MiMo-V2.6-Flash（AMD）', note: '实测术语 42/42，约 3.6 秒；高峰时可能繁忙'),
+  AiRoute('amd-gemma', 'amd', 'Gemma-4-31B-IT', 'Gemma-4-31B（AMD）', note: '实测术语 41/42，约 2.6 秒'),
   AiRoute('zhipu-flash', 'zhipu', 'glm-4-flash-250414', 'GLM-4-Flash（智谱）', note: '官方永久免费，约 1 秒'),
+  AiRoute('amd-ds4', 'amd', 'DeepSeek-V4-Flash', 'DeepSeek-V4-Flash（AMD）', note: '可选的额外备用，实测术语 41/42'),
   AiRoute('ms-122b', 'modelscope', 'Qwen/Qwen3.5-122B-A10B', 'Qwen3.5-122B（魔搭）',
       extraBody: _noThinking, note: '可选的额外备用'),
   AiRoute('custom', 'custom', '', '自定义接口', note: 'DeepSeek、通义千问、Ollama 等 OpenAI 兼容接口'),
 ];
 
-/// 默认线路：397B → 27B → 智谱。
-const defaultAiChain = ['ms-397b', 'ms-27b', 'zhipu-flash'];
+/// 默认线路：魔搭 397B → 魔搭 27B → AMD MiMo → AMD Gemma → 智谱。
+const defaultAiChain = ['ms-397b', 'ms-27b', 'amd-mimo', 'amd-gemma', 'zhipu-flash'];
+
+/// 各平台的接口地址。
+String? providerBaseUrl(String provider) => switch (provider) {
+      'modelscope' => modelscopeBaseUrl,
+      'zhipu' => zhipuBaseUrl,
+      'amd' => amdBaseUrl,
+      _ => null,
+    };
 
 AiRoute? aiRouteById(String id) {
   for (final r in aiRoutes) {

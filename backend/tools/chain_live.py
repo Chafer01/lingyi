@@ -25,6 +25,8 @@ MS = os.environ.get("MODELSCOPE_API_KEY", "").strip()
 ZP = os.environ.get("ZHIPU_API_KEY", "").strip()
 MS_URL = "https://api-inference.modelscope.cn/v1"
 ZP_URL = "https://open.bigmodel.cn/api/paas/v4"
+AMD = os.environ.get("AMD_API_KEY", "").strip()
+AMD_URL = "https://developer.amd.com.cn/radeon/api/v1"
 
 PARAGRAPHS = [
     "The antenna achieves a gain of 18 dBi with a half-power beamwidth of 65° in the azimuth plane. "
@@ -52,6 +54,8 @@ def chain():
     return [
         make("Qwen3.5-397B（魔搭）", MS_URL, MS, "Qwen/Qwen3.5-397B-A17B", nothink),
         make("Qwen3.5-27B（魔搭）", MS_URL, MS, "Qwen/Qwen3.5-27B", nothink),
+        make("MiMo-V2.6-Flash（AMD）", AMD_URL, AMD, "MiMo-V2.6-Flash"),
+        make("Gemma-4-31B（AMD）", AMD_URL, AMD, "Gemma-4-31B-IT"),
         make("GLM-4-Flash（智谱）", ZP_URL, ZP, "glm-4-flash-250414"),
     ]
 
@@ -67,8 +71,8 @@ def ask(ep: Endpoint, text: str) -> str:
 
 
 def main() -> int:
-    if not (MS and ZP):
-        print("没有配置 MODELSCOPE_API_KEY / ZHIPU_API_KEY，跳过")
+    if not (MS and ZP and AMD):
+        print("没有配置 MODELSCOPE_API_KEY / ZHIPU_API_KEY / AMD_API_KEY，跳过")
         return 0
     failures = 0
 

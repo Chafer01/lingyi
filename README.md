@@ -10,7 +10,7 @@
 | 变形自动还原（went → go，antennas → antenna） | ✅ | ✅ |
 | 输入联想、中文反查英文 | ✅ | ✅ |
 | 多引擎并排翻译：火山、百度、DeepL、腾讯、AI 翻译 | ✅ | ✅ |
-| AI 多线路自动切换：魔搭 Qwen3.5-397B → Qwen3.5-27B → 智谱 GLM-4-Flash，结果下方显示实际使用的模型 | ✅ | ✅ |
+| AI 多线路自动切换：魔搭 Qwen3.5-397B → Qwen3.5-27B → AMD MiMo-V2.6-Flash → Gemma-4-31B → 智谱 GLM-4-Flash，结果下方显示实际使用的模型 | ✅ | ✅ |
 | 术语表（默认内置射频/天线术语；AI 翻译强制使用） | ✅ | ✅ |
 | AI 讲解单词 / 解析句子 | ✅ | ✅ |
 | 朗读（系统 TTS） | ✅ | ✅ |
@@ -45,7 +45,7 @@ flutter run -d windows          # 或连接手机后 flutter run
 
 这两项由随包附带的本地后端 `backend\lingyi_backend.exe` 完成，灵译在需要时自动启动它，退出时一并关闭：
 
-- **智能识别（默认）**：魔搭 Qwen3.5-27B → Qwen3.5-397B → 智谱 GLM-4V-Flash → GLM-4.1V-Thinking-Flash 视觉识别，文字和公式一起输出（Markdown + LaTeX），都不可用时改用本地文字识别。截图会上传到魔搭/智谱。选择依据见 `tools/ocr_eval`（论文排版测试图：Qwen3.5 公式 5/5 全对，GLM-4V 4/5，本地 OCR 0/5）
+- **智能识别（默认）**：魔搭 Qwen3.5-27B → Qwen3.5-397B → AMD DeepSeek-V4-Flash-Vision → Qwen3.8-27B → 智谱 GLM-4V-Flash → GLM-4.1V-Thinking-Flash 视觉识别，文字和公式一起输出（Markdown + LaTeX），都不可用时改用本地文字识别。截图会上传到魔搭/AMD/智谱。选择依据见 `tools/ocr_eval`（论文排版测试图：Qwen3.5 公式 5/5 全对，GLM-4V 4/5，本地 OCR 0/5）
 - 文字识别（本地离线）：RapidOCR（PP-OCRv4，中英文）；会把断行合并成段落，并修复英文单词间丢失的空格
 - 公式识别（本地离线）：RapidLaTeXOCR，只适合单个公式的截图，输出 LaTeX 和 MathML
 - PDF 翻译所需的版面模型、字体（中英文精简版）、字符映射表、tiktoken 词表已内置在安装包里，无需联网下载
@@ -64,7 +64,7 @@ flutter run -d windows          # 或连接手机后 flutter run
 ## 首次配置
 
 1. **翻译引擎**（设置 → 翻译引擎）。默认只启用 AI 翻译，其他引擎可手动开启、结果并排显示
-   - **AI 翻译**（划词翻译、AI 讲解、PDF 翻译共用）：默认线路 魔搭 `Qwen3.5-397B-A17B` → 魔搭 `Qwen3.5-27B` → 智谱 `glm-4-flash-250414`。
+   - **AI 翻译**（划词翻译、AI 讲解、PDF 翻译共用）：默认线路 魔搭 `Qwen3.5-397B-A17B` → 魔搭 `Qwen3.5-27B` → AMD `MiMo-V2.6-Flash` → AMD `Gemma-4-31B-IT` → 智谱 `glm-4-flash-250414`。AMD 密钥在 developer.amd.com.cn → Radeon Cloud → Token Factory 获取（免绑卡，每天约 $10 免费额度）。
      前一个限流（429）、额度用完、超时或服务端出错时自动换下一个，出错的接口暂停使用一段时间（30 秒起，最长 10 分钟）后再回到首选。
      线路顺序可在设置里调整，也可以加入 Qwen3.5-122B 或自定义接口。选择依据见 `tools/api_eval.py` 的实测（16 句射频句子，397B 术语命中 41/42）。
      - 魔搭令牌：modelscope.cn 绑定阿里云账号、实名、**验证邮箱**后，在“访问令牌”页创建（`ms-` 开头）。每天约 2000 次免费调用，单模型额度动态调整。

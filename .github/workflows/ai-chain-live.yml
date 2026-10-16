@@ -21,6 +21,7 @@ jobs:
         env:
           MODELSCOPE_API_KEY: ${{ secrets.MODELSCOPE_API_KEY }}
           ZHIPU_API_KEY: ${{ secrets.ZHIPU_API_KEY }}
+          AMD_API_KEY: ${{ secrets.AMD_API_KEY }}
         run: |
           set +e
           flutter test test/live/ai_chain_live_test.dart --reporter expanded > live.txt 2>&1
@@ -44,6 +45,7 @@ jobs:
         env:
           MODELSCOPE_API_KEY: ${{ secrets.MODELSCOPE_API_KEY }}
           ZHIPU_API_KEY: ${{ secrets.ZHIPU_API_KEY }}
+          AMD_API_KEY: ${{ secrets.AMD_API_KEY }}
         run: |
           set +e
           python tools/chain_live.py > live.txt 2>&1

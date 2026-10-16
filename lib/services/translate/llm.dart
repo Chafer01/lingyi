@@ -21,13 +21,14 @@ class LlmEngine extends TranslateEngine {
   static bool _isLocal(String url) => url.contains('localhost') || url.contains('127.0.0.1');
 
   @override
-  String get setupHint => '在设置中填写魔搭（ModelScope）或智谱的密钥';
+  String get setupHint => '在设置中填写魔搭（ModelScope）、AMD 或智谱的密钥';
 
   /// 当前可用的接口，按尝试顺序（没填密钥的线路跳过）。
   List<AiEndpoint> get endpoints => buildEndpoints(
         chain: _s.aiChain,
         modelscopeKey: _s.modelscopeKey,
         zhipuKey: _s.zhipuKey,
+        amdKey: _s.amdKey,
         customBaseUrl: _s.llmBaseUrl,
         customKey: _s.llmKey,
         customModel: _s.llmModel,
@@ -40,6 +41,7 @@ class LlmEngine extends TranslateEngine {
     required List<String> chain,
     required String modelscopeKey,
     required String zhipuKey,
+    String amdKey = '',
     String customBaseUrl = '',
     String customKey = '',
     String customModel = '',
@@ -48,17 +50,16 @@ class LlmEngine extends TranslateEngine {
     for (final id in chain) {
       final r = aiRouteById(id);
       if (r == null) continue;
-      if (r.provider == 'modelscope') {
-        if (modelscopeKey.isNotEmpty) {
-          out.add(AiEndpoint(
-              id: r.id, label: r.label, baseUrl: modelscopeBaseUrl, apiKey: modelscopeKey,
-              model: r.model, extraBody: r.extraBody));
-        }
-      } else if (r.provider == 'zhipu') {
-        if (zhipuKey.isNotEmpty) {
-          out.add(AiEndpoint(
-              id: r.id, label: r.label, baseUrl: zhipuBaseUrl, apiKey: zhipuKey, model: r.model,
-              extraBody: r.extraBody));
+      final base = providerBaseUrl(r.provider);
+      if (base != null) {
+        final key = switch (r.provider) {
+          'modelscope' => modelscopeKey,
+          'zhipu' => zhipuKey,
+          'amd' => amdKey,
+          _ => '',
+        };
+        if (key.isNotEmpty) {
+          out.add(AiEndpoint(id: r.id, label: r.label, baseUrl: base, apiKey: key, model: r.model, extraBody: r.extraBody));
         }
       } else if (r.provider == 'custom') {
         final ok = customBaseUrl.isNotEmpty && customModel.isNotEmpty && (customKey.isNotEmpty || _isLocal(customBaseUrl));

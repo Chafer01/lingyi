@@ -125,6 +125,21 @@ class Settings extends ChangeNotifier {
     await _migrateAi();
     await _migrateGlossary();
     await _migrateAutoSelectApps();
+    await _migrateAmd();
+  }
+
+  /// v0.5.0 新增 AMD 线路：保存过线路顺序的用户，把 AMD 插到智谱前面（只做一次，没有智谱时接在末尾）。
+  Future<void> _migrateAmd() async {
+    if (_p.getBool('aiAmdV1') ?? false) return;
+    final saved = _p.getStringList('aiChain');
+    if (saved != null) {
+      final l = List<String>.from(saved);
+      final add = ['amd-mimo', 'amd-gemma'].where((e) => !l.contains(e)).toList();
+      final i = l.indexOf('zhipu-flash');
+      l.insertAll(i < 0 ? l.length : i, add);
+      await _p.setStringList('aiChain', l);
+    }
+    await _p.setBool('aiAmdV1', true);
   }
 
   /// 已经保存过自定义划词程序列表的用户：补上 v0.3.2 新增的默认程序（只补一次，不恢复用户删掉的）。
@@ -221,6 +236,10 @@ class Settings extends ChangeNotifier {
   /// 智谱开放平台 API Key。
   String get zhipuKey => _s('zhipuKey');
   set zhipuKey(String v) => _set('zhipuKey', v.trim());
+
+  /// AMD 中国开发者云 Token Factory 的 API Key（rc- 开头）。
+  String get amdKey => _s('amdKey');
+  set amdKey(String v) => _set('amdKey', v.trim());
 
   /// 启用的 AI 线路 id，按尝试顺序。见 [aiRoutes]。
   List<String> get aiChain => (_p.getStringList('aiChain') ?? defaultAiChain)

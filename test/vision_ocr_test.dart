@@ -20,6 +20,11 @@ void main() {
     expect(eps.last.apiKey, 'zp-x');
     expect(VisionOcr.buildEndpoints(modelscopeKey: '', zhipuKey: 'zp-x').map((e) => e.id), ['vl-zp-4v', 'vl-zp-41v']);
     expect(VisionOcr.buildEndpoints(modelscopeKey: ''), isEmpty);
+    final withAmd = VisionOcr.buildEndpoints(modelscopeKey: 'ms-x', zhipuKey: 'zp-x', amdKey: 'rc-x');
+    expect(withAmd.map((e) => e.id),
+        ['vl-ms-27b', 'vl-ms-397b', 'vl-amd-dsv', 'vl-amd-q27', 'vl-zp-4v', 'vl-zp-41v']);
+    expect(withAmd[2].baseUrl, amdBaseUrl);
+    expect(withAmd[3].extraBody['chat_template_kwargs'], {'enable_thinking': false});
   });
 
   test('提取独立公式和编号', () {
