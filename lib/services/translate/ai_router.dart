@@ -214,7 +214,7 @@ class AiRouter {
       'temperature': temperature,
       'stream': false,
       'messages': messages,
-      if (maxTokens != null) 'max_tokens': maxTokens,
+      'max_tokens': ?maxTokens,
       ...ep.extraBody,
     };
     final http.Response resp;

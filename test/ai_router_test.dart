@@ -91,7 +91,7 @@ void main() {
     final r = await AiRouter(client: client)
         .chat(defaultEndpoints(), 'sys', 'gain', timeout: const Duration(milliseconds: 100));
     expect(r.text, '增益');
-    expect(r.endpoint.id, 'zhipu-flash');
+    expect(r.endpoint.id, 'amd-mimo'); // 第三条线路
     expect(r.skipped.length, 2);
     expect(r.skipped[0], contains('超时'));
   });
