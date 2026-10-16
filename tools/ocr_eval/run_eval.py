@@ -37,6 +37,7 @@ PROMPT = (
 
 MS = "https://api-inference.modelscope.cn/v1"
 ZP = "https://open.bigmodel.cn/api/paas/v4"
+AMD = "https://developer.amd.com.cn/radeon/api/v1"
 
 # (名称, base_url, 密钥环境变量, 模型, 附加参数)
 VLMS = [
@@ -48,6 +49,14 @@ VLMS = [
     ("魔搭 Qwen3.5-27B", MS, "MODELSCOPE_API_KEY", "Qwen/Qwen3.5-27B", {"enable_thinking": False}),
     ("魔搭 InternVL3.5-241B", MS, "MODELSCOPE_API_KEY", "OpenGVLab/InternVL3_5-241B-A28B", {}),
     ("魔搭 ERNIE-4.5-VL-28B", MS, "MODELSCOPE_API_KEY", "PaddlePaddle/ERNIE-4.5-VL-28B-A3B-PT", {}),
+    ("AMD Qwen3.8-27B", AMD, "AMD_API_KEY", "Qwen3.8-27B", {}),
+    ("AMD Qwen3.8-27B 关思考", AMD, "AMD_API_KEY", "Qwen3.8-27B", {"chat_template_kwargs": {"enable_thinking": False}}),
+    ("AMD DeepSeek-V4.1-Flash", AMD, "AMD_API_KEY", "DeepSeek-V4.1-Flash", {}),
+    ("AMD DeepSeek-V4-Flash-Vision-Exp", AMD, "AMD_API_KEY", "DeepSeek-V4-Flash-Vision-Exp", {}),
+    ("AMD MiMo-V2.6-Flash", AMD, "AMD_API_KEY", "MiMo-V2.6-Flash", {}),
+    ("AMD Gemma-4-31B-IT", AMD, "AMD_API_KEY", "Gemma-4-31B-IT", {}),
+    ("AMD MiniCPM-V-4.7-35B-A3B", AMD, "AMD_API_KEY", "MiniCPM-V-4.7-35B-A3B", {}),
+    ("AMD MiniCPM-V-4.7-1B", AMD, "AMD_API_KEY", "MiniCPM-V-4.7-1B", {}),
 ]
 
 

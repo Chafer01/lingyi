@@ -39,6 +39,7 @@ jobs:
         env:
           ZHIPU_API_KEY: ${{ secrets.ZHIPU_API_KEY }}
           MODELSCOPE_API_KEY: ${{ secrets.MODELSCOPE_API_KEY }}
+          AMD_API_KEY: ${{ secrets.AMD_API_KEY }}
         run: python3 tools/ocr_eval/run_eval.py --only "${{ inputs.only }}" --out /tmp/ocr
       - name: 提交结果
         if: inputs.diag != 'true'
