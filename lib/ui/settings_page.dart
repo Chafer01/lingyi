@@ -9,6 +9,8 @@ import '../services/settings.dart';
 import '../services/translate/ai_router.dart';
 import '../services/translate/engine.dart';
 import '../services/translate/translate_service.dart';
+import '../version.dart';
+import 'update_ui.dart';
 import 'widgets.dart';
 
 class SettingsPage extends StatelessWidget {
@@ -126,9 +128,10 @@ class SettingsPage extends StatelessWidget {
               ),
             ),
           ]),
+          _Section(title: '关于与更新', children: const [AboutUpdateTile()]),
           const SizedBox(height: 8),
           Center(
-            child: Text('灵译 0.5.2 · 词库数据来自 ECDICT',
+            child: Text('灵译 $appVersion · 词库数据来自 ECDICT',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Theme.of(context).colorScheme.outline)),
           ),
         ],

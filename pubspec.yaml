@@ -1,7 +1,7 @@
 name: lingyi
 description: 灵译 — 查词、翻译、同传一体的个人翻译工具（Windows / Android）
 publish_to: 'none'
-version: 0.5.2+10
+version: 0.5.3+11
 
 environment:
   sdk: ^3.10.0
@@ -22,6 +22,8 @@ dependencies:
   hotkey_manager: ^0.2.3
   # 选择图片 / PDF / 输出文件夹（Flutter 官方插件）。
   file_selector: ^1.0.3
+  # 打开下载页 / 安卓上用浏览器下载新版安装包（Flutter 官方插件）。
+  url_launcher: ^6.3.1
 
 dev_dependencies:
   flutter_test:

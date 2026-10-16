@@ -330,4 +330,20 @@ class Settings extends ChangeNotifier {
   // ---- 外观 ----
   ThemeMode get themeMode => ThemeMode.values[(_p.getInt('themeMode') ?? 0).clamp(0, 2)];
   set themeMode(ThemeMode v) => _set('themeMode', v.index);
+
+  // ---- 更新 ----
+  /// 启动时自动检查新版本（每 6 小时最多一次）。
+  bool get autoCheckUpdate => _p.getBool('autoCheckUpdate') ?? true;
+  set autoCheckUpdate(bool v) => _set('autoCheckUpdate', v);
+
+  /// 用户选择“忽略此版本”的版本号。
+  String get ignoredUpdate => _s('ignoredUpdate');
+  set ignoredUpdate(String v) => _set('ignoredUpdate', v);
+
+  int get lastUpdateCheck => _p.getInt('lastUpdateCheck') ?? 0;
+  set lastUpdateCheck(int v) => _set('lastUpdateCheck', v);
+
+  /// 已下载并交给更新脚本安装的版本；下次启动时据此判断更新是否成功。
+  String get pendingUpdate => _s('pendingUpdate');
+  set pendingUpdate(String v) => _set('pendingUpdate', v);
 }

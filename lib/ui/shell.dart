@@ -13,6 +13,7 @@ import 'lookup_view.dart';
 import 'ocr_page.dart';
 import 'pdf_page.dart';
 import 'settings_page.dart';
+import 'update_ui.dart';
 import 'wordbook_page.dart';
 
 /// 主框架：宽屏用侧边导航，窄屏（手机）用底部导航；Windows 迷你弹窗只显示查词。
@@ -58,7 +59,10 @@ class Shell extends StatelessWidget {
           builder: (context, page, _) {
             final tab = dests.indexWhere((d) => d.$1 == page).clamp(0, dests.length - 1);
             void select(int i) => state.page.value = dests[i].$1;
-            final body = IndexedStack(index: tab, children: pages);
+            final body = Column(children: [
+              const UpdateBanner(),
+              Expanded(child: IndexedStack(index: tab, children: pages)),
+            ]);
             final wide = MediaQuery.sizeOf(context).width >= 720;
             if (wide) {
               return Scaffold(

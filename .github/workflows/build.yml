@@ -111,7 +111,7 @@ jobs:
             echo "::error title=flutter build windows::$msg"
           fi
           exit $code
-      - name: Windows 剪贴板测试（划词取词时备份/恢复图片）
+      - name: Windows 实机测试（剪贴板备份恢复、自动更新脚本）
         shell: bash
         run: |
           set +e
@@ -119,7 +119,7 @@ jobs:
           code=$?
           cat wintest.txt
           msg=$(tail -40 wintest.txt | sed 's/%/%25/g' | awk '{printf "%s%%0A", $0}')
-          if [ $code -ne 0 ]; then echo "::error title=Windows 剪贴板测试::$msg"; else echo "::notice title=Windows 剪贴板测试通过::$msg"; fi
+          if [ $code -ne 0 ]; then echo "::error title=Windows 实机测试::$msg"; else echo "::notice title=Windows 实机测试通过::$msg"; fi
           exit $code
       # ---- 本地后端（截图 OCR / 公式识别 / PDF 翻译）----
       - uses: actions/setup-python@v5
@@ -186,9 +186,18 @@ jobs:
       - name: 放入安装目录
         shell: pwsh
         run: Copy-Item -Recurse backend\dist\lingyi_backend build\windows\x64\runner\Release\backend
+      - name: 后端构建编号（源码不变则编号不变，自动更新时就不必重新下载后端）
+        shell: bash
+        run: bash tools/backend_id.sh > build/windows/x64/runner/Release/backend/BUILD_ID
       - name: 打包
         shell: pwsh
-        run: Compress-Archive -Path build\windows\x64\runner\Release\* -DestinationPath lingyi-windows.zip
+        run: |
+          $rel = 'build\windows\x64\runner\Release'
+          # 完整安装包（首次安装）
+          Compress-Archive -Path "$rel\*" -DestinationPath lingyi-windows.zip
+          # 自动更新用：程序本体（不含后端）与后端分开
+          Compress-Archive -Path (Get-ChildItem $rel -Exclude backend).FullName -DestinationPath lingyi-windows-app.zip
+          Compress-Archive -Path "$rel\backend\*" -DestinationPath lingyi-windows-backend.zip
       - uses: actions/upload-artifact@v4
         with:
           name: lingyi-windows
@@ -209,6 +218,23 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           merge-multiple: true
+      - name: 生成 update.json（灵译检查更新时读取）
+        env:
+          TAG: ${{ steps.ver.outputs.tag }}
+        run: |
+          v="${TAG#v}"
+          base="https://github.com/${{ github.repository }}/releases/download/$TAG"
+          asset() { jq -n --arg url "$base/$1" --argjson size "$(stat -c %s "$1")" --arg sha "$(sha256sum "$1" | cut -d' ' -f1)" '{url:$url,size:$size,sha256:$sha}'; }
+          # 更新说明取自这次提交的说明（去掉署名行）
+          notes=$(git log -1 --format=%B | grep -vE '^(Co-Authored-By|Claude-Session):' | sed -e :a -e '/^\n*$/{$d;N;ba' -e '}')
+          jq -n --arg version "$v" --arg notes "$notes" --arg page "https://github.com/${{ github.repository }}/releases/tag/$TAG" \
+            --arg backend_id "$(bash tools/backend_id.sh)" \
+            --argjson windows_app "$(asset lingyi-windows-app.zip)" \
+            --argjson windows_backend "$(asset lingyi-windows-backend.zip)" \
+            --argjson windows_full "$(asset lingyi-windows.zip)" \
+            --argjson android "$(asset lingyi-android.apk)" \
+            '{version:$version,notes:$notes,page:$page,backend_id:$backend_id,windows_app:$windows_app,windows_backend:$windows_backend,windows_full:$windows_full,android:$android}' > update.json
+          cat update.json
       - uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.ver.outputs.tag }}
@@ -216,8 +242,12 @@ jobs:
           target_commitish: ${{ github.sha }}
           overwrite_files: true
           body: |
-            - **Windows**：下载 `lingyi-windows.zip`，解压后运行 `lingyi.exe`（内含截图识别 / PDF 翻译后端，解压后约 700 MB）
+            - **Windows**：首次安装下载 `lingyi-windows.zip`，解压后运行 `lingyi.exe`（内含截图识别 / PDF 翻译后端，解压后约 700 MB）。
+              已安装 0.5.3 及以上版本的，在 设置 → 关于与更新 里一键更新即可（`-app` / `-backend` 两个包和 `update.json` 供自动更新使用）
             - **安卓**：下载 `lingyi-android.apk` 安装（需允许安装未知来源应用）
           files: |
             lingyi-android.apk
             lingyi-windows.zip
+            lingyi-windows-app.zip
+            lingyi-windows-backend.zip
+            update.json
