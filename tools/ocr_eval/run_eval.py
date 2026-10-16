@@ -77,7 +77,7 @@ def vlm(base, key, model, extra, png: bytes):
     total = 0.0
     for url_form in (f"data:image/png;base64,{b64}", b64):
         body = {
-            "model": model, "temperature": 0.1, "max_tokens": 2048, "stream": False,
+            "model": model, "temperature": 0.1, "max_tokens": 1024 if model == "glm-4v-flash" else 4096,  # 与 App 一致；glm-4v-flash 上限 1024 "stream": False,
             "messages": [{"role": "user", "content": [
                 {"type": "image_url", "image_url": {"url": url_form}},
                 {"type": "text", "text": PROMPT},
