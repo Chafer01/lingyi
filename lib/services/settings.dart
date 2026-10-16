@@ -126,6 +126,16 @@ class Settings extends ChangeNotifier {
     await _migrateGlossary();
     await _migrateAutoSelectApps();
     await _migrateAmd();
+    await _migratePdfSpeed();
+  }
+
+  /// v0.5.1：实测 15 页论文，旧默认（每秒 1 个请求 + 自动提取术语）要 10 分半，
+  /// 改为每秒 4 个请求、不提取术语后约 2 分钟。旧版界面把 1 标成“免费模型”推荐值，这里统一改一次。
+  Future<void> _migratePdfSpeed() async {
+    if (_p.getBool('pdfSpeedV1') ?? false) return;
+    if (_p.getInt('pdfQps') == 1) await _p.remove('pdfQps');
+    if (_p.getBool('pdfExtractTerms') == true) await _p.remove('pdfExtractTerms');
+    await _p.setBool('pdfSpeedV1', true);
   }
 
   /// v0.5.0 新增 AMD 线路：保存过线路顺序的用户，把 AMD 插到智谱前面（只做一次，没有智谱时接在末尾）。
@@ -333,7 +343,7 @@ class Settings extends ChangeNotifier {
   set backendDir(String v) => _set('backendDir', v);
 
   /// PDF 翻译：每秒请求数（免费大模型一般只允许 1 个并发）。
-  int get pdfQps => (_p.getInt('pdfQps') ?? 1).clamp(1, 32);
+  int get pdfQps => (_p.getInt('pdfQps') ?? 4).clamp(1, 32);
   set pdfQps(int v) => _set('pdfQps', v);
 
   /// PDF 输出：dual 左右对照 / alternating 原文译文交替页 / mono 仅译文 / both 双语 + 仅译文。
@@ -341,7 +351,7 @@ class Settings extends ChangeNotifier {
   set pdfOutput(String v) => _set('pdfOutput', v);
 
   /// 翻译前先让 AI 自动提取全文术语，保证前后译法一致（会多消耗一些额度）。
-  bool get pdfExtractTerms => _p.getBool('pdfExtractTerms') ?? true;
+  bool get pdfExtractTerms => _p.getBool('pdfExtractTerms') ?? false;
   set pdfExtractTerms(bool v) => _set('pdfExtractTerms', v);
 
   // ---- 外观 ----

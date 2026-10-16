@@ -50,9 +50,9 @@ class PdfRequest:
     base_url: str = ""
     api_key: str = ""
     model: str = ""
-    qps: int = 1
+    qps: int = 4
     glossary: list = field(default_factory=list)   # [[原文, 译文], ...]
-    extract_terms: bool = True
+    extract_terms: bool = False
 
     def all_endpoints(self) -> list[dict]:
         eps = [dict(e) for e in self.endpoints if e.get("base_url") and e.get("model")]
@@ -235,7 +235,12 @@ def run_babeldoc(job: Job) -> dict:
             t = ev.get("type")
             if t in ("progress_start", "progress_update", "progress_end"):
                 stage = ev.get("stage", "")
-                job.stage = STAGE_NAMES.get(stage, stage)
+                name = STAGE_NAMES.get(stage, stage)
+                cur, total = ev.get("stage_current"), ev.get("stage_total")
+                # 带上“已完成/总数”，例如“翻译段落 37/180”，让用户看得出在推进而不是卡住
+                if isinstance(cur, int) and isinstance(total, int) and total > 1 and t != "progress_end":
+                    name = f"{name} {cur}/{total}"
+                job.stage = name
                 if "overall_progress" in ev:
                     job.progress = float(ev["overall_progress"])
             elif t == "error":

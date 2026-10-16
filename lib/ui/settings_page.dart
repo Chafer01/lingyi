@@ -128,7 +128,7 @@ class SettingsPage extends StatelessWidget {
           ]),
           const SizedBox(height: 8),
           Center(
-            child: Text('灵译 0.5.0 · 词库数据来自 ECDICT',
+            child: Text('灵译 0.5.1 · 词库数据来自 ECDICT',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Theme.of(context).colorScheme.outline)),
           ),
         ],

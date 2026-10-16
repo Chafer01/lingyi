@@ -50,6 +50,7 @@ flutter run -d windows          # 或连接手机后 flutter run
 - 公式识别（本地离线）：RapidLaTeXOCR，只适合单个公式的截图，输出 LaTeX 和 MathML
 - PDF 翻译所需的版面模型、字体（中英文精简版）、字符映射表、tiktoken 词表已内置在安装包里，无需联网下载
 - PDF 翻译：BabelDOC 引擎，使用 设置 → AI 翻译 的线路（同样自动切换）和术语表
+- PDF 速度（实测 15 页论文，`backend/tools/pdf_bench.py`）：默认每秒 4 个请求、不自动提取术语约 2 分钟；旧默认（每秒 1 个 + 自动提取术语）约 10 分半
 - 后端只监听 127.0.0.1，并校验每次启动随机生成的令牌
 
 从源码运行时（没有打包的 exe），在 设置 → 截图识别与 PDF 翻译 → 高级 中填写：

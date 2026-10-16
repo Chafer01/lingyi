@@ -161,7 +161,8 @@ def test_babeldoc_config_wiring(tmp_path, monkeypatch):
 
     async def fake_translate(config):
         captured["config"] = config
-        yield {"type": "progress_update", "stage": "Translate Paragraphs", "overall_progress": 50.0}
+        yield {"type": "progress_update", "stage": "Translate Paragraphs", "overall_progress": 50.0,
+               "stage_current": 37, "stage_total": 180}
 
         class R:
             dual_pdf_path = Path(tmp_path / "a.zh.dual.pdf")
@@ -178,7 +179,7 @@ def test_babeldoc_config_wiring(tmp_path, monkeypatch):
     out = pdf_jobs.run_babeldoc(job)
     cfg = captured["config"]
     assert out == {"dual": str(tmp_path / "a.zh.dual.pdf")}
-    assert job.stage == "翻译段落" and job.progress == 50.0
+    assert job.stage == "翻译段落 37/180" and job.progress == 50.0
     assert cfg.use_alternating_pages_dual and cfg.no_mono and not cfg.no_dual
     assert cfg.page_ranges
     assert [e.model for e in cfg.translator.pool.endpoints] == ["glm"]   # 旧版单接口参数仍可用

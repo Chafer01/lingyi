@@ -42,9 +42,9 @@ class PdfBody(BaseModel):
     base_url: str = ""
     api_key: str = ""
     model: str = ""
-    qps: int = 1
+    qps: int = 4
     glossary: list[list[str]] = []
-    extract_terms: bool = True
+    extract_terms: bool = False
 
 
 # 各功能实际用到的模块。启动时在主线程预先导入（见 __main__.preload），健康检查再确认一遍。
