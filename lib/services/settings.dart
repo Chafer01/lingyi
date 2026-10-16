@@ -2,38 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../util/text_utils.dart';
+import 'glossary_default.dart';
 import 'translate/ai_router.dart';
 
-/// 默认术语表：射频/天线领域常用词，可在设置里自行修改。
-const defaultGlossary = '''# 每行一条：英文 = 中文。翻译时会提示术语，大模型引擎会强制使用。
-radiation pattern = 方向图
-beamwidth = 波束宽度
-half-power beamwidth = 半功率波束宽度
-downtilt = 下倾角
-electrical downtilt = 电下倾
-gain = 增益
-directivity = 方向性系数
-front-to-back ratio = 前后比
-cross-polarization = 交叉极化
-isolation = 隔离度
-return loss = 回波损耗
-VSWR = 电压驻波比
-phase shifter = 移相器
-feed network = 馈电网络
-dipole = 偶极子
-ground plane = 地板
-metasurface = 超表面
-beamforming = 波束赋形
-sidelobe = 旁瓣
-grating lobe = 栅瓣
-radome = 天线罩
-null filling = 零点填充
-beam squint = 波束偏斜
-parasitic element = 寄生单元
-mutual coupling = 互耦
-upper sidelobe suppression = 上旁瓣抑制
-adjacent-cell interference = 邻区干扰
-''';
+export 'glossary_default.dart';
 
 /// 引擎显示顺序。
 const engineOrder = ['llm', 'volc', 'baidu', 'deepl', 'tencent'];
@@ -165,9 +137,10 @@ class Settings extends ChangeNotifier {
     await _p.setBool('autoAppsV2', true);
   }
 
-  /// 已经改过术语表的用户：把新版默认术语里缺少的条目补到末尾（只补一次）。
+  /// 已经改过术语表的用户：把新版默认术语里缺少的条目补到末尾（每个版本只补一次，不改动用户已有的条目）。
+  /// v0.5.2 术语表从 27 条扩充到约 480 条（glossaryV3）。
   Future<void> _migrateGlossary() async {
-    if (_p.getBool('glossaryV2') ?? false) return;
+    if (_p.getBool('glossaryV3') ?? false) return;
     final saved = _p.getString('glossary');
     if (saved != null) {
       final have = parseGlossary(saved).keys.map((k) => k.toLowerCase()).toSet();
@@ -177,10 +150,10 @@ class Settings extends ChangeNotifier {
           .where((l) => !have.contains(l.split('=').first.trim().toLowerCase()))
           .toList();
       if (add.isNotEmpty) {
-        await _p.setString('glossary', '${saved.trimRight()}\n${add.join('\n')}\n');
+        await _p.setString('glossary', '${saved.trimRight()}\n\n# ---------- 灵译 0.5.2 新增术语 ----------\n${add.join('\n')}\n');
       }
     }
-    await _p.setBool('glossaryV2', true);
+    await _p.setBool('glossaryV3', true);
   }
 
   /// v0.3.1 之前只有一个“大模型接口”。把原来填的智谱/魔搭密钥迁移到新的分平台密钥，

@@ -147,23 +147,41 @@ Map<String, String> parseGlossary(String text) {
   return out;
 }
 
-/// 找出原文中出现的术语（英文不区分大小写、按整词匹配；中文直接包含）。
+final _termRe = <String, RegExp>{};
+
+/// 英文术语的匹配规则：不区分大小写、按整词；空格和连字符可互换或省略（side lobe / side-lobe / sidelobe），
+/// 允许复数词尾（dipoles、phase shifters）。
+RegExp _latinTermRe(String term) => _termRe.putIfAbsent(term, () {
+      final body = term.toLowerCase().split(RegExp(r'[\s\-]+')).map(RegExp.escape).join(r'[\s\-]*');
+      return RegExp(r'(^|[^a-z])' + body + r'(?:s|es)?($|[^a-z])');
+    });
+
+/// 找出原文中出现的术语（英文见 [_latinTermRe]；中文直接包含）。
+/// 一个术语若只是另一个已命中术语的一部分（如“单元”之于“辐射单元”、beamwidth 之于 half-power beamwidth），
+/// 就不再单独提示，避免给出不合适的译法。
 Map<String, String> glossaryHits(String text, Map<String, String> glossary) {
-  final hits = <String, String>{};
   final lower = text.toLowerCase();
   bool containsTerm(String term) {
     if (!_latin.hasMatch(term)) return text.contains(term);
-    final re = RegExp(r'(^|[^A-Za-z])' + RegExp.escape(term.toLowerCase()) + r'($|[^A-Za-z])');
-    return re.hasMatch(lower);
+    return _latinTermRe(term).hasMatch(lower);
   }
 
+  final found = <(String, String)>[]; // (原文里出现的一侧, 另一侧)
   glossary.forEach((src, dst) {
     if (containsTerm(src)) {
-      hits[src] = dst;
+      found.add((src, dst));
     } else if (containsTerm(dst)) {
       // 中译英时，原文里出现的是中文一侧。
-      hits[dst] = src;
+      found.add((dst, src));
     }
   });
+  String norm(String s) => s.toLowerCase().replaceAll(RegExp(r'[\s\-]+'), '');
+  final keys = [for (final f in found) norm(f.$1)];
+  final hits = <String, String>{};
+  for (var i = 0; i < found.length; i++) {
+    final k = keys[i];
+    final covered = keys.any((o) => o.length > k.length && o.contains(k));
+    if (!covered) hits[found[i].$1] = found[i].$2;
+  }
   return hits;
 }

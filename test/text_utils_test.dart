@@ -77,6 +77,20 @@ void main() {
       final hits = glossaryHits('该天线的方向图很好', g);
       expect(hits['方向图'], 'radiation pattern');
     });
+    test('glossaryHits 复数、连字符和空格变体', () {
+      final g2 = parseGlossary('side lobe = 旁瓣\nphase shifter = 移相器\ndipole = 偶极子\nS-parameters = S参数\nfeed network = 馈电网络');
+      final hits = glossaryHits('Sidelobes and side-lobe levels; two Phase Shifters feed the dipoles. S parameters of the feed-network.', g2);
+      expect(hits.keys, containsAll(['side lobe', 'phase shifter', 'dipole', 'S-parameters', 'feed network']));
+      expect(glossaryHits('dipolar moment', g2).containsKey('dipole'), isFalse);
+    });
+    test('glossaryHits 被更长术语包含的不单独提示', () {
+      final g3 = parseGlossary('unit cell = 单元\nradiating element = 辐射单元\nbeamwidth = 波束宽度\nhalf-power beamwidth = 半功率波束宽度');
+      final zh = glossaryHits('每个辐射单元下方加载寄生贴片', g3);
+      expect(zh, {'辐射单元': 'radiating element'});
+      final en = glossaryHits('The half-power beamwidth is 65°.', g3);
+      expect(en, {'half-power beamwidth': '半功率波束宽度'});
+      expect(glossaryHits('The beamwidth is 65°.', g3), {'beamwidth': '波束宽度'});
+    });
   });
 
   test('腾讯云 TC3 签名与官方算法一致', () {
