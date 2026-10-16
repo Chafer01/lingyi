@@ -10,6 +10,8 @@ on:
       - 'tools/build_dict.py'
       - '.github/workflows/api-eval.yml'
       - '.github/workflows/dict.yml'
+      - 'tools/ocr_eval/**'
+      - '.github/workflows/ocr-eval.yml'
   pull_request:
   workflow_dispatch:
 
