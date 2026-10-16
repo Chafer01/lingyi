@@ -245,6 +245,12 @@ class Backend {
   Future<OcrResult> ocrClipboard({String mode = 'text'}) async =>
       OcrResult(Map<String, dynamic>.from(await _post('/ocr/clipboard', {'mode': mode}) as Map));
 
+  /// LaTeX → MathML（粘贴到 Word 即为可编辑公式）。
+  Future<String> latexToMathml(String latex) async {
+    final r = Map<String, dynamic>.from(await _post('/latex/mathml', {'latex': latex}) as Map);
+    return r['mathml'] as String;
+  }
+
   /// 提交 PDF 翻译。使用设置中的 AI 线路和术语表。
   Future<PdfJob> pdfSubmit({
     required String path,

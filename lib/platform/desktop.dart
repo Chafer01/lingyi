@@ -9,6 +9,8 @@ import 'package:window_manager/window_manager.dart';
 
 import '../services/backend.dart';
 import '../services/settings.dart';
+import '../services/translate/engine.dart';
+import '../services/vision_ocr.dart';
 import '../util/text_utils.dart';
 import 'app_state.dart';
 import 'screen_capture.dart';
@@ -215,8 +217,28 @@ class Desktop with WindowListener, TrayListener {
       if (!await ScreenCapture.snip()) return;
       await warmup;
       try {
+        String? note;
+        // 智能识别：视觉大模型识别文字和公式；不可用时改用本地文字识别。
+        if (_settings.ocrMode == 'smart' && VisionOcr.instance.configured) {
+          final img = await Backend.instance.ocrClipboard(mode: 'none');
+          if (img.image != null) {
+            try {
+              final v = await VisionOcr.instance.recognize(img.image!);
+              _state.ocrIncoming.value = OcrIncoming(result: img, reply: v);
+              if (v.text.trim().isEmpty) {
+                _state.ocrIncoming.value = OcrIncoming(result: img, error: '没有识别到内容');
+                await _showPage(AppPage.ocr);
+                return;
+              }
+              await showMini(v.text.trim());
+              return;
+            } on TranslateException catch (e) {
+              note = '智能识别不可用，已改用本地文字识别（公式无法识别）。原因：${e.message}';
+            }
+          }
+        }
         final r = await Backend.instance.ocrClipboard();
-        _state.ocrIncoming.value = OcrIncoming(result: r);
+        _state.ocrIncoming.value = OcrIncoming(result: r, note: note);
         if (r.text.trim().isEmpty) {
           _state.ocrIncoming.value = OcrIncoming(error: '没有识别到文字');
           await _showPage(AppPage.ocr);

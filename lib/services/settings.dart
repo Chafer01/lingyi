@@ -298,6 +298,14 @@ class Settings extends ChangeNotifier {
   set ocrHotkeyIndex(int v) => _set('ocrHotkeyIndex', v);
   HotkeyPreset get ocrHotkey => ocrHotkeyPresets[ocrHotkeyIndex];
 
+  /// 截图识别模式：smart（视觉大模型，文字 + 公式）/ text（本地文字）/ formula（本地公式）。
+  String get ocrMode {
+    final m = _s('ocrMode', 'smart');
+    return const ['smart', 'text', 'formula'].contains(m) ? m : 'smart';
+  }
+
+  set ocrMode(String v) => _set('ocrMode', v);
+
   /// 后端启动命令。留空时使用随包附带的 backend\lingyi_backend.exe；
   /// 从源码运行时可填 `python -m lingyi_backend`，并把工作目录设为仓库的 backend 文件夹。
   String get backendCmd => _s('backendCmd');

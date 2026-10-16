@@ -234,7 +234,7 @@ class _PdfPageState extends State<PdfPage> {
     return ListView(padding: const EdgeInsets.all(16), children: [
       Text('PDF 翻译', style: theme.textTheme.titleLarge),
       const SizedBox(height: 4),
-      Text('保留原排版、公式和图表，输出双语对照 PDF。首次使用会自动下载版面分析模型和字体（约数百 MB）。',
+      Text('保留原排版、公式和图表，输出双语对照 PDF。版面模型和字体已内置，无需联网下载。',
           style: theme.textTheme.bodySmall?.copyWith(color: scheme.outline)),
       const SizedBox(height: 12),
       form,

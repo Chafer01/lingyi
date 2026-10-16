@@ -18,13 +18,17 @@ IMAGE_EXT = {".png", ".jpg", ".jpeg", ".bmp", ".gif", ".tif", ".tiff", ".webp"}
 
 
 class OcrBody(BaseModel):
-    mode: str = "text"            # text / formula
+    mode: str = "text"            # text / formula / none（只读取图片，不识别；智能识别由界面端调用视觉模型）
     image: str | None = None      # base64（可带 data:image/png;base64, 前缀）
     path: str | None = None       # 或本地图片路径
 
 
 class ClipBody(BaseModel):
     mode: str = "text"
+
+
+class LatexBody(BaseModel):
+    latex: str
 
 
 class PdfBody(BaseModel):
@@ -116,6 +120,8 @@ def create_app(token: str, jobs: JobManager | None = None) -> FastAPI:
             raise HTTPException(400, "图片太小")
         if mode == "formula":
             res = ocr.recognize_formula(img)
+        elif mode == "none":
+            res = {"text": ""}
         elif mode == "text":
             res = ocr.recognize_text(img)
         else:
@@ -180,6 +186,15 @@ def create_app(token: str, jobs: JobManager | None = None) -> FastAPI:
             got.save(buf, format="PNG")
             img = ocr.load_image(buf.getvalue())
         return _run(img, body.mode, with_image=True)
+
+    @app.post("/latex/mathml", dependencies=[Depends(auth)])
+    def latex_mathml(body: LatexBody):
+        """LaTeX → MathML（粘贴到 Word 即为可编辑公式）。"""
+        latex = ocr.tidy_latex(body.latex.strip().strip("$").strip())
+        mathml = ocr.to_mathml(latex)
+        if not mathml:
+            raise HTTPException(400, "无法转换为 Word 公式，请检查 LaTeX")
+        return {"latex": latex, "mathml": mathml}
 
     @app.post("/pdf/jobs", dependencies=[Depends(auth)])
     def pdf_submit(body: PdfBody):

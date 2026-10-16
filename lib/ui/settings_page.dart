@@ -30,7 +30,7 @@ class SettingsPage extends StatelessWidget {
             _EngineTile(
               engine: tr.llm,
               help: '按下面的线路顺序尝试：前一个限流、额度用完、超时或出错时自动换下一个，结果下方会显示实际使用的模型。'
-                  '划词翻译、AI 讲解和 PDF 翻译都使用这条线路。\n'
+                  '划词翻译、AI 讲解和 PDF 翻译都使用这条线路；截图“智能识别”用同样的密钥调用 Qwen3.5 视觉模型（智谱 GLM-4.1V 兜底）。\n'
                   '魔搭：modelscope.cn 绑定阿里云账号、完成实名并验证邮箱后，在“访问令牌”页创建（ms- 开头），每天约 2000 次免费调用。\n'
                   '智谱：open.bigmodel.cn 注册后在“API Keys”页创建，GLM-4-Flash 官方免费。',
               fields: [
@@ -125,7 +125,7 @@ class SettingsPage extends StatelessWidget {
           ]),
           const SizedBox(height: 8),
           Center(
-            child: Text('灵译 0.3.2 · 词库数据来自 ECDICT',
+            child: Text('灵译 0.4.0 · 词库数据来自 ECDICT',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Theme.of(context).colorScheme.outline)),
           ),
         ],

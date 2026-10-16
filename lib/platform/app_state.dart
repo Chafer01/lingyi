@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 
 import '../services/backend.dart';
+import '../services/translate/ai_router.dart';
 
 /// 外部传入的查询（全局热键划词、自动划词、剪贴板、安卓“选中文字 → 灵译”、分享）。
 class IncomingQuery {
@@ -13,9 +14,17 @@ class IncomingQuery {
 
 /// 截图热键等外部触发的识别结果（或错误），由“识别”页显示。
 class OcrIncoming {
-  OcrIncoming({this.result, this.error});
+  OcrIncoming({this.result, this.reply, this.error, this.note});
+
+  /// 本地识别结果（智能识别时只用它带回原图）。
   final OcrResult? result;
+
+  /// 智能识别（视觉大模型）结果。
+  final AiReply? reply;
   final String? error;
+
+  /// 补充说明，例如“智能识别不可用，已改用本地识别”。
+  final String? note;
 }
 
 /// 主窗口的页面。

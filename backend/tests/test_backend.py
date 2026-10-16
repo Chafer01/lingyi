@@ -64,6 +64,20 @@ def test_ocr_bad_input(client):
     assert client.post("/ocr", json={"mode": "x", "image": b64("formula_gain.png")}, headers=H).status_code == 400
 
 
+def test_ocr_none_mode_returns_image_only(client):
+    r = client.post("/ocr", json={"mode": "none", "path": str(FIX / "text_paragraphs.png")}, headers=H)
+    assert r.status_code == 200, r.text
+    j = r.json()
+    assert j["mode"] == "none" and j["text"] == "" and j["image"]
+
+
+def test_latex_to_mathml(client):
+    r = client.post("/latex/mathml", json={"latex": r"$\frac{\varepsilon_i-\varepsilon_{eff}}{\varepsilon_i-\varepsilon_h}$"},
+                    headers=H)
+    assert r.status_code == 200, r.text
+    assert "<math" in r.json()["mathml"] and "mfrac" in r.json()["mathml"]
+
+
 def test_join_rules():
     assert ocr._join("trans-", "mission") == "transmission"
     assert ocr._join("S-", "Parameter") == "S- Parameter"     # 大写开头不是断词

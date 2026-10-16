@@ -77,7 +77,8 @@ class LlmEngine extends TranslateEngine {
     final system = StringBuffer()
       ..writeln('你是专业的科技翻译，熟悉射频、天线、电磁仿真和通信工程。')
       ..writeln('把用户给出的文本翻译成$target。要求：准确、通顺、符合技术文档习惯；')
-      ..writeln('保留公式、变量名、单位、代码和专有名词的原样；不要解释，不要加括号注释，不要加引号，只输出译文。');
+      ..writeln('保留公式、变量名、单位、代码和专有名词的原样；不要解释，不要加括号注释，不要加引号，只输出译文。')
+      ..writeln(r'原文中用 $…$ 或 $$…$$ 包裹的 LaTeX 公式、\tag{…} 编号和 Markdown 段落结构必须原样保留，只翻译公式以外的文字。');
     if (terms.isNotEmpty) {
       system
         ..writeln('必须使用以下术语译法：')

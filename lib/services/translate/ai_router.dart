@@ -151,12 +151,30 @@ class AiRouter {
     String user, {
     double temperature = 0.3,
     Duration timeout = const Duration(seconds: 20),
+  }) =>
+      complete(
+        endpoints,
+        (_) => [
+          {'role': 'system', 'content': system},
+          {'role': 'user', 'content': user},
+        ],
+        temperature: temperature,
+        timeout: timeout,
+      );
+
+  /// 通用版本：[messages] 按接口生成消息（例如图片的传法因平台而异），其余与 [chat] 相同。
+  Future<AiReply> complete(
+    List<AiEndpoint> endpoints,
+    List<Map<String, dynamic>> Function(AiEndpoint ep) messages, {
+    double temperature = 0.3,
+    Duration timeout = const Duration(seconds: 20),
+    int? maxTokens,
   }) async {
     if (endpoints.isEmpty) throw TranslateException('请先在设置中填写魔搭或智谱的密钥');
     final skipped = <String>[];
     for (final ep in orderByCooldown(endpoints, _cooling)) {
       try {
-        final text = await _call(ep, system, user, temperature, timeout);
+        final text = await _call(ep, messages(ep), temperature, timeout, maxTokens);
         _fails.remove(ep._coolKey);
         _coolUntil.remove(ep._coolKey);
         return AiReply(text, ep, skipped: skipped);
@@ -171,7 +189,8 @@ class AiRouter {
     throw TranslateException('AI 接口均不可用：\n${skipped.join('\n')}');
   }
 
-  Future<String> _call(AiEndpoint ep, String system, String user, double temperature, Duration timeout) async {
+  Future<String> _call(
+      AiEndpoint ep, List<Map<String, dynamic>> messages, double temperature, Duration timeout, int? maxTokens) async {
     var base = ep.baseUrl;
     while (base.endsWith('/')) {
       base = base.substring(0, base.length - 1);
@@ -180,10 +199,8 @@ class AiRouter {
       'model': ep.model,
       'temperature': temperature,
       'stream': false,
-      'messages': [
-        {'role': 'system', 'content': system},
-        {'role': 'user', 'content': user},
-      ],
+      'messages': messages,
+      if (maxTokens != null) 'max_tokens': maxTokens,
       ...ep.extraBody,
     };
     final http.Response resp;
