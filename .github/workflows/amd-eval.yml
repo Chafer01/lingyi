@@ -1,0 +1,30 @@
+name: AMD 实测
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'diag（列模型+首字延迟）'
+        required: false
+        default: 'diag'
+
+permissions:
+  contents: read
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: 诊断
+        if: inputs.mode == 'diag'
+        env:
+          AMD_API_KEY: ${{ secrets.AMD_API_KEY }}
+        run: |
+          python3 tools/amd_eval/diag.py > out.txt 2>&1 || true
+          cat out.txt
+          msg=$(sed 's/%/%25/g' out.txt | awk '{printf "%s%%0A", $0}')
+          echo "::notice title=AMD 诊断::$msg"
