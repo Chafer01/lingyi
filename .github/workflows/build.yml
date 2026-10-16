@@ -213,6 +213,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: 读取版本号
         id: ver
         run: |
@@ -230,8 +232,11 @@ jobs:
           v="${TAG#v}"
           base="https://github.com/${{ github.repository }}/releases/download/$TAG"
           asset() { jq -n --arg url "$base/$1" --argjson size "$(stat -c %s "$1")" --arg sha "$(sha256sum "$1" | cut -d' ' -f1)" '{url:$url,size:$size,sha256:$sha}'; }
-          # 更新说明取自这次提交的说明（去掉署名行）
-          notes=$(git log -1 --format=%B | grep -vE '^(Co-Authored-By|Claude-Session):' | sed -e :a -e '/^\n*$/{$d;N;ba' -e '}')
+          # 更新说明：上一个版本以来的提交说明（去掉署名行；只改测试工具的提交不列出）
+          git fetch --tags --force -q
+          prev=$(git tag -l 'v*' --sort=-v:refname | grep -vx "$TAG" | head -1 || true)
+          notes=$(git log ${prev:+$prev..}HEAD --no-merges --format='【%s】%n%b%x1e' -- lib backend/lingyi_backend pubspec.yaml \
+            | grep -vE '^(Co-Authored-By|Claude-Session):' | tr -d '\036' | cat -s | head -c 6000)
           jq -n --arg version "$v" --arg notes "$notes" --arg page "https://github.com/${{ github.repository }}/releases/tag/$TAG" \
             --arg backend_id "$(bash tools/backend_id.sh)" \
             --argjson windows_app "$(asset lingyi-windows-app.zip)" \
