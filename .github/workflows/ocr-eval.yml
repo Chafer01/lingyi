@@ -29,7 +29,11 @@ jobs:
         if: inputs.diag == 'true'
         env:
           ZHIPU_API_KEY: ${{ secrets.ZHIPU_API_KEY }}
-        run: python3 tools/ocr_eval/diag_zhipu.py
+        run: |
+          python3 tools/ocr_eval/diag_zhipu.py > diag.txt 2>&1
+          cat diag.txt
+          msg=$(sed 's/%/%25/g' diag.txt | awk '{printf "%s%%0A", $0}')
+          echo "::notice title=智谱诊断::$msg"
       - name: 实测
         if: inputs.diag != 'true'
         env:
