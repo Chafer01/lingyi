@@ -201,7 +201,10 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: lingyi-windows
-          path: lingyi-windows.zip
+          path: |
+            lingyi-windows.zip
+            lingyi-windows-app.zip
+            lingyi-windows-backend.zip
 
   release:
     # main 分支编译成功后，按 pubspec.yaml 的版本号发布（同版本重复发布会更新安装包）
@@ -222,6 +225,8 @@ jobs:
         env:
           TAG: ${{ steps.ver.outputs.tag }}
         run: |
+          set -euo pipefail
+          ls -l lingyi-*
           v="${TAG#v}"
           base="https://github.com/${{ github.repository }}/releases/download/$TAG"
           asset() { jq -n --arg url "$base/$1" --argjson size "$(stat -c %s "$1")" --arg sha "$(sha256sum "$1" | cut -d' ' -f1)" '{url:$url,size:$size,sha256:$sha}'; }
