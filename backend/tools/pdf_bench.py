@@ -78,9 +78,10 @@ def main():
         print("没有密钥，跳过")
         return 0
     mgr = JobManager()
-    configs = [(4, False), (8, False), (4, True), (1, True)]   # 最后一个是旧默认
+    os.environ["LINGYI_IGNORE_CACHE"] = "1"
+    configs = [(1, True), (4, False), (8, False), (8, True)]   # 第一个是旧默认
     for qps, terms in configs:
-        print(run(mgr, pdf, pages, qps, terms, limit=12 * 60), flush=True)
+        print(run(mgr, pdf, pages or None, qps, terms, limit=15 * 60), flush=True)
     return 0
 
 

@@ -51,6 +51,9 @@ class AppState {
   /// 最新的外部查询。查词页监听它并自动执行查询。
   final ValueNotifier<IncomingQuery?> incoming = ValueNotifier(null);
 
+  /// 最近一次自动划词的结果（设置页显示，便于排查“为什么没弹出”）。
+  final ValueNotifier<String> autoSelectLog = ValueNotifier('');
+
   /// 当前窗口形态。
   final ValueNotifier<WinView> view = ValueNotifier(WinView.main);
 

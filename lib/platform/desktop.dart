@@ -343,7 +343,22 @@ class Desktop with WindowListener, TrayListener {
     // 在灵译自己的窗口里选中文字时不触发（前台进程就是灵译）。
     // 注意：不能用“主窗口可见”来判断——灵译启动后主窗口默认开着，常被浏览器等挡在后面，
     // 那样会导致自动划词一直不生效，直到按一次热键把窗口变成迷你弹窗为止。
-    if (fg.pid == 0 || fg.pid == WinInput.currentPid || !_appAllowed(fg)) return;
+    void log(String msg) {
+      final t = DateTime.now();
+      final hms = '${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}:'
+          '${t.second.toString().padLeft(2, '0')}';
+      _state.autoSelectLog.value = '$hms  ${fg.exe.isEmpty ? '未知程序' : fg.exe}：$msg';
+    }
+
+    if (fg.pid == 0) return log('取不到前台窗口');
+    if (fg.pid == WinInput.currentPid) return; // 灵译自己的窗口，不记录
+    if (!_appAllowed(fg)) {
+      return log(fg.exe.isEmpty
+          ? '取不到程序名（可能是以管理员身份运行的程序），跳过'
+          : _isTerminal(fg)
+              ? '终端程序，跳过'
+              : '不在“生效范围”的程序列表里，跳过（可把 ${fg.exe} 加进列表，或改成“所有程序”）');
+    }
     // 剪贴板里的图片、文件等会在取词后原样恢复（见 _copySelection），这里不再跳过。
 
     // 给目标程序一点时间更新选区；期间若用户又按下鼠标，就放弃这次。
@@ -351,9 +366,11 @@ class Desktop with WindowListener, TrayListener {
     if (WinInput.leftButtonDown) return;
 
     final text = (await _copySelection(waitForModifiers: false))?.trim();
-    if (text == null || text.isEmpty || text.length > 3000) return;
+    if (text == null || text.isEmpty) return log('没有取到选中的文字（该程序可能不支持 Ctrl+C 复制，或没有选中内容）');
+    if (text.length > 3000) return log('选中的文字超过 3000 字，跳过');
     final now = DateTime.now();
     if (text == _lastAutoText && now.difference(_lastAutoAt) < const Duration(seconds: 3)) return;
+    log('取到 ${text.length} 个字符，已${_settings.autoSelectMode == AutoSelectMode.icon ? '显示小图标' : '弹出翻译'}');
     _lastAutoText = text;
     _lastAutoAt = now;
 

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 
+import '../platform/app_state.dart';
 import '../services/backend.dart';
 import '../services/dict_service.dart';
 import '../services/settings.dart';
@@ -652,6 +653,14 @@ class _AutoSelectSectionState extends State<_AutoSelectSection> {
           value: s.autoSelect,
           onChanged: (v) => s.autoSelect = v,
         ),
+        if (s.autoSelect)
+          ValueListenableBuilder<String>(
+            valueListenable: AppState.instance.autoSelectLog,
+            builder: (context, log, _) => Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+              child: Text('最近一次划词：${log.isEmpty ? '（还没有）' : log}', style: hint),
+            ),
+          ),
         if (s.autoSelect) ...[
           ListTile(
             title: const Text('选中后'),

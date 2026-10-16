@@ -6,6 +6,7 @@
 """
 from __future__ import annotations
 
+import os
 import logging
 import re
 import threading
@@ -165,6 +166,8 @@ def make_translator(lang_in: str, lang_out: str, endpoints: list[dict], timeout:
             super().__init__(lang_in=lang_in, lang_out=lang_out, model=first.model,
                              base_url=first.base_url, api_key=first.api_key)
             self.pool = EndpointPool(eps)
+            if os.environ.get("LINGYI_IGNORE_CACHE") == "1":  # 速度实测用：不读翻译缓存
+                self.ignore_cache = True
             self.add_cache_impact_parameters("endpoints", "|".join(e.model for e in eps))
 
         def _create(self, ep: Endpoint, **kw) -> str:

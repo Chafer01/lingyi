@@ -10,7 +10,7 @@ on:
       pages:
         description: '翻译哪些页'
         required: false
-        default: '1-5'
+        default: 'all'
 
 permissions:
   contents: read
@@ -42,7 +42,7 @@ jobs:
         run: |
           curl -sSL -o /tmp/paper.pdf "${{ inputs.url }}"
           python -c "import pymupdf; d=pymupdf.open('/tmp/paper.pdf'); print('页数', d.page_count)"
-          python tools/pdf_bench.py /tmp/paper.pdf "${{ inputs.pages }}" 2>bench.err | tee bench.txt
+          p="${{ inputs.pages }}"; [ "$p" = all ] && p=""; python tools/pdf_bench.py /tmp/paper.pdf "$p" 2>bench.err | tee bench.txt
           tail -30 bench.err
           msg=$(sed 's/%/%25/g' bench.txt | awk '{printf "%s%%0A", $0}')
           echo "::notice title=PDF 速度实测::$msg"
