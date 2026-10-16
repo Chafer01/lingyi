@@ -125,7 +125,7 @@ class SettingsPage extends StatelessWidget {
           ]),
           const SizedBox(height: 8),
           Center(
-            child: Text('灵译 0.3.1 · 词库数据来自 ECDICT',
+            child: Text('灵译 0.3.2 · 词库数据来自 ECDICT',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Theme.of(context).colorScheme.outline)),
           ),
         ],
@@ -645,7 +645,7 @@ class _AutoSelectSectionState extends State<_AutoSelectSection> {
       children: [
         SwitchListTile(
           title: const Text('选中文字自动翻译'),
-          subtitle: const Text('拖选或双击选中文字后触发。主窗口打开时不打扰。'),
+          subtitle: const Text('在浏览器、PDF 等程序中拖选或双击选中文字后触发；在灵译自己的窗口里选中文字不触发。'),
           value: s.autoSelect,
           onChanged: (v) => s.autoSelect = v,
         ),

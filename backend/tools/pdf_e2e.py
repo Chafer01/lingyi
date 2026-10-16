@@ -146,6 +146,14 @@ def main():
         assert outs.get("mono") and Path(outs["mono"]).stat().st_size > 1000
         assert FakeOpenAI.calls > 0
         assert FakeOpenAI.busy >= 1 and s["models"].get("备用模型", 0) > 0, s
+        # 译文里的中文要用精简后字体族里的思源字体渲染，且能提取出来（没有缺字方框）
+        import pymupdf
+        mono = pymupdf.open(outs["mono"])
+        fonts = sorted({f"{f[3]}|{f[4]}" for page in mono for f in page.get_fonts()})
+        text = "".join(page.get_text() for page in mono)
+        print("译文 PDF 字体：", fonts)
+        assert any("SourceHan" in f for f in fonts), fonts
+        assert "译" in text, text[:200]
         print("PDF 端到端测试通过")
     finally:
         p.stdin.close()

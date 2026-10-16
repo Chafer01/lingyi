@@ -143,25 +143,36 @@ jobs:
           step "安装依赖（不带依赖）" pip install --no-deps -r requirements-nodeps.txt
           # 预先下载公式识别模型，打进安装包，用户首次使用无需联网
           step "下载公式模型" python -c "from lingyi_backend import ocr; ocr._formula()"
+          # PDF 翻译的版面模型、字体、字符映射表、tiktoken 词表打进安装包，用户无需联网下载
+          step "收集 PDF 离线资源" python -m lingyi_backend.pdf_assets collect babeldoc_assets
           step "单元测试" python -m pytest tests -q
           step "PyInstaller 打包" pyinstaller lingyi_backend.spec --noconfirm --log-level WARN
           step "冒烟测试" python tools/smoke_test.py dist/lingyi_backend/lingyi_backend.exe
-      - name: PDF 端到端测试（假 AI 接口）
+      - name: PDF 端到端测试（断网，只用内置离线资源）
         shell: bash
         working-directory: backend
         env:
           PYTHONIOENCODING: utf-8
           PYTHONUTF8: '1'
+          # 代理指向不存在的地址：BabelDOC 若还想下载模型/字体/词表就会失败；本机的假 AI 接口不受影响
+          HTTP_PROXY: http://127.0.0.1:9
+          HTTPS_PROXY: http://127.0.0.1:9
+          NO_PROXY: 127.0.0.1,localhost
         run: |
           set +e
+          # 清空收集资源时留下的缓存，确保用的是安装包里的离线资源
+          rm -rf "$USERPROFILE/.cache/babeldoc"
           python tools/pdf_e2e.py dist/lingyi_backend/lingyi_backend.exe > e2e.txt 2>&1
           code=$?
           cat e2e.txt
           if [ $code -ne 0 ]; then
-            msg=$(tail -30 e2e.txt | sed 's/%/%25/g' | awk '{printf "%s%%0A", $0}')
-            echo "::warning title=PDF 端到端测试未通过::$msg"
+            msg=$(tail -40 e2e.txt | sed 's/%/%25/g' | awk '{printf "%s%%0A", $0}')
+            echo "::error title=PDF 离线端到端测试未通过::$msg"
+          else
+            msg=$(tail -8 e2e.txt | sed 's/%/%25/g' | awk '{printf "%s%%0A", $0}')
+            echo "::notice title=PDF 离线端到端测试通过::$msg"
           fi
-          exit 0
+          exit $code
       - name: 放入安装目录
         shell: pwsh
         run: Copy-Item -Recurse backend\dist\lingyi_backend build\windows\x64\runner\Release\backend

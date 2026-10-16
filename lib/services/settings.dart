@@ -57,10 +57,15 @@ FoxitPDFReader.exe
 FoxitReader.exe
 FoxitPhantomPDF.exe
 PDFXEdit.exe
+CAJViewer.exe
 WINWORD.EXE
+EXCEL.EXE
 POWERPNT.EXE
 OUTLOOK.EXE
+olk.exe
 ONENOTE.EXE
+ms-teams.exe
+Teams.exe
 wps.exe
 wpp.exe
 Typora.exe
@@ -119,6 +124,20 @@ class Settings extends ChangeNotifier {
     _p = await SharedPreferences.getInstance();
     await _migrateAi();
     await _migrateGlossary();
+    await _migrateAutoSelectApps();
+  }
+
+  /// 已经保存过自定义划词程序列表的用户：补上 v0.3.2 新增的默认程序（只补一次，不恢复用户删掉的）。
+  Future<void> _migrateAutoSelectApps() async {
+    if (_p.getBool('autoAppsV2') ?? false) return;
+    final saved = _p.getString('autoSelectApps');
+    if (saved != null) {
+      final have = saved.split(RegExp(r'[\n,;]')).map((e) => e.trim().toLowerCase()).toSet();
+      const added = ['CAJViewer.exe', 'EXCEL.EXE', 'olk.exe', 'ms-teams.exe', 'Teams.exe'];
+      final add = added.where((e) => !have.contains(e.toLowerCase())).toList();
+      if (add.isNotEmpty) await _p.setString('autoSelectApps', '${saved.trimRight()}\n${add.join('\n')}\n');
+    }
+    await _p.setBool('autoAppsV2', true);
   }
 
   /// 已经改过术语表的用户：把新版默认术语里缺少的条目补到末尾（只补一次）。

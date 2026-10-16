@@ -14,6 +14,7 @@ import uuid
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from . import pdf_assets
 from .ai_fallback import AllEndpointsFailed, make_translator
 
 log = logging.getLogger("lingyi.pdf")
@@ -156,8 +157,11 @@ def _friendly_error(e: Exception) -> str:
         return f"AI 接口鉴权失败，请检查密钥。（{msg[:200]}）"
     if "429" in msg or "rate limit" in low:
         return f"AI 接口请求过于频繁，可把“每秒请求数”调低后重试。（{msg[:200]}）"
+    if "asset" in low:
+        return ("下载 PDF 翻译所需的版面模型或字体失败：当前网络无法访问下载服务器"
+                f"（公司网络常见）。请使用内置离线资源的新版灵译。（{msg[:200]}）")
     if "connect" in low or "timeout" in low:
-        return f"连接失败：可能是网络问题，或首次运行需要下载版面分析模型。（{msg[:200]}）"
+        return f"连接失败：请检查网络或 AI 接口地址。（{msg[:200]}）"
     return msg[:500]
 
 
@@ -167,13 +171,15 @@ _layout_model = None
 
 
 def _babel_init():
-    """加载版面模型（首次运行会自动下载模型和字体，之后走缓存）。"""
+    """加载版面模型。模型、字体等资源优先从安装包内置的离线资源恢复，无需联网下载。"""
     global _layout_model
     with _babel_lock:
         if _layout_model is None:
             import babeldoc.format.pdf.high_level as hl
             from babeldoc.docvision.doclayout import DocLayoutModel
             hl.init()
+            pdf_assets.patch_fonts()
+            pdf_assets.install()
             _layout_model = DocLayoutModel.load_onnx()
         return _layout_model
 
@@ -185,7 +191,7 @@ def run_babeldoc(job: Job) -> dict:
     from babeldoc.translator.translator import set_translate_rate_limiter
 
     req = job.req
-    job.stage = "加载版面模型（首次需下载）"
+    job.stage = "加载版面模型"
     layout = _babel_init()
     if job._cancel:
         return {}

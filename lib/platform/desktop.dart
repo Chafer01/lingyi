@@ -311,13 +311,10 @@ class Desktop with WindowListener, TrayListener {
   Future<void> _onSelectGesture(int x, int y) async {
     if (_capturing || !_settings.autoSelect) return;
     final fg = WinInput.foreground();
+    // 在灵译自己的窗口里选中文字时不触发（前台进程就是灵译）。
+    // 注意：不能用“主窗口可见”来判断——灵译启动后主窗口默认开着，常被浏览器等挡在后面，
+    // 那样会导致自动划词一直不生效，直到按一次热键把窗口变成迷你弹窗为止。
     if (fg.pid == 0 || fg.pid == WinInput.currentPid || !_appAllowed(fg)) return;
-    // 主窗口正开着时不打扰。
-    if (_state.view.value == WinView.main &&
-        await windowManager.isVisible() &&
-        !await windowManager.isMinimized()) {
-      return;
-    }
     // 剪贴板里是图片或文件时跳过，免得被选中的文字覆盖。
     if (WinInput.clipboardHasNonText) return;
 

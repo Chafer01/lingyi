@@ -17,6 +17,11 @@ import wordninja
 datas.append((os.path.join(os.path.dirname(wordninja.__file__), "wordninja", "wordninja_words.txt.gz"),
               "wordninja"))
 
+# PDF 翻译的离线资源（版面模型、字体、字符映射表、tiktoken 词表），由 CI 预先收集：
+#   python -m lingyi_backend.pdf_assets collect babeldoc_assets
+if os.path.isdir("babeldoc_assets"):
+    datas.append(("babeldoc_assets", "babeldoc_assets"))
+
 a = Analysis(
     ["run_backend.py"],
     pathex=["."],
